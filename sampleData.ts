@@ -1,0 +1,5 @@
+export type Match={id:string;competition:string;kickoff:string;home:string;away:string;status:'SCHEDULED'|'LIVE'|'FINISHED';score:string|null;homeForm:string[];awayForm:string[];homeGF:number;homeGA:number;awayGF:number;awayGA:number;dataLabel:'DEMO'};
+export const demoMatches:Match[]=[
+{id:'demo-1',competition:'Premier League · DEMO',kickoff:'2026-11-21T15:00:00Z',home:'North London FC',away:'Harbour United',status:'SCHEDULED',score:null,homeForm:['W','W','D','W','L'],awayForm:['L','D','W','L','D'],homeGF:1.8,homeGA:.9,awayGF:1.1,awayGA:1.5,dataLabel:'DEMO'},
+{id:'demo-2',competition:'La Liga · DEMO',kickoff:'2026-11-21T17:30:00Z',home:'Capital Athletic',away:'Valley CF',status:'SCHEDULED',score:null,homeForm:['W','D','W','L','W'],awayForm:['W','W','D','D','L'],homeGF:1.6,homeGA:1,awayGF:1.4,awayGA:1.2,dataLabel:'DEMO'},
+{id:'demo-3',competition:'Serie A · DEMO',kickoff:'2026-11-21T19:45:00Z',home:'Blue City',away:'Old Town Calcio',status:'SCHEDULED',score:null,homeForm:['D','W','L','W','D'],awayForm:['W','L','W','W','D'],homeGF:1.3,homeGA:1.2,awayGF:1.7,awayGA:1.1,dataLabel:'DEMO'}];
