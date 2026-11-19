@@ -1,4 +1,5 @@
 
+
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
@@ -95,6 +96,67 @@ function mapFixture(fixture: any) {
         : null,
     dataLabel: 'SPORTMONKS'
   };
+}
+
+// Save generated picks to Supabase.
+async function savePicksToSupabase(picks: any[]) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return { submitted: 0, configured: false };
+  }
+
+  if (picks.length === 0) {
+    return { submitted: 0, configured: true };
+  }
+
+  const predictionDay = lagosDate(new Date());
+
+  const rows = picks.map((pick: any) => ({
+    match_id: String(pick.matchId),
+    prediction_day: predictionDay,
+    competition: pick.competition || 'Football',
+    kickoff: pick.kickoff || null,
+    home_team: pick.home,
+    away_team: pick.away,
+    market: pick.market,
+    estimated_probability: pick.estimatedProbability,
+    expected_home_goals: pick.expectedGoals?.home ?? null,
+    expected_away_goals: pick.expectedGoals?.away ?? null,
+    model: pick.model || 'Unknown',
+    model_status: pick.modelStatus || 'EXPERIMENTAL_NOT_VALIDATED',
+    status: 'PENDING'
+  }));
+
+  const endpoint = new URL('/rest/v1/predictions', supabaseUrl);
+
+  endpoint.searchParams.set(
+    'on_conflict',
+    'match_id,market,prediction_day'
+  );
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=ignore-duplicates,return=minimal'
+    },
+    body: JSON.stringify(rows),
+    signal: AbortSignal.timeout(15000)
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+
+    throw new Error(
+      `Supabase save failed (HTTP ${response.status}): ${detail}`
+    );
+  }
+
+  return { submitted: rows.length, configured: true };
 }
 
 async function sportmonksGet(url: URL) {
@@ -300,9 +362,7 @@ function summarizeTeam(matches: TeamMatch[]) {
   };
 }
 
-// --------------------------------------------------
-// ELITE MATCH AI 100.0 - AUTOMATIC BEST PICKS ENGINE
-// --------------------------------------------------
+// ELITE MATCH AI BEST PICKS ENGINE
 
 type BestPickCache = {
   expiresAt: number;
@@ -362,7 +422,6 @@ async function analyseFixtureForBestPick(fixture: any) {
     const homeStats = summarizeTeam(homeMatches);
     const awayStats = summarizeTeam(awayMatches);
 
-    // Require at least four recent completed matches per team.
     if (
       homeStats.matchesPlayed < 4 ||
       awayStats.matchesPlayed < 4
@@ -409,11 +468,18 @@ async function analyseFixtureForBestPick(fixture: any) {
       homeStats.matchesPlayed < 5 ||
       awayStats.matchesPlayed < 5
     ) {
-      riskFlags.push('One or both teams have fewer than five recent matches.');
+      riskFlags.push(
+        'One or both teams have fewer than five recent matches.'
+      );
     }
 
-    riskFlags.push('Model probabilities are not calibrated or backtested.');
-    riskFlags.push('Confirmed lineups and injury information are not included.');
+    riskFlags.push(
+      'Model probabilities are not calibrated or backtested.'
+    );
+
+    riskFlags.push(
+      'Confirmed lineups and injury information are not included.'
+    );
 
     const reasons = [
       `${fixture.home} recent average goals scored: ${homeStats.averageGoalsScored}.`,
@@ -484,7 +550,6 @@ app.get('/api/best-picks', async (_req, res) => {
 
     const picks: any[] = [];
 
-    // Process two fixtures at a time to limit API pressure.
     for (let i = 0; i < upcomingFixtures.length; i += 2) {
       const batch = upcomingFixtures.slice(i, i + 2);
 
@@ -516,13 +581,41 @@ app.get('/api/best-picks', async (_req, res) => {
         'These are experimental statistical estimates, not verified betting probabilities or guaranteed outcomes. A 65% screening threshold is not proof of a 65% real-world chance. No pick is better than a weak pick.'
     };
 
+    let archive: {
+      submitted: number;
+      configured: boolean;
+    } = {
+      submitted: 0,
+      configured: Boolean(
+        process.env.SUPABASE_URL &&
+        process.env.SUPABASE_SECRET_KEY
+      )
+    };
+
+    try {
+      archive = await savePicksToSupabase(payload.picks);
+    } catch (archiveError) {
+      console.error(
+        'Supabase prediction archive error:',
+        archiveError
+      );
+    }
+
+    const responsePayload = {
+      ...payload,
+      archive: {
+        configured: archive.configured,
+        submitted: archive.submitted
+      }
+    };
+
     bestPicksCache = {
       expiresAt: Date.now() + 15 * 60 * 1000,
-      payload
+      payload: responsePayload
     };
 
     return res.json({
-      ...payload,
+      ...responsePayload,
       cached: false
     });
   } catch (error) {
