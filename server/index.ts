@@ -902,8 +902,10 @@ app.post('/api/settle-predictions', async (req, res) => {
     }
 
     const fixtures = await sportmonksGet(
-      `https://api.sportmonks.com/v3/football/fixtures/multi/${ids.join(',')}?include=state;scores`
-    );
+  new URL(
+    `https://api.sportmonks.com/v3/football/fixtures/multi/${ids.join(',')}?include=state;scores`
+  )
+);
 
     let settled = 0;
     let skipped = 0;
