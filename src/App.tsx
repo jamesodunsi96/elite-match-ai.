@@ -225,7 +225,32 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
     loadFixtures();
   },[]);
+  const loadPerformance=()=>{
+    setPerformanceLoading(true);
+    setPerformanceError('');
 
+    fetch('/api/performance')
+      .then(async r=>{
+        const data=await r.json();
+
+        if(!r.ok){
+          throw new Error(data.error||'Performance request failed.');
+        }
+
+        return data as PerformanceResponse;
+      })
+      .then(data=>{
+        setPerformance(data);
+      })
+      .catch(error=>{
+        setPerformanceError(
+          error.message||'Unable to load performance.'
+        );
+      })
+      .finally(()=>{
+        setPerformanceLoading(false);
+      });
+  };
   useEffect(()=>{
     if(page==='AI Best Picks'){
       loadBestPicks();
