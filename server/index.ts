@@ -1,11 +1,18 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { demoMatches, type Match } from './sampleData';
 import { predictMatch } from './prediction';
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '../dist');
+
 app.use(cors());
 app.use(express.json());
 
@@ -194,6 +201,20 @@ app.post('/api/analyze', (req, res) => {
   return res.json({
     source: 'MODEL_FROM_USER_INPUT',
     ...predictMatch(match)
+  });
+});
+
+// Serve the built React frontend.
+app.use(express.static(distPath));
+
+// Keep API requests separate from the frontend fallback.
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+
+  res.sendFile(path.join(distPath, 'index.html'), error => {
+    if (error) next(error);
   });
 });
 
