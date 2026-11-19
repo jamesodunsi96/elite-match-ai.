@@ -162,7 +162,9 @@ export default function App(){
   const[bestError,setBestError]=useState('');
   const[bestNotice,setBestNotice]=useState('');
   const[bestMeta,setBestMeta]=useState<BestPicksResponse|null>(null);
-
+const[performance,setPerformance]=useState<PerformanceResponse|null>(null);
+const[performanceLoading,setPerformanceLoading]=useState(false);
+const[performanceError,setPerformanceError]('');
   const loadFixtures=()=>{
     setLoading(true);
 
