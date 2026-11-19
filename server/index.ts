@@ -769,6 +769,69 @@ app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
   }
 });
 
+
+// Read saved predictions and calculate real performance.
+app.get('/api/performance', async (_req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Prediction archive is not configured.',
+      source: 'SUPABASE'
+    });
+  }
+
+  try {
+    const endpoint = new URL('/rest/v1/predictions', supabaseUrl);
+
+    endpoint.searchParams.set(
+      'select',
+      'id,match_id,prediction_day,competition,kickoff,home_team,away_team,market,estimated_probability,status,actual_home_score,actual_away_score,created_at'
+    );
+    endpoint.searchParams.set('order', 'created_at.desc');
+    endpoint.searchParams.set('limit', '100');
+
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Supabase read failed: HTTP ${response.status}`);
+    }
+
+    const records = await response.json();
+
+    const won = records.filter((row: any) => row.status === 'WON').length;
+    const lost = records.filter((row: any) => row.status === 'LOST').length;
+    const pending = records.filter((row: any) => row.status === 'PENDING').length;
+    const settled = won + lost;
+
+    return res.json({
+      source: 'SUPABASE',
+      total: records.length,
+      pending,
+      won,
+      lost,
+      settled,
+      accuracy: settled > 0
+        ? Number(((won / settled) * 100).toFixed(1))
+        : null,
+      records
+    });
+  } catch (error) {
+    console.error('Supabase performance read error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to load saved prediction records.',
+      source: 'SUPABASE'
+    });
+  }
+});
 // Demo predictions.
 app.get('/api/predictions', (_req, res) => {
   res.json({
