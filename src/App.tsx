@@ -864,18 +864,109 @@ const[performanceError,setPerformanceError]=useState('');
                   </div>
 
                   {page==='Performance'?(
-                    <div className="notice">
-                      <ChartNoAxesCombined/>
-                      <div>
-                        <b>Performance tracker is not active yet</b>
-                        <p>
-                          We will add permanent prediction records,
-                          settled results, accuracy and profit/loss tracking
-                          in a later upgrade. No historical performance
-                          figures are being invented.
-                        </p>
-                      </div>
-                    </div>
+                    <div>
+  <div className="section-title">
+    <div>
+      <label>SUPABASE RECORDS</label>
+      <h2>Prediction Performance</h2>
+    </div>
+
+    <button onClick={loadPerformance} disabled={performanceLoading}>
+      <RefreshCw/>
+      {performanceLoading?'Loading...':'Refresh'}
+    </button>
+  </div>
+
+  {performanceLoading&&(
+    <div className="empty">Loading performance records...</div>
+  )}
+
+  {performanceError&&(
+    <div className="notice">
+      <Activity/>
+      <div>
+        <b>Unable to load performance</b>
+        <p>{performanceError}</p>
+      </div>
+    </div>
+  )}
+
+  {performance&&(
+    <>
+      <div className="details">
+        <article>
+          <h3>Total predictions</h3>
+          <h2>{performance.total}</h2>
+        </article>
+
+        <article>
+          <h3>Pending</h3>
+          <h2>{performance.pending}</h2>
+        </article>
+
+        <article>
+          <h3>Won</h3>
+          <h2>{performance.won}</h2>
+        </article>
+
+        <article>
+          <h3>Lost</h3>
+          <h2>{performance.lost}</h2>
+        </article>
+
+        <article>
+          <h3>Accuracy</h3>
+          <h2>
+            {performance.accuracy===null
+              ?'Not available'
+              :pct(performance.accuracy)}
+          </h2>
+        </article>
+      </div>
+
+      <div className="section-title">
+        <div>
+          <label>DATABASE HISTORY</label>
+          <h2>Recorded predictions</h2>
+        </div>
+      </div>
+
+      {performance.records.length===0?(
+        <div className="empty">No prediction records found.</div>
+      ):performance.records.map(record=>(
+        <article className="match" key={`${record.match_id}-${record.market}`}>
+          <div className="teams">
+            <b>{record.home_team}</b>
+            <div>VS</div>
+            <b className="away">{record.away_team}</b>
+          </div>
+
+          <div className="prob">
+            <span>Market</span>
+            <b>{record.market}</b>
+          </div>
+
+          <div className="meta">
+            <span>Prediction status</span>
+            <i>{record.status}</i>
+          </div>
+        </article>
+      ))}
+
+      <div className="notice">
+        <ShieldCheck/>
+        <div>
+          <b>Transparent performance tracking</b>
+          <p>
+            Accuracy is calculated only from settled wins and losses.
+            Pending predictions are not counted. Results are not
+            automatically settled yet.
+          </p>
+        </div>
+      </div>
+    </>
+  )}
+</div>
                   ):(
                     <>
                       <div className="toolbar">
