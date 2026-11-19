@@ -20,7 +20,10 @@ const PORT = Number(process.env.PORT || 3001);
 const SPORTMONKS_TOKEN = process.env.SPORTMONKS_API_TOKEN;
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'elite-match-ai-api' });
+  res.json({
+    ok: true,
+    service: 'elite-match-ai-api'
+  });
 });
 
 function dateString(date: Date) {
@@ -108,7 +111,9 @@ async function sportmonksGet(url: URL) {
   });
 
   if (!response.ok) {
-    throw new Error(`Sportmonks returned HTTP ${response.status}`);
+    throw new Error(
+      `Sportmonks returned HTTP ${response.status}`
+    );
   }
 
   const result: any = await response.json();
@@ -230,7 +235,10 @@ async function getTeamRecentMatches(teamId: string) {
     const homeGoals = Number(homeScore.score.goals);
     const awayGoals = Number(awayScore.score.goals);
 
-    if (!Number.isFinite(homeGoals) || !Number.isFinite(awayGoals)) {
+    if (
+      !Number.isFinite(homeGoals) ||
+      !Number.isFinite(awayGoals)
+    ) {
       continue;
     }
 
@@ -294,6 +302,7 @@ function summarizeTeam(matches: TeamMatch[]) {
   };
 }
 
+// Real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
   try {
     const matches = await getSportmonksFixtures();
@@ -353,6 +362,84 @@ app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
   }
 });
 
+// Generate predictions using real Sportmonks statistics.
+app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
+  const { homeTeamId, awayTeamId } = req.params;
+
+  if (
+    !/^\d+$/.test(homeTeamId) ||
+    !/^\d+$/.test(awayTeamId) ||
+    homeTeamId === awayTeamId
+  ) {
+    return res.status(400).json({
+      error: 'Valid, different Sportmonks team IDs are required.'
+    });
+  }
+
+  try {
+    const [homeMatches, awayMatches] = await Promise.all([
+      getTeamRecentMatches(homeTeamId),
+      getTeamRecentMatches(awayTeamId)
+    ]);
+
+    const homeStats = summarizeTeam(homeMatches);
+    const awayStats = summarizeTeam(awayMatches);
+
+    if (
+      homeStats.matchesPlayed < 3 ||
+      awayStats.matchesPlayed < 3
+    ) {
+      return res.status(422).json({
+        error: 'Not enough recent matches for a statistical estimate.',
+        source: 'SPORTMONKS',
+        home: homeStats,
+        away: awayStats
+      });
+    }
+
+    const match: Match = {
+      id: 'sportmonks-analysis',
+      competition: 'Real match analysis',
+      kickoff: new Date().toISOString(),
+      home: 'Home team',
+      away: 'Away team',
+      status: 'SCHEDULED',
+      score: null,
+      homeForm: homeStats.form,
+      awayForm: awayStats.form,
+      homeGF: homeStats.averageGoalsScored!,
+      homeGA: homeStats.averageGoalsConceded!,
+      awayGF: awayStats.averageGoalsScored!,
+      awayGA: awayStats.averageGoalsConceded!,
+      dataLabel: 'SPORTMONKS'
+    };
+
+    const prediction = predictMatch(match);
+
+    return res.json({
+      source: 'SPORTMONKS',
+      live: true,
+      sampleSize: {
+        home: homeStats.matchesPlayed,
+        away: awayStats.matchesPlayed
+      },
+      home: homeStats,
+      away: awayStats,
+      prediction,
+      disclaimer:
+        'Estimates based on recent completed matches. Not guaranteed betting outcomes.'
+    });
+  } catch (error) {
+    console.error('Real match analysis error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to generate real match analysis right now.',
+      source: 'SPORTMONKS'
+    });
+  }
+});
+
+// Demo predictions.
 app.get('/api/predictions', (_req, res) => {
   res.json({
     source: 'DEMO_DATA',
@@ -423,6 +510,5 @@ app.get('*', (req, res, next) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Elite Match AI API listening on ${PORT}`);
+  console.log(`Elite Match AI API listening on port ${PORT}`);
 });
-  
