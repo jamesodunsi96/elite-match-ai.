@@ -256,7 +256,11 @@ const[performanceError,setPerformanceError]=useState('');
       loadBestPicks();
     }
   },[page]);
-
+  useEffect(()=>{
+    if(page==='Performance'){
+      loadPerformance();
+    }
+  },[page]);
   const filtered=useMemo(
     ()=>matches.filter(m=>
       `${m.home} ${m.away} ${m.competition}`
