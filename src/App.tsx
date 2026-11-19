@@ -8,6 +8,8 @@ import {
 
 type Match={
   id:string;
+  homeTeamId?:string;
+  awayTeamId?:string;
   competition:string;
   kickoff:string;
   home:string;
@@ -27,6 +29,36 @@ type Pred={
   strongestOutcome:string;
   disclaimer:string;
   dataLimitations:string[];
+};
+
+type RecentMatch={
+  fixtureId:string;
+  opponent:string;
+  date:string;
+  result:string;
+  goalsFor:number;
+  goalsAgainst:number;
+};
+
+type TeamSummary={
+  matchesPlayed:number;
+  form:string[];
+  wins:number;
+  draws:number;
+  losses:number;
+  goalsScored:number;
+  goalsConceded:number;
+  averageGoalsScored:number;
+  averageGoalsConceded:number;
+  recentMatches:RecentMatch[];
+};
+
+type TeamStats={
+  source:string;
+  sampleSize:number;
+  home:TeamSummary;
+  away:TeamSummary;
+  notice:string;
 };
 
 const nav=[
@@ -55,6 +87,10 @@ export default function App(){
   const[selected,setSelected]=useState<string|null>(null);
   const[menu,setMenu]=useState(false);
   const[source,setSource]=useState('Connecting');
+
+  const[teamStats,setTeamStats]=useState<TeamStats|null>(null);
+  const[statsLoading,setStatsLoading]=useState(false);
+  const[statsError,setStatsError]=useState('');
 
   useEffect(()=>{
     Promise.all([
@@ -90,14 +126,124 @@ export default function App(){
   );
 
   const chosen=matches.find(m=>m.id===selected);
+  const isReal=source==='SPORTMONKS';
+  const isDemo=source==='DEMO_DATA';
+
+  // Load real team statistics whenever a real fixture is selected.
+  useEffect(()=>{
+    if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
+      setTeamStats(null);
+      setStatsError('');
+      setStatsLoading(false);
+      return;
+    }
+
+    let cancelled=false;
+
+    setTeamStats(null);
+    setStatsError('');
+    setStatsLoading(true);
+
+    fetch(`/api/team-stats/${chosen.homeTeamId}/${chosen.awayTeamId}`)
+      .then(async r=>{
+        const data=await r.json();
+        if(!r.ok){
+          throw new Error(data.error||'Unable to load team statistics.');
+        }
+        return data;
+      })
+      .then(data=>{
+        if(!cancelled){
+          setTeamStats(data);
+        }
+      })
+      .catch(error=>{
+        if(!cancelled){
+          setStatsError(
+            error.message||'Unable to retrieve team statistics.'
+          );
+        }
+      })
+      .finally(()=>{
+        if(!cancelled){
+          setStatsLoading(false);
+        }
+      });
+
+    return ()=>{
+      cancelled=true;
+    };
+  },[chosen?.id,chosen?.homeTeamId,chosen?.awayTeamId,isReal]);
 
   // Demo predictions must never be attached to real Sportmonks fixtures.
-  const pred=source==='DEMO_DATA'
+  const pred=isDemo
     ?preds.find(p=>p.matchId===selected)
     :undefined;
 
-  const isReal=source==='SPORTMONKS';
-  const isDemo=source==='DEMO_DATA';
+  const renderTeamStats=(team:TeamSummary,name:string)=>(
+    <article>
+      <h3>{name}</h3>
+
+      <div className="prob">
+        <span>Recent form</span>
+        <b>{team.form.join(' · ')||'Unavailable'}</b>
+      </div>
+
+      <div className="prob">
+        <span>Matches played</span>
+        <b>{team.matchesPlayed}</b>
+      </div>
+
+      <div className="prob">
+        <span>Wins / Draws / Losses</span>
+        <b>{team.wins} / {team.draws} / {team.losses}</b>
+      </div>
+
+      <div className="prob">
+        <span>Goals scored</span>
+        <b>{team.goalsScored}</b>
+      </div>
+
+      <div className="prob">
+        <span>Goals conceded</span>
+        <b>{team.goalsConceded}</b>
+      </div>
+
+      <hr/>
+
+      <div className="prob">
+        <span>Average goals scored</span>
+        <b>{team.averageGoalsScored.toFixed(2)}</b>
+      </div>
+
+      <div className="prob">
+        <span>Average goals conceded</span>
+        <b>{team.averageGoalsConceded.toFixed(2)}</b>
+      </div>
+
+      <hr/>
+
+      <h3>Recent matches</h3>
+
+      {team.recentMatches.length===0?(
+        <p className="muted">No completed matches available.</p>
+      ):team.recentMatches.map(match=>(
+        <div className="score" key={match.fixtureId}>
+          <span>
+            {match.opponent}
+            <small style={{display:'block'}}>
+              {match.date}
+            </small>
+          </span>
+          <b>
+            {match.goalsFor} - {match.goalsAgainst}
+            {' '}
+            ({match.result})
+          </b>
+        </div>
+      ))}
+    </article>
+  );
 
   return (
     <div className="shell">
@@ -178,6 +324,65 @@ export default function App(){
                 </p>
               </div>
 
+              {isReal&&(
+                <>
+                  <div className="section-title">
+                    <div>
+                      <label>SPORTMONKS DATA</label>
+                      <h2>Real team statistics</h2>
+                    </div>
+                  </div>
+
+                  {statsLoading&&(
+                    <div className="empty">
+                      Loading real team statistics…
+                    </div>
+                  )}
+
+                  {statsError&&(
+                    <div className="notice">
+                      <Activity/>
+                      <div>
+                        <b>Statistics temporarily unavailable</b>
+                        <p>{statsError}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {teamStats&&(
+                    <>
+                      <div className="details">
+                        {renderTeamStats(teamStats.home,chosen.home)}
+                        {renderTeamStats(teamStats.away,chosen.away)}
+                      </div>
+
+                      <div className="notice">
+                        <ShieldCheck/>
+                        <div>
+                          <b>
+                            Real statistics · {teamStats.sampleSize} match sample
+                          </b>
+                          <p>{teamStats.notice}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {!chosen.homeTeamId||!chosen.awayTeamId?(
+                    <div className="notice">
+                      <BrainCircuit/>
+                      <div>
+                        <b>Team IDs unavailable</b>
+                        <p>
+                          This fixture does not currently contain both
+                          Sportmonks team IDs.
+                        </p>
+                      </div>
+                    </div>
+                  ):null}
+                </>
+              )}
+
               {pred?(
                 <>
                   <div className="details">
@@ -256,7 +461,7 @@ export default function App(){
                     </div>
                   </div>
                 </>
-              ):(
+              ):!isReal?(
                 <div className="notice">
                   <BrainCircuit/>
                   <div>
@@ -269,7 +474,7 @@ export default function App(){
                     </p>
                   </div>
                 </div>
-              )}
+              ):null}
             </>
           ):(
             <>
@@ -380,9 +585,9 @@ export default function App(){
                   <div>
                     <b>No verified AI picks yet</b>
                     <p>
-                      Real fixtures are connected, but match-specific
-                      statistics and validated predictions are not ready.
-                      We will not rank fixtures using unrelated demo data.
+                      Real fixtures are connected, and team statistics
+                      can now be viewed inside each match. Validated
+                      predictions are still being developed.
                     </p>
                   </div>
                 </div>
@@ -461,7 +666,7 @@ export default function App(){
                         <strong>
                           <BrainCircuit/>
                           {isReal
-                            ?'Analysis unavailable'
+                            ?'Team stats available'
                             :'Demo model'}
                         </strong>
                         ›
@@ -477,7 +682,7 @@ export default function App(){
                   <b>Data transparency</b>
                   <p>
                     {isReal
-                      ?'Fixture information is supplied by Sportmonks. Verified team statistics, match-specific AI predictions and performance tracking are still being developed.'
+                      ?'Fixture information and team statistics are supplied by Sportmonks. Validated match-specific AI predictions and performance tracking are still being developed.'
                       :isDemo
                       ?'The current fixtures and model estimates are sample data for testing. They are not verified betting predictions.'
                       :'The football data connection is currently unavailable. Please try again later.'}
@@ -495,5 +700,4 @@ export default function App(){
       </main>
     </div>
   );
-                                     }
-              
+}
