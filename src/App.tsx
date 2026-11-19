@@ -1,9 +1,10 @@
 
+
 import {useEffect,useMemo,useState} from 'react';
 import {
   Activity,BrainCircuit,CalendarDays,ChartNoAxesCombined,
   ChevronRight,Clock3,Menu,Search,ShieldCheck,Sparkles,
-  Target,Trophy,Wifi,X
+  Target,Trophy,Wifi,X,RefreshCw
 } from 'lucide-react';
 
 type Match={
@@ -62,6 +63,38 @@ type RealAnalysis={
   disclaimer:string;
 };
 
+type BestPick={
+  matchId:string;
+  competition:string;
+  kickoff:string;
+  home:string;
+  away:string;
+  market:string;
+  estimatedProbability:number;
+  expectedGoals:{home:number;away:number};
+  sampleSize:{home:number;away:number};
+  recentForm:{home:string[];away:string[]};
+  reasons:string[];
+  riskFlags:string[];
+  model:string;
+  modelStatus:string;
+};
+
+type BestPicksResponse={
+  source:string;
+  engine:string;
+  modelStatus:string;
+  generatedAt:string;
+  fixturesFound:number;
+  fixturesAnalysed:number;
+  picksReturned:number;
+  minimumEstimatedProbability:number;
+  picks:BestPick[];
+  notice:string;
+  cached?:boolean;
+  error?:string;
+};
+
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
@@ -79,6 +112,20 @@ const statusLabel=(status:string)=>{
   return status||'Unknown';
 };
 
+const formatKickoff=(date:string)=>{
+  const time=Date.parse(date);
+  if(!Number.isFinite(time)) return 'Time unavailable';
+
+  return new Date(time).toLocaleString('en-GB',{
+    timeZone:'Africa/Lagos',
+    weekday:'short',
+    day:'2-digit',
+    month:'short',
+    hour:'2-digit',
+    minute:'2-digit'
+  })+' WAT';
+};
+
 export default function App(){
   const[page,setPage]=useState('Overview');
   const[matches,setMatches]=useState<Match[]>([]);
@@ -93,7 +140,15 @@ export default function App(){
   const[statsLoading,setStatsLoading]=useState(false);
   const[statsError,setStatsError]=useState('');
 
-  useEffect(()=>{
+  const[bestPicks,setBestPicks]=useState<BestPick[]>([]);
+  const[bestLoading,setBestLoading]=useState(false);
+  const[bestError,setBestError]=useState('');
+  const[bestNotice,setBestNotice]=useState('');
+  const[bestMeta,setBestMeta]=useState<BestPicksResponse|null>(null);
+
+  const loadFixtures=()=>{
+    setLoading(true);
+
     Promise.all([
       fetch('/api/matches').then(r=>{
         if(!r.ok) throw new Error('Matches request failed');
@@ -115,7 +170,48 @@ export default function App(){
     .finally(()=>{
       setLoading(false);
     });
+  };
+
+  const loadBestPicks=()=>{
+    setBestLoading(true);
+    setBestError('');
+
+    fetch('/api/best-picks')
+      .then(async r=>{
+        const data=await r.json();
+
+        if(!r.ok){
+          throw new Error(data.error||'Best Picks request failed.');
+        }
+
+        return data as BestPicksResponse;
+      })
+      .then(data=>{
+        setBestMeta(data);
+        setBestPicks(data.picks||[]);
+        setBestNotice(data.notice||'');
+        if(data.error) setBestError(data.error);
+      })
+      .catch(error=>{
+        setBestError(
+          error.message||'Unable to load AI Best Picks.'
+        );
+        setBestPicks([]);
+      })
+      .finally(()=>{
+        setBestLoading(false);
+      });
+  };
+
+  useEffect(()=>{
+    loadFixtures();
   },[]);
+
+  useEffect(()=>{
+    if(page==='AI Best Picks'){
+      loadBestPicks();
+    }
+  },[page]);
 
   const filtered=useMemo(
     ()=>matches.filter(m=>
@@ -130,7 +226,6 @@ export default function App(){
   const isReal=source==='SPORTMONKS';
   const isDemo=source==='DEMO_DATA';
 
-  // Load real statistics and prediction when a real fixture is selected.
   useEffect(()=>{
     if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
       setAnalysis(null);
@@ -154,9 +249,7 @@ export default function App(){
         return data;
       })
       .then(data=>{
-        if(!cancelled){
-          setAnalysis(data);
-        }
+        if(!cancelled) setAnalysis(data);
       })
       .catch(error=>{
         if(!cancelled){
@@ -166,17 +259,12 @@ export default function App(){
         }
       })
       .finally(()=>{
-        if(!cancelled){
-          setStatsLoading(false);
-        }
+        if(!cancelled) setStatsLoading(false);
       });
 
-    return ()=>{
-      cancelled=true;
-    };
+    return ()=>{cancelled=true;};
   },[chosen?.id,chosen?.homeTeamId,chosen?.awayTeamId,isReal]);
 
-  // Real fixtures use their own live analysis, never demo predictions.
   const pred=isReal
     ?analysis?.prediction
     :isDemo
@@ -234,16 +322,78 @@ export default function App(){
         <div className="score" key={match.fixtureId}>
           <span>
             {match.opponent}
-            <small style={{display:'block'}}>
-              {match.date}
-            </small>
+            <small style={{display:'block'}}>{match.date}</small>
           </span>
           <b>
-            {match.goalsFor} - {match.goalsAgainst}
-            {' '}
-            ({match.result})
+            {match.goalsFor} - {match.goalsAgainst} ({match.result})
           </b>
         </div>
+      ))}
+    </article>
+  );
+
+  const renderBestPick=(pick:BestPick,index:number)=>(
+    <article className="match" key={pick.matchId}>
+      <div className="meta">
+        <span>{pick.competition}</span>
+        <i>RANK #{index+1}</i>
+      </div>
+
+      <div className="teams">
+        <b>{pick.home}</b>
+        <div>
+          VS
+          <small>{formatKickoff(pick.kickoff)}</small>
+        </div>
+        <b className="away">{pick.away}</b>
+      </div>
+
+      <hr/>
+
+      <div className="prob">
+        <span>Model's leading market</span>
+        <b>{pick.market}</b>
+      </div>
+
+      <div className="prob">
+        <span>Experimental model estimate</span>
+        <b>{pct(pick.estimatedProbability)}</b>
+        <div className="bar">
+          <i style={{width:pct(pick.estimatedProbability)}}/>
+        </div>
+      </div>
+
+      <div className="prob">
+        <span>Expected goals</span>
+        <b>{pick.expectedGoals.home.toFixed(2)} - {pick.expectedGoals.away.toFixed(2)}</b>
+      </div>
+
+      <div className="prob">
+        <span>Recent form</span>
+        <b>
+          {pick.recentForm.home.join(' ')}
+          {' / '}
+          {pick.recentForm.away.join(' ')}
+        </b>
+      </div>
+
+      <div className="prob">
+        <span>Recent match sample</span>
+        <b>
+          {pick.sampleSize.home} home team / {pick.sampleSize.away} away team
+        </b>
+      </div>
+
+      <hr/>
+
+      <h3>Analysis notes</h3>
+      {pick.reasons.map((reason,i)=>(
+        <p className="muted" key={i}>• {reason}</p>
+      ))}
+
+      <h3>Risk warnings</h3>
+      {pick.riskFlags.map((flag,i)=>(
+        <p className="muted" key={i}>⚠ {flag}</p>
       ))}
     </article>
   );
@@ -319,10 +469,7 @@ export default function App(){
                   {chosen.home} <em>vs</em> {chosen.away}
                 </h1>
                 <p>
-                  Kick-off {new Date(chosen.kickoff).toLocaleString(
-                    'en-GB',
-                    {timeZone:'Africa/Lagos'}
-                  )} WAT
+                  Kick-off {formatKickoff(chosen.kickoff)}
                   · {statusLabel(chosen.status)}
                 </p>
               </div>
@@ -494,7 +641,7 @@ export default function App(){
                     {page==='Overview'
                       ?'A clearer view of the game, powered by data.'
                       :page==='AI Best Picks'
-                      ?'Only properly supported analysis belongs here. No forced selections.'
+                      ?'Automatically ranked statistical estimates from real fixtures.'
                       :page==='Performance'
                       ?'Honest tracking starts with recording every prediction.'
                       :'Explore fixtures and match information.'}
@@ -534,165 +681,255 @@ export default function App(){
                 </div>
               )}
 
-              <div className="stats">
-                {[
-                  [
-                    CalendarDays,
-                    'Fixtures loaded',
-                    String(matches.length).padStart(2,'0'),
-                    isReal?'Sportmonks fixtures':'Current app dataset'
-                  ],
-                  [
-                    BrainCircuit,
-                    'AI analyses',
-                    isReal?'—':String(preds.length).padStart(2,'0'),
-                    isReal?'Analysis runs when a fixture is opened':'Demo baseline only'
-                  ],
-                  [
-                    Target,
-                    'Verified accuracy',
-                    '—',
-                    'Awaiting tracked results'
-                  ],
-                  [
-                    Wifi,
-                    'Data connection',
-                    isReal?'Connected':isDemo?'Demo':'Check',
-                    isReal?'Sportmonks feed connected':'Real provider not confirmed'
-                  ]
-                ].map(([Icon,title,value,note]:any)=>(
-                  <article key={title}>
-                    <div><Icon/>{title}</div>
-                    <strong>{value}</strong>
-                    <small>{note}</small>
-                  </article>
-                ))}
-              </div>
-
-              <div className="section-title">
-                <div>
-                  <label>MATCH CENTRE</label>
-                  <h2>
-                    {page==='AI Best Picks'
-                      ?'Fixtures awaiting analysis'
-                      :'Upcoming fixtures'}
-                  </h2>
-                </div>
-                <button onClick={()=>setPage('Fixtures')}>
-                  All fixtures　›
-                </button>
-              </div>
-
-              {page==='AI Best Picks'&&isReal&&(
-                <div className="notice">
-                  <BrainCircuit/>
-                  <div>
-                    <b>Open a fixture to generate its analysis</b>
-                    <p>
-                      Select any real fixture to load recent team form,
-                      statistical probabilities and scoreline estimates.
-                      These estimates are illustrative and not calibrated betting advice.
-                    </p>
+              {page==='AI Best Picks'?(
+                <>
+                  <div className="stats">
+                    {[
+                      ['Fixtures found',bestMeta?.fixturesFound??'—'],
+                      ['Fixtures analysed',bestMeta?.fixturesAnalysed??'—'],
+                      ['Picks returned',bestMeta?.picksReturned??'—'],
+                      ['Engine','100.0']
+                    ].map(([title,value])=>(
+                      <article key={String(title)}>
+                        <div><BrainCircuit/>{title}</div>
+                        <strong>{value}</strong>
+                        <small>Experimental engine output</small>
+                      </article>
+                    ))}
                   </div>
-                </div>
-              )}
 
-              <div className="toolbar">
-                <div className="search">
-                  <Search/>
-                  <input
-                    value={query}
-                    onChange={e=>setQuery(e.target.value)}
-                    placeholder="Search team or competition..."
-                  />
-                </div>
-                <small>
-                  {isReal
-                    ?'Real fixtures · Sportmonks'
-                    :isDemo
-                    ?'Demo fixtures'
-                    :'Waiting for fixture data'}
-                </small>
-              </div>
-
-              {loading?(
-                <div className="empty">Loading match centre…</div>
-              ):filtered.length===0?(
-                <div className="empty">No matching fixtures found.</div>
-              ):(
-                <div className="matches">
-                  {filtered.map(m=>(
+                  <div className="section-title">
+                    <div>
+                      <label>ELITE MATCH AI 100.0</label>
+                      <h2>Automatically ranked Best Picks</h2>
+                    </div>
                     <button
-                      className="match"
-                      key={m.id}
-                      onClick={()=>setSelected(m.id)}
+                      onClick={loadBestPicks}
+                      disabled={bestLoading}
                     >
-                      <div className="meta">
-                        <span>{m.competition}</span>
-                        <i>{statusLabel(m.status)}</i>
-                      </div>
-
-                      <div className="teams">
-                        <b>
-                          <span>{m.home[0]}</span>
-                          {m.home}
-                        </b>
-
-                        <div>
-                          {m.score||'VS'}
-                          <small>
-                            {new Date(m.kickoff).toLocaleTimeString(
-                              'en-GB',
-                              {
-                                hour:'2-digit',
-                                minute:'2-digit',
-                                timeZone:'Africa/Lagos'
-                              }
-                            )} WAT
-                          </small>
-                        </div>
-
-                        <b className="away">
-                          {m.away}
-                          <span>{m.away[0]}</span>
-                        </b>
-                      </div>
-
-                      <div className="match-foot">
-                        <span>
-                          <Clock3/>
-                          {new Date(m.kickoff).toLocaleDateString(
-                            'en-GB',
-                            {day:'2-digit',month:'short'}
-                          )}
-                        </span>
-
-                        <strong>
-                          <BrainCircuit/>
-                          {isReal
-                            ?'Match analysis available'
-                            :'Demo model'}
-                        </strong>
-                        ›
-                      </div>
+                      <RefreshCw/>
+                      {bestLoading?'Analysing…':'Refresh'}
                     </button>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              <div className="notice">
-                <ShieldCheck/>
-                <div>
-                  <b>Data transparency</b>
-                  <p>
-                    {isReal
-                      ?'Fixture information and team statistics are supplied by Sportmonks. Match-specific estimates are generated when a fixture is opened. Predictions are not validated betting advice.'
-                      :isDemo
-                      ?'The current fixtures and model estimates are sample data for testing. They are not verified betting predictions.'
-                      :'The football data connection is currently unavailable. Please try again later.'}
-                  </p>
-                </div>
-              </div>
+                  {bestMeta&&(
+                    <div className="notice">
+                      <BrainCircuit/>
+                      <div>
+                        <b>
+                          {bestMeta.engine} · {bestMeta.modelStatus}
+                        </b>
+                        <p>
+                          Analysed {bestMeta.fixturesAnalysed} upcoming fixtures.
+                          Generated: {formatKickoff(bestMeta.generatedAt)}
+                          {bestMeta.cached?' · Cached result':''}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {bestError&&(
+                    <div className="notice">
+                      <Activity/>
+                      <div>
+                        <b>Best Picks unavailable</b>
+                        <p>{bestError}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {bestLoading?(
+                    <div className="empty">
+                      <BrainCircuit/>
+                      Analysing upcoming fixtures and ranking markets…
+                    </div>
+                  ):bestPicks.length===0?(
+                    <div className="empty">
+                      No qualifying picks are currently available.
+                      The engine will not invent selections.
+                    </div>
+                  ):(
+                    <div className="details">
+                      {bestPicks.map(renderBestPick)}
+                    </div>
+                  )}
+
+                  {bestNotice&&(
+                    <div className="notice">
+                      <ShieldCheck/>
+                      <div>
+                        <b>Important model warning</b>
+                        <p>{bestNotice}</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ):(
+                <>
+                  <div className="stats">
+                    {[
+                      [
+                        CalendarDays,
+                        'Fixtures loaded',
+                        String(matches.length).padStart(2,'0'),
+                        isReal?'Sportmonks fixtures':'Current app dataset'
+                      ],
+                      [
+                        BrainCircuit,
+                        'AI analyses',
+                        isReal?'—':String(preds.length).padStart(2,'0'),
+                        isReal?'Analysis runs when a fixture is opened':'Demo baseline only'
+                      ],
+                      [
+                        Target,
+                        'Verified accuracy',
+                        '—',
+                        'Awaiting tracked results'
+                      ],
+                      [
+                        Wifi,
+                        'Data connection',
+                        isReal?'Connected':isDemo?'Demo':'Check',
+                        isReal?'Sportmonks feed connected':'Real provider not confirmed'
+                      ]
+                    ].map(([Icon,title,value,note]:any)=>(
+                      <article key={title}>
+                        <div><Icon/>{title}</div>
+                        <strong>{value}</strong>
+                        <small>{note}</small>
+                      </article>
+                    ))}
+                  </div>
+
+                  <div className="section-title">
+                    <div>
+                      <label>MATCH CENTRE</label>
+                      <h2>
+                        {page==='Performance'
+                          ?'Prediction performance'
+                          :'Upcoming fixtures'}
+                      </h2>
+                    </div>
+                    <button onClick={loadFixtures}>
+                      Refresh fixtures
+                    </button>
+                  </div>
+
+                  {page==='Performance'?(
+                    <div className="notice">
+                      <ChartNoAxesCombined/>
+                      <div>
+                        <b>Performance tracker is not active yet</b>
+                        <p>
+                          We will add permanent prediction records,
+                          settled results, accuracy and profit/loss tracking
+                          in a later upgrade. No historical performance
+                          figures are being invented.
+                        </p>
+                      </div>
+                    </div>
+                  ):(
+                    <>
+                      <div className="toolbar">
+                        <div className="search">
+                          <Search/>
+                          <input
+                            value={query}
+                            onChange={e=>setQuery(e.target.value)}
+                            placeholder="Search team or competition..."
+                          />
+                        </div>
+                        <small>
+                          {isReal
+                            ?'Real fixtures · Sportmonks'
+                            :isDemo
+                            ?'Demo fixtures'
+                            :'Waiting for fixture data'}
+                        </small>
+                      </div>
+
+                      {loading?(
+                        <div className="empty">Loading match centre…</div>
+                      ):filtered.length===0?(
+                        <div className="empty">No matching fixtures found.</div>
+                      ):(
+                        <div className="matches">
+                          {filtered.map(m=>(
+                            <button
+                              className="match"
+                              key={m.id}
+                              onClick={()=>setSelected(m.id)}
+                            >
+                              <div className="meta">
+                                <span>{m.competition}</span>
+                                <i>{statusLabel(m.status)}</i>
+                              </div>
+
+                              <div className="teams">
+                                <b>
+                                  <span>{m.home[0]}</span>
+                                  {m.home}
+                                </b>
+
+                                <div>
+                                  {m.score||'VS'}
+                                  <small>
+                                    {new Date(m.kickoff).toLocaleTimeString(
+                                      'en-GB',
+                                      {
+                                        hour:'2-digit',
+                                        minute:'2-digit',
+                                        timeZone:'Africa/Lagos'
+                                      }
+                                    )} WAT
+                                  </small>
+                                </div>
+
+                                <b className="away">
+                                  {m.away}
+                                  <span>{m.away[0]}</span>
+                                </b>
+                              </div>
+
+                              <div className="match-foot">
+                                <span>
+                                  <Clock3/>
+                                  {new Date(m.kickoff).toLocaleDateString(
+                                    'en-GB',
+                                    {day:'2-digit',month:'short'}
+                                  )}
+                                </span>
+
+                                <strong>
+                                  <BrainCircuit/>
+                                  {isReal
+                                    ?'Match analysis available'
+                                    :'Demo model'}
+                                </strong>
+                                ›
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <div className="notice">
+                    <ShieldCheck/>
+                    <div>
+                      <b>Data transparency</b>
+                      <p>
+                        {isReal
+                          ?'Fixture information and team statistics are supplied by Sportmonks. Match-specific estimates are generated when a fixture is opened. Predictions are not validated betting advice.'
+                          :isDemo
+                          ?'The current fixtures and model estimates are sample data for testing. They are not verified betting predictions.'
+                          :'The football data connection is currently unavailable. Please try again later.'}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </section>
