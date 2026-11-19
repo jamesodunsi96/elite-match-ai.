@@ -94,7 +94,24 @@ type BestPicksResponse={
   cached?:boolean;
   error?:string;
 };
+type PerformanceRecord={
+  match_id:string;
+  home_team:string;
+  away_team:string;
+  market:string;
+  status:string;
+};
 
+type PerformanceResponse={
+  source:string;
+  total:number;
+  pending:number;
+  won:number;
+  lost:number;
+  settled:number;
+  accuracy:number|null;
+  records:PerformanceRecord[];
+};
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
