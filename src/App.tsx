@@ -1,3 +1,4 @@
+TypeScript
 
 import {useEffect,useMemo,useState} from 'react';
 import {
@@ -20,7 +21,7 @@ type Match={
 };
 
 type Pred={
-  matchId:string;
+  matchId?:string;
   model:string;
   status:string;
   expectedGoals:{home:number;away:number};
@@ -53,12 +54,13 @@ type TeamSummary={
   recentMatches:RecentMatch[];
 };
 
-type TeamStats={
+type RealAnalysis={
   source:string;
-  sampleSize:number;
+  sampleSize:{home:number;away:number};
   home:TeamSummary;
   away:TeamSummary;
-  notice:string;
+  prediction:Pred;
+  disclaimer:string;
 };
 
 const nav=[
@@ -88,7 +90,7 @@ export default function App(){
   const[menu,setMenu]=useState(false);
   const[source,setSource]=useState('Connecting');
 
-  const[teamStats,setTeamStats]=useState<TeamStats|null>(null);
+  const[analysis,setAnalysis]=useState<RealAnalysis|null>(null);
   const[statsLoading,setStatsLoading]=useState(false);
   const[statsError,setStatsError]=useState('');
 
@@ -129,10 +131,10 @@ export default function App(){
   const isReal=source==='SPORTMONKS';
   const isDemo=source==='DEMO_DATA';
 
-  // Load real team statistics whenever a real fixture is selected.
+  // Load real statistics and prediction when a real fixture is selected.
   useEffect(()=>{
     if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
-      setTeamStats(null);
+      setAnalysis(null);
       setStatsError('');
       setStatsLoading(false);
       return;
@@ -140,27 +142,27 @@ export default function App(){
 
     let cancelled=false;
 
-    setTeamStats(null);
+    setAnalysis(null);
     setStatsError('');
     setStatsLoading(true);
 
-    fetch(`/api/team-stats/${chosen.homeTeamId}/${chosen.awayTeamId}`)
+    fetch(`/api/analyze/${chosen.homeTeamId}/${chosen.awayTeamId}`)
       .then(async r=>{
         const data=await r.json();
         if(!r.ok){
-          throw new Error(data.error||'Unable to load team statistics.');
+          throw new Error(data.error||'Unable to load match analysis.');
         }
         return data;
       })
       .then(data=>{
         if(!cancelled){
-          setTeamStats(data);
+          setAnalysis(data);
         }
       })
       .catch(error=>{
         if(!cancelled){
           setStatsError(
-            error.message||'Unable to retrieve team statistics.'
+            error.message||'Unable to retrieve match analysis.'
           );
         }
       })
@@ -175,8 +177,10 @@ export default function App(){
     };
   },[chosen?.id,chosen?.homeTeamId,chosen?.awayTeamId,isReal]);
 
-  // Demo predictions must never be attached to real Sportmonks fixtures.
-  const pred=isDemo
+  // Real fixtures use their own live analysis, never demo predictions.
+  const pred=isReal
+    ?analysis?.prediction
+    :isDemo
     ?preds.find(p=>p.matchId===selected)
     :undefined;
 
@@ -329,13 +333,13 @@ export default function App(){
                   <div className="section-title">
                     <div>
                       <label>SPORTMONKS DATA</label>
-                      <h2>Real team statistics</h2>
+                      <h2>Real team statistics and match analysis</h2>
                     </div>
                   </div>
 
                   {statsLoading&&(
                     <div className="empty">
-                      Loading real team statistics…
+                      Loading real team statistics and prediction…
                     </div>
                   )}
 
@@ -343,26 +347,26 @@ export default function App(){
                     <div className="notice">
                       <Activity/>
                       <div>
-                        <b>Statistics temporarily unavailable</b>
+                        <b>Match analysis temporarily unavailable</b>
                         <p>{statsError}</p>
                       </div>
                     </div>
                   )}
 
-                  {teamStats&&(
+                  {analysis&&(
                     <>
                       <div className="details">
-                        {renderTeamStats(teamStats.home,chosen.home)}
-                        {renderTeamStats(teamStats.away,chosen.away)}
+                        {renderTeamStats(analysis.home,chosen.home)}
+                        {renderTeamStats(analysis.away,chosen.away)}
                       </div>
 
                       <div className="notice">
                         <ShieldCheck/>
                         <div>
                           <b>
-                            Real statistics · {teamStats.sampleSize} match sample
+                            Sportmonks data · Home sample: {analysis.sampleSize.home} matches · Away sample: {analysis.sampleSize.away} matches
                           </b>
-                          <p>{teamStats.notice}</p>
+                          <p>{analysis.disclaimer}</p>
                         </div>
                       </div>
                     </>
@@ -452,11 +456,12 @@ export default function App(){
                   <div className="notice">
                     <ShieldCheck/>
                     <div>
-                      <b>Demo model limitations</b>
+                      <b>{isReal?'Statistical model limitations':'Demo model limitations'}</b>
                       <p>
-                        These estimates use sample data, not verified
-                        statistics for this real fixture. They are not
-                        validated betting advice.
+                        {isReal
+                          ?(analysis?.prediction.dataLimitations||[]).join(' · ')
+                          :'These estimates use sample data, not verified statistics for this real fixture.'}
+                        {' '}These estimates are illustrative, not validated betting advice.
                       </p>
                     </div>
                   </div>
@@ -541,8 +546,8 @@ export default function App(){
                   [
                     BrainCircuit,
                     'AI analyses',
-                    isReal?'00':String(preds.length).padStart(2,'0'),
-                    isReal?'Real-fixture analysis not connected':'Demo baseline only'
+                    isReal?'—':String(preds.length).padStart(2,'0'),
+                    isReal?'Analysis runs when a fixture is opened':'Demo baseline only'
                   ],
                   [
                     Target,
@@ -583,11 +588,11 @@ export default function App(){
                 <div className="notice">
                   <BrainCircuit/>
                   <div>
-                    <b>No verified AI picks yet</b>
+                    <b>Open a fixture to generate its analysis</b>
                     <p>
-                      Real fixtures are connected, and team statistics
-                      can now be viewed inside each match. Validated
-                      predictions are still being developed.
+                      Select any real fixture to load recent team form,
+                      statistical probabilities and scoreline estimates.
+                      These estimates are illustrative and not calibrated betting advice.
                     </p>
                   </div>
                 </div>
@@ -666,7 +671,7 @@ export default function App(){
                         <strong>
                           <BrainCircuit/>
                           {isReal
-                            ?'Team stats available'
+                            ?'Match analysis available'
                             :'Demo model'}
                         </strong>
                         ›
@@ -682,7 +687,7 @@ export default function App(){
                   <b>Data transparency</b>
                   <p>
                     {isReal
-                      ?'Fixture information and team statistics are supplied by Sportmonks. Validated match-specific AI predictions and performance tracking are still being developed.'
+                      ?'Fixture information and team statistics are supplied by Sportmonks. Match-specific estimates are generated when a fixture is opened. Predictions are not validated betting advice.'
                       :isDemo
                       ?'The current fixtures and model estimates are sample data for testing. They are not verified betting predictions.'
                       :'The football data connection is currently unavailable. Please try again later.'}
