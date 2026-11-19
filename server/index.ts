@@ -832,6 +832,205 @@ app.get('/api/performance', async (_req, res) => {
     });
   }
 });
+// Automatically settle predictions with verified full-time scores.
+app.post('/api/settle-predictions', async (req, res) => {
+  const settlementSecret = process.env.SETTLEMENT_CRON_SECRET;
+  const suppliedSecret = req.headers['x-settlement-secret'];
+
+  if (
+    !settlementSecret ||
+    typeof suppliedSecret !== 'string' ||
+    suppliedSecret !== settlementSecret
+  ) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey || !SPORTMONKS_TOKEN) {
+    return res.status(500).json({
+      error: 'Server configuration is incomplete.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(`${supabaseUrl}/rest/v1/predictions`);
+
+    endpoint.searchParams.set('select', 'id,match_id,market');
+    endpoint.searchParams.set('status', 'eq.PENDING');
+    endpoint.searchParams.append('kickoff', 'not.is.null');
+    endpoint.searchParams.append(
+      'kickoff',
+      `lte.${new Date().toISOString()}`
+    );
+    endpoint.searchParams.set('order', 'kickoff.asc');
+    endpoint.searchParams.set('limit', '50');
+
+    const pendingResponse = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!pendingResponse.ok) {
+      throw new Error('Could not read pending predictions.');
+    }
+
+    const pending = await pendingResponse.json();
+
+    if (!pending.length) {
+      return res.json({
+        checked: 0,
+        settled: 0,
+        message: 'No pending predictions are ready for settlement.'
+      });
+    }
+
+    const ids = pending
+      .map((row: any) => String(row.match_id))
+      .filter((id: string) => /^\d+$/.test(id));
+
+    if (!ids.length) {
+      return res.json({
+        checked: pending.length,
+        settled: 0,
+        message: 'No valid fixture IDs were found.'
+      });
+    }
+
+    const fixtures = await sportmonksGet(
+      `https://api.sportmonks.com/v3/football/fixtures/multi/${ids.join(',')}?include=state;scores`
+    );
+
+    let settled = 0;
+    let skipped = 0;
+    const results: any[] = [];
+
+    for (const row of pending) {
+      const fixture = fixtures.find(
+        (item: any) => String(item.id) === String(row.match_id)
+      );
+
+      if (!fixture) {
+        skipped++;
+        continue;
+      }
+
+      const state = String(
+        fixture.state?.developer_name || fixture.state?.name || ''
+      ).toUpperCase();
+
+      if (!['FT', 'FINISHED', 'FULL_TIME'].includes(state)) {
+        skipped++;
+        continue;
+      }
+
+      const currentScores = (fixture.scores || []).filter(
+        (item: any) => item.description === 'CURRENT'
+      );
+
+      const homeScore = currentScores.find(
+        (item: any) => item.score?.participant === 'home'
+      )?.score?.goals;
+
+      const awayScore = currentScores.find(
+        (item: any) => item.score?.participant === 'away'
+      )?.score?.goals;
+
+      if (
+        !Number.isInteger(homeScore) ||
+        !Number.isInteger(awayScore)
+      ) {
+        skipped++;
+        continue;
+      }
+
+      const totalGoals = homeScore + awayScore;
+      const market = String(row.market).trim().toLowerCase();
+
+      let won: boolean | null = null;
+
+      if (market === 'over 1.5 goals') won = totalGoals >= 2;
+      else if (market === 'under 1.5 goals') won = totalGoals <= 1;
+      else if (market === 'over 2.5 goals') won = totalGoals >= 3;
+      else if (market === 'under 2.5 goals') won = totalGoals <= 2;
+      else if (market === 'under 3.5 goals') won = totalGoals <= 3;
+      else if (
+        ['btts yes', 'btts - yes', 'both teams to score - yes'].includes(market)
+      ) won = homeScore > 0 && awayScore > 0;
+      else if (
+        ['btts no', 'btts - no', 'both teams to score - no'].includes(market)
+      ) won = homeScore === 0 || awayScore === 0;
+      else if (['home or draw', '1x'].includes(market))
+        won = homeScore >= awayScore;
+      else if (['away or draw', 'x2'].includes(market))
+        won = awayScore >= homeScore;
+      else if (['home win', '1'].includes(market))
+        won = homeScore > awayScore;
+      else if (['draw', 'x'].includes(market))
+        won = homeScore === awayScore;
+      else if (['away win', '2'].includes(market))
+        won = awayScore > homeScore;
+
+      if (won === null) {
+        skipped++;
+        continue;
+      }
+
+      const updateUrl = new URL(
+        `${supabaseUrl}/rest/v1/predictions`
+      );
+
+      updateUrl.searchParams.set('id', `eq.${row.id}`);
+      updateUrl.searchParams.set('status', 'eq.PENDING');
+
+      const updateResponse = await fetch(updateUrl, {
+        method: 'PATCH',
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: won ? 'WON' : 'LOST',
+          actual_home_score: homeScore,
+          actual_away_score: awayScore
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (!updateResponse.ok) {
+        skipped++;
+        continue;
+      }
+
+      settled++;
+      results.push({
+        match_id: row.match_id,
+        market: row.market,
+        status: won ? 'WON' : 'LOST',
+        score: `${homeScore}-${awayScore}`
+      });
+    }
+
+    return res.json({
+      checked: pending.length,
+      settled,
+      skipped,
+      results
+    });
+  } catch (error) {
+    console.error('Prediction settlement error:', error);
+
+    return res.status(502).json({
+      error: 'Settlement could not be completed.'
+    });
+  }
+});
 // Demo predictions.
 app.get('/api/predictions', (_req, res) => {
   res.json({
