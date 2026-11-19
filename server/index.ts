@@ -300,6 +300,245 @@ function summarizeTeam(matches: TeamMatch[]) {
   };
 }
 
+// --------------------------------------------------
+// ELITE MATCH AI 100.0 - AUTOMATIC BEST PICKS ENGINE
+// --------------------------------------------------
+
+type BestPickCache = {
+  expiresAt: number;
+  payload: any;
+};
+
+let bestPicksCache: BestPickCache | null = null;
+
+function getMarketCandidates(probabilities: any) {
+  return [
+    {
+      market: 'Home or Draw',
+      probability: probabilities.homeOrDraw
+    },
+    {
+      market: 'Away or Draw',
+      probability: probabilities.awayOrDraw
+    },
+    {
+      market: 'Over 1.5 Goals',
+      probability: probabilities.over15
+    },
+    {
+      market: 'Under 3.5 Goals',
+      probability: probabilities.under35
+    },
+    {
+      market: 'BTTS - Yes',
+      probability: probabilities.bttsYes
+    },
+    {
+      market: 'BTTS - No',
+      probability: probabilities.bttsNo
+    },
+    {
+      market: 'Over 2.5 Goals',
+      probability: probabilities.over25
+    }
+  ].filter(
+    item =>
+      typeof item.probability === 'number' &&
+      Number.isFinite(item.probability)
+  );
+}
+
+async function analyseFixtureForBestPick(fixture: any) {
+  if (!fixture.homeTeamId || !fixture.awayTeamId) {
+    return null;
+  }
+
+  try {
+    const [homeMatches, awayMatches] = await Promise.all([
+      getTeamRecentMatches(fixture.homeTeamId),
+      getTeamRecentMatches(fixture.awayTeamId)
+    ]);
+
+    const homeStats = summarizeTeam(homeMatches);
+    const awayStats = summarizeTeam(awayMatches);
+
+    // Require at least four recent completed matches per team.
+    if (
+      homeStats.matchesPlayed < 4 ||
+      awayStats.matchesPlayed < 4
+    ) {
+      return null;
+    }
+
+    const match: Match = {
+      id: fixture.id,
+      competition: fixture.competition,
+      kickoff: fixture.kickoff,
+      home: fixture.home,
+      away: fixture.away,
+      status: fixture.status,
+      score: null,
+      homeForm: homeStats.form,
+      awayForm: awayStats.form,
+      homeGF: homeStats.averageGoalsScored!,
+      homeGA: homeStats.averageGoalsConceded!,
+      awayGF: awayStats.averageGoalsScored!,
+      awayGA: awayStats.averageGoalsConceded!,
+      dataLabel: 'DEMO'
+    };
+
+    const prediction = predictMatch(match);
+
+    const candidates = getMarketCandidates(
+      prediction.probabilities
+    );
+
+    candidates.sort(
+      (a, b) => b.probability - a.probability
+    );
+
+    const bestMarket = candidates[0];
+
+    if (!bestMarket || bestMarket.probability < 65) {
+      return null;
+    }
+
+    const riskFlags: string[] = [];
+
+    if (
+      homeStats.matchesPlayed < 5 ||
+      awayStats.matchesPlayed < 5
+    ) {
+      riskFlags.push('One or both teams have fewer than five recent matches.');
+    }
+
+    riskFlags.push('Model probabilities are not calibrated or backtested.');
+    riskFlags.push('Confirmed lineups and injury information are not included.');
+
+    const reasons = [
+      `${fixture.home} recent average goals scored: ${homeStats.averageGoalsScored}.`,
+      `${fixture.away} recent average goals scored: ${awayStats.averageGoalsScored}.`,
+      `${fixture.home} recent average goals conceded: ${homeStats.averageGoalsConceded}.`,
+      `${fixture.away} recent average goals conceded: ${awayStats.averageGoalsConceded}.`
+    ];
+
+    return {
+      matchId: fixture.id,
+      competition: fixture.competition,
+      kickoff: fixture.kickoff,
+      home: fixture.home,
+      away: fixture.away,
+      market: bestMarket.market,
+      estimatedProbability: bestMarket.probability,
+      expectedGoals: prediction.expectedGoals,
+      sampleSize: {
+        home: homeStats.matchesPlayed,
+        away: awayStats.matchesPlayed
+      },
+      recentForm: {
+        home: homeStats.form,
+        away: awayStats.form
+      },
+      reasons,
+      riskFlags,
+      model: prediction.model,
+      modelStatus: 'ILLUSTRATIVE_NOT_VALIDATED'
+    };
+  } catch (error) {
+    console.error(
+      `Best Picks analysis failed for fixture ${fixture.id}:`,
+      error
+    );
+
+    return null;
+  }
+}
+
+// Automatically analyse and rank upcoming fixtures.
+app.get('/api/best-picks', async (_req, res) => {
+  if (
+    bestPicksCache &&
+    bestPicksCache.expiresAt > Date.now()
+  ) {
+    return res.json({
+      ...bestPicksCache.payload,
+      cached: true
+    });
+  }
+
+  try {
+    const allFixtures = await getSportmonksFixtures();
+
+    const upcomingFixtures = allFixtures
+      .filter((fixture: any) => {
+        const kickoffTime = Date.parse(fixture.kickoff);
+
+        return (
+          fixture.homeTeamId &&
+          fixture.awayTeamId &&
+          Number.isFinite(kickoffTime) &&
+          kickoffTime > Date.now()
+        );
+      })
+      .slice(0, 12);
+
+    const picks: any[] = [];
+
+    // Process two fixtures at a time to limit API pressure.
+    for (let i = 0; i < upcomingFixtures.length; i += 2) {
+      const batch = upcomingFixtures.slice(i, i + 2);
+
+      const results = await Promise.all(
+        batch.map(analyseFixtureForBestPick)
+      );
+
+      for (const result of results) {
+        if (result) picks.push(result);
+      }
+    }
+
+    picks.sort(
+      (a, b) =>
+        b.estimatedProbability - a.estimatedProbability
+    );
+
+    const payload = {
+      source: 'SPORTMONKS',
+      engine: 'ELITE_MATCH_AI_100.0_BEST_PICKS',
+      modelStatus: 'EXPERIMENTAL_NOT_VALIDATED',
+      generatedAt: new Date().toISOString(),
+      fixturesFound: allFixtures.length,
+      fixturesAnalysed: upcomingFixtures.length,
+      picksReturned: Math.min(picks.length, 10),
+      minimumEstimatedProbability: 65,
+      picks: picks.slice(0, 10),
+      notice:
+        'These are experimental statistical estimates, not verified betting probabilities or guaranteed outcomes. A 65% screening threshold is not proof of a 65% real-world chance. No pick is better than a weak pick.'
+    };
+
+    bestPicksCache = {
+      expiresAt: Date.now() + 15 * 60 * 1000,
+      payload
+    };
+
+    return res.json({
+      ...payload,
+      cached: false
+    });
+  } catch (error) {
+    console.error('Automatic Best Picks error:', error);
+
+    return res.status(502).json({
+      source: 'SPORTMONKS',
+      engine: 'ELITE_MATCH_AI_100.0_BEST_PICKS',
+      error: 'Unable to generate Best Picks right now.',
+      picks: [],
+      notice:
+        'The engine could not retrieve or analyse the required live data. No predictions have been invented.'
+    });
+  }
+});
+
 // Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
   try {
@@ -511,4 +750,3 @@ app.get('*', (req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Elite Match AI API listening on port ${PORT}`);
 });
-                                                          
