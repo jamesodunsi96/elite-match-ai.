@@ -111,9 +111,7 @@ async function sportmonksGet(url: URL) {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Sportmonks returned HTTP ${response.status}`
-    );
+    throw new Error(`Sportmonks returned HTTP ${response.status}`);
   }
 
   const result: any = await response.json();
@@ -302,7 +300,7 @@ function summarizeTeam(matches: TeamMatch[]) {
   };
 }
 
-// Real fixtures from Sportmonks.
+// Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
   try {
     const matches = await getSportmonksFixtures();
@@ -324,7 +322,7 @@ app.get('/api/matches', async (_req, res) => {
   }
 });
 
-// Real recent form and goals for both teams.
+// Get recent statistics for both teams.
 app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
   const { homeTeamId, awayTeamId } = req.params;
 
@@ -362,7 +360,7 @@ app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
   }
 });
 
-// Generate predictions using real Sportmonks statistics.
+// Generate a prediction using real recent team statistics.
 app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
   const { homeTeamId, awayTeamId } = req.params;
 
@@ -411,7 +409,7 @@ app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
       homeGA: homeStats.averageGoalsConceded!,
       awayGF: awayStats.averageGoalsScored!,
       awayGA: awayStats.averageGoalsConceded!,
-      dataLabel: 'SPORTMONKS'
+      dataLabel: 'DEMO'
     };
 
     const prediction = predictMatch(match);
@@ -461,6 +459,7 @@ const schema = z.object({
   awayGoalsAgainst: z.number().min(0).max(8)
 });
 
+// Analyze a match using manually supplied statistics.
 app.post('/api/analyze', (req, res) => {
   const parsed = schema.safeParse(req.body);
 
@@ -512,3 +511,4 @@ app.get('*', (req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Elite Match AI API listening on port ${PORT}`);
 });
+                                                          
