@@ -699,7 +699,9 @@ app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
 app.get('/api/fixture-details/:fixtureId', async (req, res) => {
   const { fixtureId } = req.params;
 
-  if (!/^\d+$/.test(fixtureId)) {
+  console.log('Received fixture ID:', JSON.stringify(fixtureId));
+
+if (!fixtureId || !/^[0-9]+$/.test(String(fixtureId))) {
     return res.status(400).json({
       error: 'A valid Sportmonks fixture ID is required.'
     });
