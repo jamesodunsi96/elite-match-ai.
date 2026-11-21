@@ -876,11 +876,14 @@ useEffect(()=>{
   const isGoalkeeper=positionName.includes('goalkeeper');
 
   const summaryStats=[
-    'appearances',
-    'goals',
-    'assists',
-    'minutes played'
-  ];
+  'appearances',
+  'goals',
+  'assists',
+  'minutes played',
+  'team wins',
+  'team lost',
+  'lineups'
+];
 
   const goalkeeperOnly=[
     'goals conceded',
