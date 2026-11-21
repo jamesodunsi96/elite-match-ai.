@@ -896,10 +896,13 @@ const[performanceError,setPerformanceError]=useState('');
     <>
       <div className="details">
         <article>
-          <h3>Total predictions</h3>
+          <h3>Unique predictions</h3>
           <h2>{performance.total}</h2>
         </article>
-
+        <article>
+          <h3>All saved entries</h3>
+          <h2>{performance.entries}</h2>
+        </article>
         <article>
           <h3>Pending</h3>
           <h2>{performance.pending}</h2>
