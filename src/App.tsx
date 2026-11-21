@@ -922,6 +922,8 @@ useEffect(()=>{
 )}
         </article>
 )}
+  </>
+)}
               {isReal&&(
                 <>
                   <div className="section-title">
