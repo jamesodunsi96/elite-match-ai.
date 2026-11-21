@@ -786,7 +786,169 @@ app.get('/api/player-team-records/:playerId', async (req, res) => {
     });
   }
 });
+// Verify fixture-listed players against their registered club on match date.
+app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
+  const { fixtureId } = req.params;
 
+  if (!/^\d+$/.test(fixtureId)) {
+    return res.status(400).json({
+      error: 'A valid Sportmonks fixture ID is required.'
+    });
+  }
+
+  try {
+    const fixtureUrl = new URL(
+      `https://api.sportmonks.com/v3/football/fixtures/${fixtureId}`
+    );
+
+    fixtureUrl.searchParams.set(
+      'include',
+      'participants;lineups.player'
+    );
+
+    const fixture = await sportmonksGet(fixtureUrl);
+
+    if (!fixture || Array.isArray(fixture)) {
+      return res.status(404).json({
+        error: 'Fixture not found.',
+        source: 'SPORTMONKS'
+      });
+    }
+
+    const matchDate = String(fixture.starting_at || '').slice(0, 10);
+
+    if (!matchDate) {
+      return res.status(422).json({
+        error: 'Fixture date is unavailable.'
+      });
+    }
+
+    const lineups = fixture.lineups || [];
+    const uniquePlayers = new Map();
+
+    for (const item of lineups) {
+      if (!item.player_id || !item.team_id) continue;
+
+      const playerId = String(item.player_id);
+
+      if (!uniquePlayers.has(playerId)) {
+        uniquePlayers.set(playerId, {
+          playerId,
+          teamId: Number(item.team_id),
+          playerName:
+            item.player?.display_name ||
+            item.player?.name ||
+            item.player_name ||
+            'Unknown player'
+        });
+      }
+    }
+
+    const players = Array.from(uniquePlayers.values());
+    const results = [];
+    let nextIndex = 0;
+
+    const worker = async () => {
+      while (nextIndex < players.length) {
+        const index = nextIndex++;
+        const item = players[index];
+
+        try {
+          const playerUrl = new URL(
+            `https://api.sportmonks.com/v3/football/players/${item.playerId}`
+          );
+
+          playerUrl.searchParams.set(
+            'include',
+            'teams.team;transfers'
+          );
+
+          const player = await sportmonksGet(playerUrl);
+          const registrations = (player?.teams || []).filter(record =>
+            record.team?.type === 'domestic' &&
+            record.start &&
+            record.team_id
+          );
+
+          const activeRecords = registrations.filter(record => {
+            const started = String(record.start).slice(0, 10);
+            const ended = record.end
+              ? String(record.end).slice(0, 10)
+              : null;
+
+            return started <= matchDate &&
+              (!ended || ended >= matchDate);
+          });
+
+          const matchingRecord = activeRecords.find(
+            record => Number(record.team_id) === item.teamId
+          );
+
+          let status = 'UNVERIFIED';
+          let reason = 'No dated domestic club registration was available.';
+
+          if (matchingRecord) {
+            status = 'VERIFIED';
+            reason = 'Club registration matches the fixture team on the match date.';
+          } else if (activeRecords.length > 0) {
+            status = 'MISMATCH';
+            reason = 'Dated club registration points to a different team.';
+          }
+
+          results.push({
+            playerId: item.playerId,
+            playerName: item.playerName,
+            fixtureTeamId: item.teamId,
+            status,
+            registeredTeam: matchingRecord?.team?.name ||
+              activeRecords[0]?.team?.name ||
+              null,
+            reason
+          });
+        } catch (error) {
+          results.push({
+            playerId: item.playerId,
+            playerName: item.playerName,
+            fixtureTeamId: item.teamId,
+            status: 'UNVERIFIED',
+            registeredTeam: null,
+            reason: 'Unable to retrieve player registration records.'
+          });
+        }
+      }
+    };
+
+    await Promise.all(
+      Array.from(
+        { length: Math.min(4, players.length) },
+        () => worker()
+      )
+    );
+
+    const verified = results.filter(p => p.status === 'VERIFIED').length;
+    const mismatches = results.filter(p => p.status === 'MISMATCH').length;
+    const unverified = results.filter(p => p.status === 'UNVERIFIED').length;
+
+    return res.json({
+      source: 'SPORTMONKS',
+      fixtureId,
+      matchDate,
+      totalChecked: results.length,
+      verified,
+      mismatches,
+      unverified,
+      players: results,
+      notice: 'Registration verification does not confirm starting lineups or guarantee provider data accuracy.'
+    });
+  } catch (error) {
+    console.error('Fixture player verification error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to verify fixture players.',
+      source: 'SPORTMONKS'
+    });
+  }
+});
 // Get an individual player's season statistics.
 app.get('/api/player-season-stats/:playerId/:seasonId', async (req, res) => {
   const { playerId, seasonId } = req.params;
