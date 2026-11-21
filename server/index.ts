@@ -845,7 +845,14 @@ app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
     }
 
     const players = Array.from(uniquePlayers.values());
-    const results = [];
+    const results: Array<{
+  playerId: string;
+  playerName: string;
+  fixtureTeamId: number;
+  status: string;
+  registeredTeam: string | null;
+  reason: string;
+}> = [];
     let nextIndex = 0;
 
     const worker = async () => {
