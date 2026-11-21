@@ -859,13 +859,8 @@ useEffect(()=>{
     </div>
   );
 })()}
-        <h3>
-          {playerSeasonStats.player?.display_name||
-           playerSeasonStats.player?.name||
-           'Selected player'}
-        </h3>
-
-        {(()=>{
+        
+{(()=>{
   const selectedLineupPlayer=(fixtureDetails.fixture?.lineups||[])
     .find((item:any)=>
       String(item.player_id)===String(selectedPlayerId)
@@ -876,36 +871,47 @@ useEffect(()=>{
 
   const isGoalkeeper=positionName.includes('goalkeeper');
 
-  const allDetails=(playerSeasonStats.player?.statistics||[])
-    .flatMap((stat:any)=>stat.details||[]);
+  const summaryStats=[
+    'appearances',
+    'goals',
+    'assists',
+    'minutes played'
+  ];
 
-  const hiddenForOutfield=[
+  const goalkeeperOnly=[
     'goals conceded',
     'cleansheets',
     'saves'
   ];
 
-  const visibleDetails=isGoalkeeper
-    ?allDetails
-    :allDetails.filter((detail:any)=>
-        !hiddenForOutfield.includes(
-          (detail.type?.name||'').toLowerCase()
-        )
-      );
+  const allDetails=(playerSeasonStats.player?.statistics||[])
+    .flatMap((stat:any)=>stat.details||[]);
 
-  return visibleDetails.length===0?(
-    <p className="muted">
-      Relevant season statistics are not available yet.
-    </p>
-  ):(
-    visibleDetails.map((detail:any,index:number)=>(
-      <div className="prob" key={detail.id||index}>
-        <span>{detail.type?.name||'Statistic'}</span>
-        <b>{detail.value?.total??'Not available'}</b>
-      </div>
-    ))
+  const visibleDetails=allDetails.filter((detail:any)=>{
+    const name=(detail.type?.name||'').toLowerCase();
+
+    return !summaryStats.includes(name)&&
+      (isGoalkeeper||!goalkeeperOnly.includes(name));
+  });
+
+  return (
+    <>
+      <h3>Additional season statistics</h3>
+
+      {visibleDetails.length===0?(
+        <p className="muted">
+          No additional relevant statistics are available yet.
+        </p>
+      ):visibleDetails.map((detail:any,index:number)=>(
+        <div className="prob" key={detail.id||index}>
+          <span>{detail.type?.name||'Statistic'}</span>
+          <b>{detail.value?.total??'Not available'}</b>
+        </div>
+      ))}
+    </>
   );
 })()}
+
 
     <div className="notice">
       <ShieldCheck/>
