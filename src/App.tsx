@@ -832,7 +832,7 @@ const[performanceError,setPerformanceError]=useState('');
                         Target,
                         'Verified accuracy',
                         '—',
-                        'Awaiting tracked results'
+                        'Accuracy based on settled results'
                       ],
                       [
                         Wifi,
