@@ -710,7 +710,45 @@ useEffect(()=>{
     <p className="muted">Player lineups are not available yet.</p>
   )}
 </article>
+{selectedPlayerId&&(
+  <article>
+    <h3>Player season statistics</h3>
 
+    {playerSeasonLoading&&(
+      <p className="muted">Loading player statistics...</p>
+    )}
+
+    {playerSeasonError&&(
+      <p className="muted">{playerSeasonError}</p>
+    )}
+
+    {playerSeasonStats&&(
+      <>
+        <h3>
+          {playerSeasonStats.player?.display_name||
+           playerSeasonStats.player?.name||
+           'Selected player'}
+        </h3>
+
+        {((playerSeasonStats.player?.statistics||[])
+          .flatMap((stat:any)=>stat.details||[])).length===0?(
+          <p className="muted">
+            Season statistics are not available yet.
+          </p>
+        ):(
+          (playerSeasonStats.player?.statistics||[])
+            .flatMap((stat:any)=>stat.details||[])
+            .map((detail:any,index:number)=>(
+              <div className="prob" key={detail.id||index}>
+                <span>{detail.type?.name||'Statistic'}</span>
+                <b>{detail.value?.total??'Not available'}</b>
+              </div>
+            ))
+        )}
+      </>
+    )}
+  </article>
+)}
 
     <div className="notice">
       <ShieldCheck/>
