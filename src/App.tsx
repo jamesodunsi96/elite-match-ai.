@@ -782,7 +782,46 @@ useEffect(()=>{
   )}
 </article>
 {selectedPlayerId&&(
-  <article>
+  <div
+    role="presentation"
+    onClick={()=>setSelectedPlayerId(null)}
+    style={{
+      position:'fixed',
+      inset:0,
+      zIndex:9999,
+      background:'rgba(0,0,0,0.82)',
+      display:'flex',
+      justifyContent:'center',
+      alignItems:'center',
+      padding:12
+    }}
+  >
+    <article
+      role="dialog"
+      aria-modal="true"
+      aria-label="Player Profile"
+      onClick={e=>e.stopPropagation()}
+      style={{
+        width:'100%',
+        maxWidth:650,
+        maxHeight:'90vh',
+        overflowY:'auto',
+        position:'relative',
+        margin:0
+      }}
+    >
+      <button
+        onClick={()=>setSelectedPlayerId(null)}
+        style={{
+          display:'flex',
+          alignItems:'center',
+          gap:6,
+          marginBottom:16
+        }}
+      >
+        <X size={18}/>
+        Close Profile
+      </button>
     <h3>Player Profile</h3>
 {(()=>{
   const player=(fixtureDetails.fixture?.lineups||[])
