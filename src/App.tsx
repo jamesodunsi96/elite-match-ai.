@@ -281,7 +281,46 @@ const[performanceError,setPerformanceError]=useState('');
   const chosen=matches.find(m=>m.id===selected);
   const isReal=source==='SPORTMONKS';
   const isDemo=source==='DEMO_DATA';
+useEffect(()=>{
+  if(!chosen||!isReal){
+    setFixtureDetails(null);
+    setFixtureDetailsError('');
+    setFixtureDetailsLoading(false);
+    return;
+  }
 
+  let cancelled=false;
+
+  setFixtureDetails(null);
+  setFixtureDetailsError('');
+  setFixtureDetailsLoading(true);
+
+  fetch(`/api/fixture-details/${chosen.id}`)
+    .then(async r=>{
+      const data=await r.json();
+
+      if(!r.ok){
+        throw new Error(data.error||'Unable to load fixture details.');
+      }
+
+      return data as FixtureDetailsResponse;
+    })
+    .then(data=>{
+      if(!cancelled) setFixtureDetails(data);
+    })
+    .catch(error=>{
+      if(!cancelled){
+        setFixtureDetailsError(
+          error.message||'Unable to load fixture details.'
+        );
+      }
+    })
+    .finally(()=>{
+      if(!cancelled) setFixtureDetailsLoading(false);
+    });
+
+  return ()=>{cancelled=true;};
+},[chosen?.id,isReal]);
   useEffect(()=>{
     if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
       setAnalysis(null);
