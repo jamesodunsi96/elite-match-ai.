@@ -376,6 +376,44 @@ useEffect(()=>{
   return ()=>{cancelled=true;};
 },[selectedPlayerId,fixtureDetails?.fixture?.season_id]);
   useEffect(()=>{
+  const fixtureId=fixtureDetails?.fixture?.id;
+
+  if(!fixtureId){
+    setVerification(null);
+    setVerificationError('');
+    setVerificationLoading(false);
+    return;
+  }
+
+  let cancelled=false;
+
+  setVerification(null);
+  setVerificationError('');
+  setVerificationLoading(true);
+
+  fetch(`/api/verify-fixture-players/${fixtureId}`)
+    .then(async r=>{
+      const data=await r.json();
+      if(!r.ok){
+        throw new Error(data.error||'Unable to verify players.');
+      }
+      return data;
+    })
+    .then(data=>{
+      if(!cancelled) setVerification(data);
+    })
+    .catch(error=>{
+      if(!cancelled){
+        setVerificationError(error.message||'Unable to verify players.');
+      }
+    })
+    .finally(()=>{
+      if(!cancelled) setVerificationLoading(false);
+    });
+
+  return ()=>{cancelled=true;};
+},[fixtureDetails?.fixture?.id]);
+  useEffect(()=>{
     if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
       setAnalysis(null);
       setStatsError('');
