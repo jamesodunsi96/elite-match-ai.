@@ -105,6 +105,7 @@ type PerformanceRecord={
 type PerformanceResponse={
   source:string;
   total:number;
+  entries:number;
   pending:number;
   won:number;
   lost:number;
