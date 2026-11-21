@@ -837,6 +837,7 @@ useEffect(()=>{
     Statistics loaded from saved cache (24-hour validity).
   </p>
 )} 
+        <h3>Season Performance Dashboard</h3>
         {(()=>{
   const details=(playerSeasonStats.player?.statistics||[])
     .flatMap((stat:any)=>stat.details||[]);
