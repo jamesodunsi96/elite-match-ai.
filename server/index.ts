@@ -1022,10 +1022,17 @@ return res.json(responseData);
   } catch (error) {
     console.error('Player season statistics error:', error);
 
-    return res.status(502).json({
-      error: 'Unable to retrieve player season statistics.',
-      source: 'SPORTMONKS'
-    });
+    const message =
+  error instanceof Error ? error.message : 'Unknown error';
+
+const rateLimited = message.includes('HTTP 429');
+
+return res.status(rateLimited ? 429 : 502).json({
+  error: rateLimited
+    ? 'Sportmonks rate limit reached. Please try again later.'
+    : 'Unable to retrieve player season statistics.',
+  source: 'SPORTMONKS'
+});
   }
 });
 
