@@ -888,10 +888,13 @@ app.post('/api/settle-predictions', async (req, res) => {
         message: 'No pending predictions are ready for settlement.'
       });
     }
-
-    const ids = pending
+const ids = [
+  ...new Set(
+    pending
       .map((row: any) => String(row.match_id))
-      .filter((id: string) => /^\d+$/.test(id));
+      .filter((id: string) => /^\d+$/.test(id))
+  )
+];
 
     if (!ids.length) {
       return res.json({
