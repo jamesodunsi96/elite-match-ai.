@@ -832,6 +832,11 @@ useEffect(()=>{
 
     {playerSeasonStats&&(
       <>
+       {playerSeasonStats.cached&&(
+  <p className="muted">
+    Statistics loaded from saved cache (24-hour validity).
+  </p>
+)} 
         {(()=>{
   const details=(playerSeasonStats.player?.statistics||[])
     .flatMap((stat:any)=>stat.details||[]);
