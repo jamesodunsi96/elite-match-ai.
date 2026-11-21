@@ -696,6 +696,11 @@ useEffect(()=>{
             <b>
               {item.jersey_number?`#${item.jersey_number}`:'—'}
             </b>
+            <button
+  onClick={()=>setSelectedPlayerId(String(item.player_id))}
+>
+  Season stats
+</button>
           </div>
         ))}
     </div>
