@@ -118,6 +118,11 @@ type FixtureDetailsResponse={
   fixture:any;
   notice:string;
 };
+type PlayerSeasonStatsResponse={
+  source:string;
+  player:any;
+  seasonId:string;
+};
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
