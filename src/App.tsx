@@ -958,10 +958,11 @@ const[performanceError,setPerformanceError]=useState('');
         <div>
           <b>Transparent performance tracking</b>
           <p>
-            Accuracy is calculated only from settled wins and losses.
-            Pending predictions are not counted. Results are not
-            automatically settled yet.
-          </p>
+  Accuracy is calculated only from settled wins and losses.
+  Pending predictions are not counted. Results are checked
+  automatically after matches finish, when official scores
+  are available.
+</p>
         </div>
       </div>
     </>
