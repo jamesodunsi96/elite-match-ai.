@@ -695,6 +695,51 @@ app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
   }
 });
 
+// Get detailed fixture, player and match statistics.
+app.get('/api/fixture-details/:fixtureId', async (req, res) => {
+  const { fixtureId } = req.params;
+
+  if (!/^\d+$/.test(fixtureId)) {
+    return res.status(400).json({
+      error: 'A valid Sportmonks fixture ID is required.'
+    });
+  }
+
+  try {
+    const url = new URL(
+      `https://api.sportmonks.com/v3/football/fixtures/${fixtureId}`
+    );
+
+    url.searchParams.set(
+      'include',
+      'participants;league;state;scores;events.type;lineups.player;lineups.position;lineups.details.type;statistics.type'
+    );
+
+    const fixture = await sportmonksGet(url);
+
+    if (!fixture || Array.isArray(fixture)) {
+      return res.status(404).json({
+        error: 'Fixture details were not found.',
+        source: 'SPORTMONKS'
+      });
+    }
+
+    return res.json({
+      source: 'SPORTMONKS',
+      fixture,
+      notice:
+        'Player lineups and statistics may be unavailable until Sportmonks receives the relevant match data.'
+    });
+  } catch (error) {
+    console.error('Fixture details error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to retrieve fixture details right now.',
+      source: 'SPORTMONKS'
+    });
+  }
+});
+
 // Generate a prediction using real recent team statistics.
 app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
   const { homeTeamId, awayTeamId } = req.params;
