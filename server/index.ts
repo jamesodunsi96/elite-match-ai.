@@ -871,11 +871,12 @@ app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
           );
 
           const player = await sportmonksGet(playerUrl);
-          const registrations = (player?.teams || []).filter(record =>
-            record.team?.type === 'domestic' &&
-            record.start &&
-            record.team_id
-          );
+          const registrations: any[] = (player?.teams || []).filter(
+  (record: any) =>
+    record.team?.type === 'domestic' &&
+    record.start &&
+    record.team_id
+);
 
           const activeRecords = registrations.filter(record => {
             const started = String(record.start).slice(0, 10);
