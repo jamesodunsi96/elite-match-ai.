@@ -113,6 +113,11 @@ type PerformanceResponse={
   accuracy:number|null;
   records:PerformanceRecord[];
 };
+type FixtureDetailsResponse={
+  source:string;
+  fixture:any;
+  notice:string;
+};
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
