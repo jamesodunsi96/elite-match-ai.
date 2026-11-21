@@ -947,7 +947,7 @@ const positionCategory=isGoalkeeper
       Player category: <b>{positionCategory}</b>
     </p>
 
-    <h3>Additional season statistics</h3>
+    <h3>{positionCategory} Season Statistics</h3>
       {visibleDetails.length===0?(
         <p className="muted">
           No additional relevant statistics are available yet.
