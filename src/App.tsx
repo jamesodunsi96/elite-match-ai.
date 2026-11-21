@@ -893,6 +893,26 @@ useEffect(()=>{
 
   const isGoalkeeper=positionName.includes('goalkeeper');
 
+const isForward=
+  positionName.includes('forward')||
+  positionName.includes('striker')||
+  positionName.includes('attacker');
+
+const isMidfielder=positionName.includes('midfield');
+
+const isDefender=
+  positionName.includes('defender')||
+  positionName.includes('back');
+
+const positionCategory=isGoalkeeper
+  ?'Goalkeeper'
+  :isForward
+  ?'Forward'
+  :isMidfielder
+  ?'Midfielder'
+  :isDefender
+  ?'Defender'
+  :'Player';
   const summaryStats=[
   'appearances',
   'goals',
