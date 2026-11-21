@@ -1007,11 +1007,18 @@ if (cachedEntry) {
       });
     }
 
-    return res.json({
-      source: 'SPORTMONKS',
-      player,
-      seasonId
-    });
+    const responseData = {
+  source: 'SPORTMONKS',
+  player,
+  seasonId
+};
+
+playerSeasonStatsCache.set(cacheKey, {
+  data: responseData,
+  expiresAt: Date.now() + 24 * 60 * 60 * 1000
+});
+
+return res.json(responseData);
   } catch (error) {
     console.error('Player season statistics error:', error);
 
