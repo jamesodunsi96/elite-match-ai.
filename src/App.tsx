@@ -646,7 +646,7 @@ useEffect(()=>{
 
     
 <article>
-  <h3>Starting and listed players</h3>
+  <h3>Players returned by Sportmonks</h3>
 
   {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
     <div key={team.id} style={{marginBottom:24}}>
