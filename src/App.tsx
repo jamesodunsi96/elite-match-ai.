@@ -593,15 +593,47 @@ useEffect(()=>{
       </div>
     </div>
 
-    <article>
-      <h3>Starting and listed players</h3>
+    
+<article>
+  <h3>Starting and listed players</h3>
 
-      {(fixtureDetails.fixture?.lineups||[]).length===0?(
-        <p className="muted">Player lineups are not available yet.</p>
-      ):(
-        (fixtureDetails.fixture.lineups||[]).map((item:any,index:number)=>(
-          <div className="score" key={item.id||index}>
-            <span>
+  {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
+    <div key={team.id} style={{marginBottom:24}}>
+      <div className="prob">
+        <b>{team.name}</b>
+        <small>{team.meta?.location==='home'?'HOME':'AWAY'}</small>
+      </div>
+
+      {(fixtureDetails.fixture?.lineups||[])
+        .filter((item:any)=>item.team_id===team.id)
+        .map((item:any,index:number)=>(
+          <div
+            className="score"
+            key={item.id||index}
+            style={{alignItems:'center',gap:12}}
+          >
+            {item.player?.image_path?(
+              <img
+                src={item.player.image_path}
+                alt={item.player.display_name||item.player.name||'Player'}
+                style={{
+                  width:48,
+                  height:48,
+                  borderRadius:'50%',
+                  objectFit:'cover',
+                  background:'#202938'
+                }}
+              />
+            ):(
+              <div style={{
+                width:48,
+                height:48,
+                borderRadius:'50%',
+                background:'#202938'
+              }}/>
+            )}
+
+            <span style={{flex:1}}>
               <b>
                 {item.player?.display_name||item.player?.name||'Player'}
               </b>
@@ -609,15 +641,20 @@ useEffect(()=>{
                 {item.position?.name||'Position unavailable'}
               </small>
             </span>
+
             <b>
-              {item.jersey_number
-                ?`#${item.jersey_number}`
-                :'—'}
+              {item.jersey_number?`#${item.jersey_number}`:'—'}
             </b>
           </div>
-        ))
-      )}
-    </article>
+        ))}
+    </div>
+  ))}
+
+  {(fixtureDetails.fixture?.lineups||[]).length===0&&(
+    <p className="muted">Player lineups are not available yet.</p>
+  )}
+</article>
+
 
     <div className="notice">
       <ShieldCheck/>
