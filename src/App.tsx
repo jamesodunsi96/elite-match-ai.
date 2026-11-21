@@ -850,6 +850,8 @@ useEffect(()=>{
   };
 
   return (
+  <>
+    <h4>Season totals</h4>
     <div style={{
       display:'grid',
       gridTemplateColumns:'repeat(2,minmax(0,1fr))',
