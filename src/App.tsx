@@ -122,6 +122,7 @@ type PlayerSeasonStatsResponse={
   source:string;
   player:any;
   seasonId:string;
+  cached?:boolean;
 };
 const nav=[
   {name:'Overview',icon:Activity},
