@@ -162,7 +162,9 @@ export default function App(){
   const[analysis,setAnalysis]=useState<RealAnalysis|null>(null);
   const[statsLoading,setStatsLoading]=useState(false);
   const[statsError,setStatsError]=useState('');
-
+const[fixtureDetails,setFixtureDetails]=useState<FixtureDetailsResponse|null>(null);
+const[fixtureDetailsLoading,setFixtureDetailsLoading]=useState(false);
+const[fixtureDetailsError,setFixtureDetailsError]=useState('');
   const[bestPicks,setBestPicks]=useState<BestPick[]>([]);
   const[bestLoading,setBestLoading]=useState(false);
   const[bestError,setBestError]=useState('');
