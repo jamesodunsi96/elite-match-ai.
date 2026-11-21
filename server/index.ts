@@ -215,6 +215,7 @@ type TeamMatch = {
   fixtureId: string;
   opponent: string;
   date: string;
+  venue: 'HOME' | 'AWAY';
   result: 'W' | 'D' | 'L';
   goalsFor: number;
   goalsAgainst: number;
