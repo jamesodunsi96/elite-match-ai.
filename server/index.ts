@@ -773,7 +773,8 @@ app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
 });
 
 
-// Read saved predictions and calculate real performance.
+// 
+// Read saved predictions and calculate performance without repeated daily copies.
 app.get('/api/performance', async (_req, res) => {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SECRET_KEY;
@@ -809,14 +810,43 @@ app.get('/api/performance', async (_req, res) => {
 
     const records = await response.json();
 
-    const won = records.filter((row: any) => row.status === 'WON').length;
-    const lost = records.filter((row: any) => row.status === 'LOST').length;
-    const pending = records.filter((row: any) => row.status === 'PENDING').length;
+    // Use the earliest saved copy for each match and market.
+    const orderedRecords = [...records].sort(
+      (a: any, b: any) =>
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime()
+    );
+
+    const uniquePicks = new Map<string, any>();
+
+    for (const row of orderedRecords) {
+      const key = `${row.match_id}:${row.market}`;
+
+      if (!uniquePicks.has(key)) {
+        uniquePicks.set(key, row);
+      }
+    }
+
+    const performanceRecords = Array.from(uniquePicks.values());
+
+    const won = performanceRecords.filter(
+      (row: any) => row.status === 'WON'
+    ).length;
+
+    const lost = performanceRecords.filter(
+      (row: any) => row.status === 'LOST'
+    ).length;
+
+    const pending = performanceRecords.filter(
+      (row: any) => row.status === 'PENDING'
+    ).length;
+
     const settled = won + lost;
 
     return res.json({
       source: 'SUPABASE',
-      total: records.length,
+      total: performanceRecords.length,
+      entries: records.length,
       pending,
       won,
       lost,
@@ -824,7 +854,7 @@ app.get('/api/performance', async (_req, res) => {
       accuracy: settled > 0
         ? Number(((won / settled) * 100).toFixed(1))
         : null,
-      records
+      records: performanceRecords
     });
   } catch (error) {
     console.error('Supabase performance read error:', error);
@@ -835,6 +865,7 @@ app.get('/api/performance', async (_req, res) => {
     });
   }
 });
+
 // Automatically settle predictions with verified full-time scores.
 app.post('/api/settle-predictions', async (req, res) => {
   const settlementSecret = process.env.SETTLEMENT_CRON_SECRET;
