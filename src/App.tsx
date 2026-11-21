@@ -899,8 +899,9 @@ const isForward=
   positionName.includes('attacker')||
   positionName.includes('winger');
 
-const isMidfielder=positionName.includes('midfield');
-
+const isMidfielder=
+  positionName.includes('midfield')||
+  positionName.includes('midfielder');
 const isDefender=
   positionName.includes('defender')||
   positionName.includes('back')||
