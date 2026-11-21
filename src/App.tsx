@@ -568,7 +568,70 @@ useEffect(()=>{
                   · {statusLabel(chosen.status)}
                 </p>
               </div>
+{fixtureDetailsLoading&&(
+  <div className="empty">
+    Loading official player and fixture details…
+  </div>
+)}
 
+{fixtureDetailsError&&(
+  <div className="notice">
+    <Activity/>
+    <div>
+      <b>Fixture details unavailable</b>
+      <p>{fixtureDetailsError}</p>
+    </div>
+  </div>
+)}
+
+{fixtureDetails&&(
+  <>
+    <div className="section-title">
+      <div>
+        <label>OFFICIAL SPORTMONKS DATA</label>
+        <h2>Match and player details</h2>
+      </div>
+    </div>
+
+    <article>
+      <h3>Starting and listed players</h3>
+
+      {(fixtureDetails.fixture?.lineups||[]).length===0?(
+        <p className="muted">Player lineups are not available yet.</p>
+      ):(
+        (fixtureDetails.fixture.lineups||[]).map((item:any,index:number)=>(
+          <div className="score" key={item.id||index}>
+            <span>
+              <b>
+                {item.player?.display_name||item.player?.name||'Player'}
+              </b>
+              <small style={{display:'block'}}>
+                {item.position?.name||'Position unavailable'}
+              </small>
+            </span>
+            <b>
+              {item.jersey_number
+                ?`#${item.jersey_number}`
+                :'—'}
+            </b>
+          </div>
+        ))
+      )}
+    </article>
+
+    <div className="notice">
+      <ShieldCheck/>
+      <div>
+        <b>Player statistics status</b>
+        <p>
+          Goals, assists, ratings and other match statistics will appear
+          when Sportmonks makes them available. Missing statistics are
+          not treated as zero.
+        </p>
+      </div>
+    </div>
+  </>
+)}
               {isReal&&(
                 <>
                   <div className="section-title">
