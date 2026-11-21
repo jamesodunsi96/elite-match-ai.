@@ -809,9 +809,18 @@ useEffect(()=>{
       )}
       <div>
         <b>{player.player?.display_name||player.player?.name||'Player'}</b>
-        <small style={{display:'block'}}>
-          {player.position?.name||'Position unavailable'}
-        </small>
+        <span style={{
+  display:'inline-block',
+  marginTop:6,
+  padding:'4px 10px',
+  borderRadius:20,
+  background:'#2563eb',
+  color:'#fff',
+  fontSize:12,
+  fontWeight:700
+}}>
+  {player.position?.name||'Position unavailable'}
+</span>
         <small style={{display:'block'}}>
           {team?.name||'Team unavailable'}
         </small>
