@@ -779,7 +779,44 @@ useEffect(()=>{
 {selectedPlayerId&&(
   <article>
     <h3>Player Profile</h3>
+{(()=>{
+  const player=(fixtureDetails.fixture?.lineups||[])
+    .find((item:any)=>String(item.player_id)===String(selectedPlayerId));
 
+  if(!player) return null;
+
+  const team=(fixtureDetails.fixture?.participants||[])
+    .find((item:any)=>item.id===player.team_id);
+
+  return (
+    <div className="prob" style={{alignItems:'center',gap:14}}>
+      {player.player?.image_path&&(
+        <img
+          src={player.player.image_path}
+          alt={player.player.display_name||player.player.name||'Player'}
+          style={{
+            width:76,
+            height:76,
+            borderRadius:'50%',
+            objectFit:'cover'
+          }}
+        />
+      )}
+      <div>
+        <b>{player.player?.display_name||player.player?.name||'Player'}</b>
+        <small style={{display:'block'}}>
+          {player.position?.name||'Position unavailable'}
+        </small>
+        <small style={{display:'block'}}>
+          {team?.name||'Team unavailable'}
+        </small>
+        <small style={{display:'block'}}>
+          Shirt number: {player.jersey_number||'—'}
+        </small>
+      </div>
+    </div>
+  );
+})()}
     {playerSeasonLoading&&(
       <p className="muted">Loading player statistics...</p>
     )}
