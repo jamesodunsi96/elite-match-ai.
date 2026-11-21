@@ -905,8 +905,8 @@ const isMidfielder=
 const isDefender=
   positionName.includes('defender')||
   positionName.includes('back')||
-  positionName.includes('centre-back')||
-  positionName.includes('full-back');
+  positionName.includes('wing-back')||
+  positionName.includes('wingback');
 const positionCategory=isGoalkeeper
   ?'Goalkeeper'
   :isForward
