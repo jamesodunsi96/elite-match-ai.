@@ -173,8 +173,11 @@ async function sportmonksGet(url: URL) {
   });
 
   if (!response.ok) {
-    throw new Error(`Sportmonks returned HTTP ${response.status}`);
-  }
+  const detail = await response.text();
+  throw new Error(
+    `Sportmonks returned HTTP ${response.status}: ${detail}`
+  );
+}
 
   const result: any = await response.json();
 
