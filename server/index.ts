@@ -742,6 +742,51 @@ if (!fixtureId || !/^[0-9]+$/.test(String(fixtureId))) {
   }
 });
 
+// Get a player's registered team records and transfer history.
+app.get('/api/player-team-records/:playerId', async (req, res) => {
+  const { playerId } = req.params;
+
+  if (!/^\d+$/.test(playerId)) {
+    return res.status(400).json({
+      error: 'A valid Sportmonks player ID is required.'
+    });
+  }
+
+  try {
+    const url = new URL(
+      `https://api.sportmonks.com/v3/football/players/${playerId}`
+    );
+
+    url.searchParams.set(
+      'include',
+      'teams.team;transfers'
+    );
+
+    const player = await sportmonksGet(url);
+
+    if (!player || Array.isArray(player)) {
+      return res.status(404).json({
+        error: 'Player team records were not found.',
+        source: 'SPORTMONKS'
+      });
+    }
+
+    return res.json({
+      source: 'SPORTMONKS',
+      player,
+      notice:
+        'Team records and transfers are provider data. They must be checked against the fixture season before confirming a player.'
+    });
+  } catch (error) {
+    console.error('Player team records error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to retrieve player team records.',
+      source: 'SPORTMONKS'
+    });
+  }
+});
+
 // Get an individual player's season statistics.
 app.get('/api/player-season-stats/:playerId/:seasonId', async (req, res) => {
   const { playerId, seasonId } = req.params;
