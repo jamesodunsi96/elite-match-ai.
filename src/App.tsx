@@ -331,6 +331,48 @@ useEffect(()=>{
   return ()=>{cancelled=true;};
 },[chosen?.id,isReal]);
   useEffect(()=>{
+  const seasonId=fixtureDetails?.fixture?.season_id;
+
+  if(!selectedPlayerId||!seasonId){
+    setPlayerSeasonStats(null);
+    setPlayerSeasonError('');
+    setPlayerSeasonLoading(false);
+    return;
+  }
+
+  let cancelled=false;
+
+  setPlayerSeasonStats(null);
+  setPlayerSeasonError('');
+  setPlayerSeasonLoading(true);
+
+  fetch(`/api/player-season-stats/${selectedPlayerId}/${seasonId}`)
+    .then(async r=>{
+      const data=await r.json();
+
+      if(!r.ok){
+        throw new Error(data.error||'Unable to load player season statistics.');
+      }
+
+      return data as PlayerSeasonStatsResponse;
+    })
+    .then(data=>{
+      if(!cancelled) setPlayerSeasonStats(data);
+    })
+    .catch(error=>{
+      if(!cancelled){
+        setPlayerSeasonError(
+          error.message||'Unable to load player season statistics.'
+        );
+      }
+    })
+    .finally(()=>{
+      if(!cancelled) setPlayerSeasonLoading(false);
+    });
+
+  return ()=>{cancelled=true;};
+},[selectedPlayerId,fixtureDetails?.fixture?.season_id]);
+  useEffect(()=>{
     if(!chosen||!isReal||!chosen.homeTeamId||!chosen.awayTeamId){
       setAnalysis(null);
       setStatsError('');
