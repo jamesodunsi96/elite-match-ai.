@@ -865,25 +865,47 @@ useEffect(()=>{
            'Selected player'}
         </h3>
 
-        {((playerSeasonStats.player?.statistics||[])
-          .flatMap((stat:any)=>stat.details||[])).length===0?(
-          <p className="muted">
-            Season statistics are not available yet.
-          </p>
-        ):(
-          (playerSeasonStats.player?.statistics||[])
-            .flatMap((stat:any)=>stat.details||[])
-            .map((detail:any,index:number)=>(
-              <div className="prob" key={detail.id||index}>
-                <span>{detail.type?.name||'Statistic'}</span>
-                <b>{detail.value?.total??'Not available'}</b>
-              </div>
-            ))
-        )}
-      </>
-    )}
-  </article>
-)}
+        {(()=>{
+  const selectedLineupPlayer=(fixtureDetails.fixture?.lineups||[])
+    .find((item:any)=>
+      String(item.player_id)===String(selectedPlayerId)
+    );
+
+  const positionName=(selectedLineupPlayer?.position?.name||'')
+    .toLowerCase();
+
+  const isGoalkeeper=positionName.includes('goalkeeper');
+
+  const allDetails=(playerSeasonStats.player?.statistics||[])
+    .flatMap((stat:any)=>stat.details||[]);
+
+  const hiddenForOutfield=[
+    'goals conceded',
+    'cleansheets',
+    'saves'
+  ];
+
+  const visibleDetails=isGoalkeeper
+    ?allDetails
+    :allDetails.filter((detail:any)=>
+        !hiddenForOutfield.includes(
+          (detail.type?.name||'').toLowerCase()
+        )
+      );
+
+  return visibleDetails.length===0?(
+    <p className="muted">
+      Relevant season statistics are not available yet.
+    </p>
+  ):(
+    visibleDetails.map((detail:any,index:number)=>(
+      <div className="prob" key={detail.id||index}>
+        <span>{detail.type?.name||'Statistic'}</span>
+        <b>{detail.value?.total??'Not available'}</b>
+      </div>
+    ))
+  );
+})()}
 
     <div className="notice">
       <ShieldCheck/>
