@@ -878,16 +878,15 @@ app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
     record.team_id
 );
 
-          const activeRecords = registrations.filter(record => {
-            const started = String(record.start).slice(0, 10);
-            const ended = record.end
-              ? String(record.end).slice(0, 10)
-              : null;
+          const activeRecords: any[] = registrations.filter((record: any) => {
+  const started = String(record.start).slice(0, 10);
+  const ended = record.end
+    ? String(record.end).slice(0, 10)
+    : null;
 
-            return started <= matchDate &&
-              (!ended || ended >= matchDate);
-          });
-
+  return started <= matchDate &&
+    (!ended || ended >= matchDate);
+});
           const matchingRecord = activeRecords.find(
             record => Number(record.team_id) === item.teamId
           );
