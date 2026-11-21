@@ -895,11 +895,13 @@ useEffect(()=>{
     .flatMap((stat:any)=>stat.details||[]);
 
   const visibleDetails=allDetails.filter((detail:any)=>{
-    const name=(detail.type?.name||'').toLowerCase();
+  const name=(detail.type?.name||'')
+    .trim()
+    .toLowerCase();
 
-    return !summaryStats.includes(name)&&
-      (isGoalkeeper||!goalkeeperOnly.includes(name));
-  });
+  return !summaryStats.includes(name)&&
+    (isGoalkeeper||!goalkeeperOnly.includes(name));
+});
 
   return (
     <>
