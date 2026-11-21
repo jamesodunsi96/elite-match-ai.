@@ -896,7 +896,8 @@ useEffect(()=>{
 const isForward=
   positionName.includes('forward')||
   positionName.includes('striker')||
-  positionName.includes('attacker');
+  positionName.includes('attacker')||
+  positionName.includes('winger');
 
 const isMidfielder=positionName.includes('midfield');
 
