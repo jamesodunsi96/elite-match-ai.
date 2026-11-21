@@ -970,7 +970,19 @@ app.get('/api/player-season-stats/:playerId/:seasonId', async (req, res) => {
       error: 'Valid player and season IDs are required.'
     });
   }
+const cacheKey = `${playerId}:${seasonId}`;
+const cachedEntry = playerSeasonStatsCache.get(cacheKey);
 
+if (cachedEntry && cachedEntry.expiresAt > Date.now()) {
+  return res.json({
+    ...cachedEntry.data,
+    cached: true
+  });
+}
+
+if (cachedEntry) {
+  playerSeasonStatsCache.delete(cacheKey);
+}
   try {
     const url = new URL(
       `https://api.sportmonks.com/v3/football/players/${playerId}`
