@@ -765,8 +765,7 @@ useEffect(()=>{
             </b>
             <button
   onClick={()=>setSelectedPlayerId(String(item.player_id))}
->
-  Season stats
+>View Profile
 </button>
           </div>
         ))}
@@ -779,7 +778,7 @@ useEffect(()=>{
 </article>
 {selectedPlayerId&&(
   <article>
-    <h3>Player season statistics</h3>
+    <h3>Player Profile</h3>
 
     {playerSeasonLoading&&(
       <p className="muted">Loading player statistics...</p>
