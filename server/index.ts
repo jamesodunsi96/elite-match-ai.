@@ -742,6 +742,55 @@ if (!fixtureId || !/^[0-9]+$/.test(String(fixtureId))) {
   }
 });
 
+// Get an individual player's season statistics.
+app.get('/api/player-season-stats/:playerId/:seasonId', async (req, res) => {
+  const { playerId, seasonId } = req.params;
+
+  if (!/^\d+$/.test(playerId) || !/^\d+$/.test(seasonId)) {
+    return res.status(400).json({
+      error: 'Valid player and season IDs are required.'
+    });
+  }
+
+  try {
+    const url = new URL(
+      `https://api.sportmonks.com/v3/football/players/${playerId}`
+    );
+
+    url.searchParams.set(
+      'include',
+      'statistics.details.type'
+    );
+
+    url.searchParams.set(
+      'filters',
+      `playerStatisticSeasons:${seasonId}`
+    );
+
+    const player = await sportmonksGet(url);
+
+    if (!player || Array.isArray(player)) {
+      return res.status(404).json({
+        error: 'Player statistics were not found.',
+        source: 'SPORTMONKS'
+      });
+    }
+
+    return res.json({
+      source: 'SPORTMONKS',
+      player,
+      seasonId
+    });
+  } catch (error) {
+    console.error('Player season statistics error:', error);
+
+    return res.status(502).json({
+      error: 'Unable to retrieve player season statistics.',
+      source: 'SPORTMONKS'
+    });
+  }
+});
+
 // Generate a prediction using real recent team statistics.
 app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
   const { homeTeamId, awayTeamId } = req.params;
