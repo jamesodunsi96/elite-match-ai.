@@ -827,6 +827,38 @@ useEffect(()=>{
 
     {playerSeasonStats&&(
       <>
+        {(()=>{
+  const details=(playerSeasonStats.player?.statistics||[])
+    .flatMap((stat:any)=>stat.details||[]);
+
+  const getStat=(name:string)=>{
+    const item=details.find((d:any)=>
+      (d.type?.name||'').toLowerCase()===name.toLowerCase()
+    );
+    return item?.value?.total;
+  };
+
+  return (
+    <div style={{
+      display:'grid',
+      gridTemplateColumns:'repeat(2,minmax(0,1fr))',
+      gap:10,
+      marginBottom:16
+    }}>
+      {[
+        ['Appearances','Appearances'],
+        ['Goals','Goals'],
+        ['Assists','Assists'],
+        ['Minutes','Minutes Played']
+      ].map(([label,key])=>(
+        <div className="prob" key={key}>
+          <span>{label}</span>
+          <b>{getStat(key)??'—'}</b>
+        </div>
+      ))}
+    </div>
+  );
+})()}
         <h3>
           {playerSeasonStats.player?.display_name||
            playerSeasonStats.player?.name||
