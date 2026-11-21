@@ -956,6 +956,11 @@ app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
     });
   }
 });
+// Cache player season statistics for 24 hours.
+const playerSeasonStatsCache = new Map<
+  string,
+  { data: any; expiresAt: number }
+>();
 // Get an individual player's season statistics.
 app.get('/api/player-season-stats/:playerId/:seasonId', async (req, res) => {
   const { playerId, seasonId } = req.params;
