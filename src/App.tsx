@@ -1018,7 +1018,8 @@ const positionCategory=isGoalkeeper
     </div>
   </>
 )}
-        </article>
+                </article>
+      </div>
 )}
   </>
 )}
