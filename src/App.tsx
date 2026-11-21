@@ -830,7 +830,7 @@ const[performanceError,setPerformanceError]=useState('');
                       ],
                       [
                         Target,
-                        'Verified accuracy',
+                        'Settled accuracy',
                         '—',
                         'Accuracy based on settled results'
                       ],
