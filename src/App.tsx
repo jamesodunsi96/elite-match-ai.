@@ -170,6 +170,10 @@ export default function App(){
 const[fixtureDetails,setFixtureDetails]=useState<FixtureDetailsResponse|null>(null);
 const[fixtureDetailsLoading,setFixtureDetailsLoading]=useState(false);
 const[fixtureDetailsError,setFixtureDetailsError]=useState('');
+  const[selectedPlayerId,setSelectedPlayerId]=useState<string|null>(null);
+const[playerSeasonStats,setPlayerSeasonStats]=useState<PlayerSeasonStatsResponse|null>(null);
+const[playerSeasonLoading,setPlayerSeasonLoading]=useState(false);
+const[playerSeasonError,setPlayerSeasonError]=useState('');
   const[bestPicks,setBestPicks]=useState<BestPick[]>([]);
   const[bestLoading,setBestLoading]=useState(false);
   const[bestError,setBestError]=useState('');
