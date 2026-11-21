@@ -732,6 +732,32 @@ useEffect(()=>{
               <small style={{display:'block'}}>
                 {item.position?.name||'Position unavailable'}
               </small>
+              {(()=>{
+  const playerCheck=verification?.players?.find(
+    (p:any)=>String(p.playerId)===String(item.player_id)
+  );
+
+  return (
+    <small style={{
+      display:'block',
+      marginTop:5,
+      color:
+        playerCheck?.status==='VERIFIED'
+          ?'#22c55e'
+          :playerCheck?.status==='MISMATCH'
+          ?'#ef4444'
+          :'#f59e0b'
+    }}>
+      {verificationLoading
+        ?'Checking registration...'
+        :playerCheck?.status==='VERIFIED'
+        ?'✓ VERIFIED'
+        :playerCheck?.status==='MISMATCH'
+        ?'⚠ TEAM MISMATCH'
+        :'UNVERIFIED'}
+    </small>
+  );
+})()}
             </span>
 
             <b>
