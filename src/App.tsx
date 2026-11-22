@@ -772,12 +772,14 @@ useEffect(()=>{
           :'#f59e0b'
     }}>
       {verificationLoading
-        ?'Checking registration...'
-        :playerCheck?.status==='VERIFIED'
-        ?'✓ VERIFIED'
-        :playerCheck?.status==='MISMATCH'
-        ?'⚠ TEAM MISMATCH'
-        :'UNVERIFIED'}
+  ?'Checking registration...'
+  :verificationError
+  ?'Verification unavailable'
+  :playerCheck?.status==='VERIFIED'
+  ?'✓ VERIFIED'
+  :playerCheck?.status==='MISMATCH'
+  ?'⚠ TEAM MISMATCH'
+  :'UNVERIFIED'}
     </small>
   );
 })()}
