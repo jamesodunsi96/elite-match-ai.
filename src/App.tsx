@@ -336,6 +336,90 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
     if(deviceId) loadNotifications();
   },[deviceId]);
+    const enablePush=async()=>{
+    setPushLoading(true);
+    setPushMessage('');
+
+    try{
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+        throw new Error('Push notifications are not supported by this browser.');
+      }
+
+      const permission=await Notification.requestPermission();
+
+      if(permission!=='granted'){
+        throw new Error('Notification permission was not granted.');
+      }
+
+      const keyResponse=await fetch('/api/notifications/public-key');
+      const keyData=await keyResponse.json();
+
+      if(!keyResponse.ok||!keyData.configured||!keyData.publicKey){
+        throw new Error('Push notifications are not configured on the server.');
+      }
+
+      const registration=await navigator.serviceWorker.ready;
+
+      let subscription=await registration.pushManager.getSubscription();
+
+      if(!subscription){
+        subscription=await registration.pushManager.subscribe({
+          userVisibleOnly:true,
+          applicationServerKey:urlBase64ToUint8Array(keyData.publicKey)
+        });
+      }
+
+      const response=await fetch('/api/notifications/subscribe',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          deviceId,
+          subscription:subscription.toJSON()
+        })
+      });
+
+      if(!response.ok){
+        throw new Error('Could not save this device subscription.');
+      }
+
+      setPushEnabled(true);
+      setPushMessage('Phone notifications enabled.');
+    }catch(error:any){
+      setPushMessage(error.message||'Unable to enable notifications.');
+    }finally{
+      setPushLoading(false);
+    }
+  };
+
+  const disablePush=async()=>{
+    setPushLoading(true);
+    setPushMessage('');
+
+    try{
+      const registration=await navigator.serviceWorker.ready;
+      const subscription=await registration.pushManager.getSubscription();
+
+      if(subscription){
+        await fetch('/api/notifications/unsubscribe',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            deviceId,
+            endpoint:subscription.endpoint
+          })
+        });
+
+        await subscription.unsubscribe();
+      }
+
+      setPushEnabled(false);
+      setPushMessage('Phone notifications disabled.');
+    }catch(error:any){
+      setPushMessage(error.message||'Unable to disable notifications.');
+    }finally{
+      setPushLoading(false);
+    }
+  };
   const loadPerformance=()=>{
     setPerformanceLoading(true);
     setPerformanceError('');
