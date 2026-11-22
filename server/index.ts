@@ -168,6 +168,64 @@ app.post('/api/notifications/subscribe', async (req, res) => {
     });
   }
 });
+app.post('/api/notifications/unsubscribe', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid(),
+    endpoint: z.string().url()
+  }).safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'Invalid unsubscribe request.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/push_subscriptions',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set(
+      'device_id',
+      `eq.${parsed.data.deviceId}`
+    );
+    endpoint.searchParams.set(
+      'endpoint',
+      `eq.${parsed.data.endpoint}`
+    );
+
+    const response = await fetch(endpoint, {
+      method: 'DELETE',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Push unsubscribe failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not unsubscribe this device.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
