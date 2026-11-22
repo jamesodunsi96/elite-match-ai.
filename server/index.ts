@@ -1908,6 +1908,11 @@ app.get('/api/performance', async (_req, res) => {
     }
 
     const records = await response.json();
+    const orderedRecords = [...records].sort(
+  (a: any, b: any) =>
+    new Date(a.created_at).getTime() -
+    new Date(b.created_at).getTime()
+);
 
     // Use the earliest saved copy for each match and market.
     
