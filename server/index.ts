@@ -229,7 +229,12 @@ app.post('/api/notifications/test-push', async (req, res) => {
 
     return res.json({ success: true, sent });
   } catch (error) {
-    console.error('Test push failed:', error);
+    console.error('Test push failed details:', {
+  message: (error as any)?.message,
+  statusCode: (error as any)?.statusCode,
+  body: (error as any)?.body,
+  headers: (error as any)?.headers
+});
     return res.status(500).json({ error: 'Test push could not be delivered.' });
   }
 });
