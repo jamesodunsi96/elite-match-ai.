@@ -19,7 +19,23 @@ app.use(express.json());
 
 const PORT = Number(process.env.PORT || 3001);
 const SPORTMONKS_TOKEN = process.env.SPORTMONKS_API_TOKEN;
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || '';
 
+const pushConfigured = Boolean(
+  VAPID_PUBLIC_KEY &&
+  VAPID_PRIVATE_KEY &&
+  VAPID_SUBJECT
+);
+
+if (pushConfigured) {
+  webpush.setVapidDetails(
+    VAPID_SUBJECT,
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY
+  );
+}
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
