@@ -909,7 +909,14 @@ useEffect(()=>{
                   ?'Disable phone notifications'
                   :'Enable phone notifications'}
               </button>
-
+{pushEnabled&&(
+  <button
+    onClick={sendTestPush}
+    disabled={pushLoading}
+  >
+    Send test notification
+  </button>
+)}
               {pushMessage&&<p>{pushMessage}</p>}
             </div>
             {!notificationsLoading&&notifications.length===0&&(
