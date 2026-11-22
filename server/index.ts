@@ -2224,6 +2224,102 @@ app.post('/api/analyze', (req, res) => {
   });
 });
 
+// Monitor live matches and send one notification for each new goal.
+const seenGoalEvents = new Set<string>();
+let goalMonitorStarted = false;
+
+async function checkLiveGoalEvents() {
+  if (!SPORTMONKS_TOKEN) return;
+
+  const url = new URL(
+    'https://api.sportmonks.com/v3/football/livescores/inplay'
+  );
+
+  url.searchParams.set('include', 'participants;events');
+
+  const fixtures = await sportmonksGet(url);
+
+  if (!Array.isArray(fixtures)) {
+    throw new Error('Unexpected Sportmonks live-score response.');
+  }
+
+  for (const fixture of fixtures) {
+    const fixtureId = String(fixture.id);
+    const participants = fixture.participants || [];
+    const home = participants.find(
+      (team: any) => team.meta?.location === 'home'
+    );
+    const away = participants.find(
+      (team: any) => team.meta?.location === 'away'
+    );
+
+    const events = fixture.events || [];
+
+    for (const event of events) {
+      const eventType = Number(event.type_id);
+
+      // Sportmonks: 14 = goal, 15 = own goal.
+      if (![14, 15].includes(eventType) || !event.id) continue;
+
+      const eventKey = `${fixtureId}-${event.id}`;
+
+      // On first run, record existing goals without sending old alerts.
+      if (!goalMonitorStarted) {
+        seenGoalEvents.add(eventKey);
+        continue;
+      }
+
+      if (seenGoalEvents.has(eventKey)) continue;
+
+      seenGoalEvents.add(eventKey);
+
+      const homeName = home?.name || 'Home';
+      const awayName = away?.name || 'Away';
+      const minute = event.minute
+        ? `${event.minute}${event.extra_minute ? `+${event.extra_minute}` : ''}'`
+        : 'Live';
+
+      const player = event.player_name
+        ? ` — ${event.player_name}`
+        : '';
+
+      const score = event.result || '';
+
+      await createDeviceNotifications(
+        'goals',
+        'GOAL ALERT!',
+        `${homeName} ${score} ${awayName} · ${minute}${player}`,
+        {
+          screen: 'matches',
+          fixtureId,
+          eventId: String(event.id),
+          minute,
+          score
+        },
+        `goal-${eventKey}`
+      );
+
+      console.log(`Goal alert processed: ${homeName} vs ${awayName}`);
+    }
+  }
+
+  goalMonitorStarted = true;
+}
+
+async function runGoalMonitor() {
+  try {
+    await checkLiveGoalEvents();
+  } catch (error) {
+    console.error('Live goal monitor error:', error);
+  }
+
+  setTimeout(runGoalMonitor, 30000);
+}
+
+runGoalMonitor();
+
+// Serve the built React frontend.
+    
 // Serve the built React frontend.
 app.use(express.static(distPath));
 
