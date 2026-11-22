@@ -420,9 +420,9 @@ async function analyseFixtureForBestPick(fixture: any) {
 
   try {
     const [homeMatches, awayMatches] = await Promise.all([
-      getTeamRecentMatches(fixture.homeTeamId),
-      getTeamRecentMatches(fixture.awayTeamId)
-    ]);
+  getTeamRecentMatches(fixture.homeTeamId, 50),
+  getTeamRecentMatches(fixture.awayTeamId, 50)
+]);
 
     const homeStats = summarizeTeam(homeMatches);
     const awayStats = summarizeTeam(awayMatches);
