@@ -323,13 +323,14 @@ async function getTeamRecentMatches(teamId: string, limit = 5) {
         : 'L';
 
     completed.push({
-      fixtureId: String(fixture.id),
-      opponent: isHome ? away.name : home.name,
-      date: fixture.starting_at || '',
-      result,
-      goalsFor,
-      goalsAgainst
-    });
+  fixtureId: String(fixture.id),
+  opponent: isHome ? away.name : home.name,
+  date: fixture.starting_at || '',
+  venue: isHome ? 'HOME' : 'AWAY',
+  result,
+  goalsFor,
+  goalsAgainst
+});
   }
 
   return completed.slice(0, 5);
