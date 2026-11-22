@@ -303,6 +303,28 @@ const[performanceError,setPerformanceError]=useState('');
       body:JSON.stringify({deviceId:id})
     }).catch(()=>{});
   },[]);
+    const loadNotifications=()=>{
+    if(!deviceId) return;
+
+    setNotificationsLoading(true);
+
+    fetch(`/api/notifications?deviceId=${encodeURIComponent(deviceId)}`)
+      .then(async r=>{
+        if(!r.ok) throw new Error('Notifications request failed');
+        return r.json();
+      })
+      .then(data=>{
+        setNotifications(data.notifications||[]);
+      })
+      .catch(()=>{})
+      .finally(()=>{
+        setNotificationsLoading(false);
+      });
+  };
+
+  useEffect(()=>{
+    if(deviceId) loadNotifications();
+  },[deviceId]);
   const loadPerformance=()=>{
     setPerformanceLoading(true);
     setPerformanceError('');
