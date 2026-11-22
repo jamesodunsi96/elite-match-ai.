@@ -712,9 +712,11 @@ useEffect(()=>{
       </div>
     </div>
   )}
-  VERIFIED confirms club registration only; it does not confirm
-the starting XI or matchday squad.
-</p>
+  {verification?.checkedAt&&(
+  <p className="muted">
+    Last checked: {new Date(verification.checkedAt).toLocaleString()}
+  </p>
+)}
   {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
     <div key={team.id} style={{marginBottom:24}}>
       <div className="prob">
