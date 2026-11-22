@@ -560,6 +560,147 @@ async function savePicksToSupabase(picks: any[]) {
   return { submitted: rows.length, configured: true };
 }
 
+// Create in-app notifications and send phone push alerts.
+async function createDeviceNotifications(
+  type: 'ai_picks' | 'goals' | 'red_cards' | 'kickoff' | 'full_time' | 'settlements',
+  title: string,
+  body: string,
+  data: Record<string, unknown>,
+  dedupeKey: string
+) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Notifications: Supabase is not configured.');
+    return { notified: 0, pushed: 0 };
+  }
+
+  try {
+    const devicesUrl = new URL('/rest/v1/notification_devices', supabaseUrl);
+    devicesUrl.searchParams.set('select', 'device_id,preferences');
+    devicesUrl.searchParams.set('active', 'eq.true');
+
+    const devicesResponse = await fetch(devicesUrl, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!devicesResponse.ok) {
+      throw new Error('Could not load notification devices.');
+    }
+
+    const devices = await devicesResponse.json();
+    let notified = 0;
+    let pushed = 0;
+
+    for (const device of devices) {
+      if (device.preferences?.[type] !== true) continue;
+
+      const notificationUrl = new URL('/rest/v1/notifications', supabaseUrl);
+      notificationUrl.searchParams.set(
+        'on_conflict',
+        'device_id,dedupe_key'
+      );
+
+      const notificationResponse = await fetch(notificationUrl, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=ignore-duplicates,return=representation'
+        },
+        body: JSON.stringify([{
+          device_id: device.device_id,
+          type,
+          title,
+          body,
+          data,
+          dedupe_key: dedupeKey
+        }]),
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (!notificationResponse.ok) {
+        console.error('Could not save notification:', await notificationResponse.text());
+        continue;
+      }
+
+      const inserted = await notificationResponse.json();
+
+      // An empty response means this notification was already saved.
+      if (!Array.isArray(inserted) || inserted.length === 0) continue;
+
+      notified++;
+
+      if (!pushConfigured) continue;
+
+      const subscriptionsUrl = new URL('/rest/v1/push_subscriptions', supabaseUrl);
+      subscriptionsUrl.searchParams.set('select', 'endpoint,p256dh,auth');
+      subscriptionsUrl.searchParams.set('device_id', `eq.${device.device_id}`);
+
+      const subscriptionsResponse = await fetch(subscriptionsUrl, {
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`
+        },
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (!subscriptionsResponse.ok) continue;
+
+      const subscriptions = await subscriptionsResponse.json();
+
+      for (const item of subscriptions) {
+        try {
+          await webpush.sendNotification(
+            {
+              endpoint: item.endpoint,
+              keys: {
+                p256dh: item.p256dh,
+                auth: item.auth
+              }
+            },
+            JSON.stringify({
+              title,
+              body,
+              data,
+              notificationId: inserted[0].id
+            })
+          );
+
+          pushed++;
+        } catch (error: any) {
+          if (error.statusCode === 404 || error.statusCode === 410) {
+            const deleteUrl = new URL('/rest/v1/push_subscriptions', supabaseUrl);
+            deleteUrl.searchParams.set('endpoint', `eq.${item.endpoint}`);
+
+            await fetch(deleteUrl, {
+              method: 'DELETE',
+              headers: {
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`
+              },
+              signal: AbortSignal.timeout(15000)
+            });
+          } else {
+            console.error('Push notification failed:', error.message);
+          }
+        }
+      }
+    }
+
+    return { notified, pushed };
+  } catch (error) {
+    console.error('Notification engine error:', error);
+    return { notified: 0, pushed: 0 };
+  }
+    }
+        
 async function sportmonksGet(url: URL) {
   if (!SPORTMONKS_TOKEN) {
     throw new Error('SPORTMONKS_API_TOKEN is not configured.');
