@@ -354,6 +354,73 @@ app.patch('/api/notifications/:id/read', async (req, res) => {
     });
   }
 });
+app.patch('/api/notifications/preferences', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid(),
+    preferences: z.object({
+      ai_picks: z.boolean(),
+      goals: z.boolean(),
+      red_cards: z.boolean(),
+      kickoff: z.boolean(),
+      full_time: z.boolean(),
+      settlements: z.boolean()
+    })
+  }).safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'Invalid notification preferences.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/notification_devices',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set(
+      'device_id',
+      `eq.${parsed.data.deviceId}`
+    );
+
+    const response = await fetch(endpoint, {
+      method: 'PATCH',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({
+        preferences: parsed.data.preferences,
+        last_seen_at: new Date().toISOString()
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Saving preferences failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not save notification preferences.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
