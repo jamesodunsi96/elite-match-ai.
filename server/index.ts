@@ -424,15 +424,28 @@ async function analyseFixtureForBestPick(fixture: any) {
   getTeamRecentMatches(fixture.awayTeamId, 50)
 ]);
 
-    const homeStats = summarizeTeam(homeMatches);
-    const awayStats = summarizeTeam(awayMatches);
+    const homeOverallMatches = homeMatches.slice(0, 5);
+const awayOverallMatches = awayMatches.slice(0, 5);
 
-    if (
-      homeStats.matchesPlayed < 4 ||
-      awayStats.matchesPlayed < 4
-    ) {
-      return null;
-    }
+const homeVenueMatches = homeMatches
+  .filter(match => match.venue === 'HOME')
+  .slice(0, 5);
+
+const awayVenueMatches = awayMatches
+  .filter(match => match.venue === 'AWAY')
+  .slice(0, 5);
+
+if (
+  homeOverallMatches.length < 4 ||
+  awayOverallMatches.length < 4 ||
+  homeVenueMatches.length < 3 ||
+  awayVenueMatches.length < 3
+) {
+  return null;
+}
+
+const homeStats = summarizeTeam(homeOverallMatches);
+const awayStats = summarizeTeam(awayOverallMatches);
 
     const match: Match = {
       id: fixture.id,
