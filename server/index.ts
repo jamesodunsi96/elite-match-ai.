@@ -769,7 +769,7 @@ if (!fixtureId || !/^[0-9]+$/.test(String(fixtureId))) {
 
     url.searchParams.set(
       'include',
-      'participants;league;state;scores;events.type;lineups.player;lineups.position;lineups.details.type;statistics.type'
+      'participants;league;state;scores;events.type;lineups.player;lineups.position;lineups.type;lineups.details.type;statistics.type'
     );
 
     const fixture = await sportmonksGet(url);
