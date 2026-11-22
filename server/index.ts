@@ -1910,23 +1910,33 @@ app.get('/api/performance', async (_req, res) => {
     const records = await response.json();
 
     // Use the earliest saved copy for each match and market.
-    const orderedRecords = [...records].sort(
-      (a: any, b: any) =>
-        new Date(a.created_at).getTime() -
-        new Date(b.created_at).getTime()
-    );
-
-    const uniquePicks = new Map<string, any>();
-
-    for (const row of orderedRecords) {
-      const key = `${row.match_id}:${row.market}`;
-
-      if (!uniquePicks.has(key)) {
-        uniquePicks.set(key, row);
-      }
-    }
     
+// Combine duplicate copies of the same match and market.
+// Prefer a settled result over a pending copy.
+// If statuses are equal, keep the newest saved copy.
+const uniquePicks = new Map<string, any>();
+
+for (const row of orderedRecords) {
+  const key = `${row.match_id}:${row.market}`;
+  const existing = uniquePicks.get(key);
+
+  const isSettled = row.status === 'WON' || row.status === 'LOST';
+  const existingIsSettled =
+    existing?.status === 'WON' || existing?.status === 'LOST';
+
+  if (
+    !existing ||
+    (isSettled && !existingIsSettled) ||
+    (isSettled === existingIsSettled &&
+      new Date(row.created_at).getTime() >
+      new Date(existing.created_at).getTime())
+  ) {
+    uniquePicks.set(key, row);
+  }
+}
+
 const performanceRecords = Array.from(uniquePicks.values());
+
 
 const latestPicks = new Map<string, any>();
 
