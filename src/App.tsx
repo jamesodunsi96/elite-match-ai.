@@ -702,6 +702,16 @@ useEffect(()=>{
     VERIFIED confirms club registration only; it does not confirm
     the starting XI or matchday squad.
   </p>
+    {verificationError&&(
+    <div className="notice">
+      <ShieldCheck/>
+      <div>
+        <b>Registration verification unavailable</b>
+        <p>{verificationError}</p>
+        <p>Player registration has not been confirmed. Please try again later.</p>
+      </div>
+    </div>
+  )}
   {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
     <div key={team.id} style={{marginBottom:24}}>
       <div className="prob">
