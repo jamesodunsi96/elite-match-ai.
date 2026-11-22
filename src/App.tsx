@@ -162,7 +162,27 @@ const formatKickoff=(date:string)=>{
     minute:'2-digit'
   })+' WAT';
 };
+function getTacticalPosition(positionName:string){
+  const position=positionName.toLowerCase();
 
+  if(position.includes('goalkeeper')) return 'GK';
+
+  if(
+    position.includes('defender')||
+    position.includes('back')
+  ) return 'DEF';
+
+  if(position.includes('midfield')) return 'MID';
+
+  if(
+    position.includes('forward')||
+    position.includes('striker')||
+    position.includes('attacker')||
+    position.includes('winger')
+  ) return 'FWD';
+
+  return 'OTHER';
+  }
 export default function App(){
   const[page,setPage]=useState('Overview');
   const[matches,setMatches]=useState<Match[]>([]);
