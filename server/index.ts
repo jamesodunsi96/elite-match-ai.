@@ -1222,8 +1222,7 @@ app.get('/api/performance', async (_req, res) => {
         uniquePicks.set(key, row);
       }
     }
-
-    const performanceRecords = Array.from(uniquePicks.values());
+    
 const performanceRecords = Array.from(uniquePicks.values());
 
 const latestPicks = new Map<string, any>();
