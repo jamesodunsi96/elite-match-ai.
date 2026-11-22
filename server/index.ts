@@ -23,7 +23,20 @@ const SPORTMONKS_TOKEN = process.env.SPORTMONKS_API_TOKEN;
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || '';
+let vapidKeysMatch = false;
 
+try {
+  if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+    const ecdh = createECDH('prime256v1');
+    ecdh.setPrivateKey(Buffer.from(VAPID_PRIVATE_KEY, 'base64url'));
+    const derivedPublicKey = ecdh.getPublicKey('base64url', 'uncompressed');
+    vapidKeysMatch = derivedPublicKey === VAPID_PUBLIC_KEY;
+  }
+} catch {
+  vapidKeysMatch = false;
+}
+
+console.log('VAPID key pair matches:', vapidKeysMatch);
 const pushConfigured = Boolean(
   VAPID_PUBLIC_KEY &&
   VAPID_PRIVATE_KEY &&
