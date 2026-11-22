@@ -291,6 +291,69 @@ app.get('/api/notifications', async (req, res) => {
     });
   }
 });
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  const parsed = z.object({
+    id: z.string().uuid(),
+    deviceId: z.string().uuid()
+  }).safeParse({
+    id: req.params.id,
+    deviceId: req.body?.deviceId
+  });
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'Invalid notification details.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/notifications',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set('id', `eq.${parsed.data.id}`);
+    endpoint.searchParams.set(
+      'device_id',
+      `eq.${parsed.data.deviceId}`
+    );
+
+    const response = await fetch(endpoint, {
+      method: 'PATCH',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({
+        read_at: new Date().toISOString()
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Mark notification read failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not update notification.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
