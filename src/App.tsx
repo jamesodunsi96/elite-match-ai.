@@ -194,6 +194,10 @@ function getTacticalPosition(positionName:string){
   }
 export default function App(){
   const[page,setPage]=useState('Overview');
+  const [notifications,setNotifications]=useState<AppNotification[]>([]);
+const [notificationsLoading,setNotificationsLoading]=useState(false);
+const [showNotifications,setShowNotifications]=useState(false);
+const [deviceId,setDeviceId]=useState('');
   const[matches,setMatches]=useState<Match[]>([]);
   const[preds,setPreds]=useState<Pred[]>([]);
   const[loading,setLoading]=useState(true);
