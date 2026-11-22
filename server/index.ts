@@ -443,7 +443,14 @@ if (
 ) {
   return null;
 }
-
+if (
+  homeVenueStats.matchesPlayed < 5 ||
+  awayVenueStats.matchesPlayed < 5
+) {
+  riskFlags.push(
+    'One or both teams have fewer than five matches at the relevant venue.'
+  );
+}
 const homeStats = summarizeTeam(homeOverallMatches);
 const awayStats = summarizeTeam(awayOverallMatches);
 
