@@ -206,6 +206,9 @@ export default function App(){
 const [notificationsLoading,setNotificationsLoading]=useState(false);
 const [showNotifications,setShowNotifications]=useState(false);
 const [deviceId,setDeviceId]=useState('');
+  const [pushEnabled,setPushEnabled]=useState(false);
+const [pushLoading,setPushLoading]=useState(false);
+const [pushMessage,setPushMessage]=useState('');
   const[matches,setMatches]=useState<Match[]>([]);
   const[preds,setPreds]=useState<Pred[]>([]);
   const[loading,setLoading]=useState(true);
