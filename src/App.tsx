@@ -1966,6 +1966,17 @@ const positionCategory=isGoalkeeper
       <div className="section-title">
         <div>
           <label>DATABASE HISTORY</label>
+                <div className="notice">
+        <ShieldCheck/>
+        <div>
+          <b>Early results — small sample</b>
+          <p>
+            Current accuracy is based on {performance.settled} settled
+            predictions: {performance.won} won and {performance.lost} lost.
+            This is an early sample, not proof of long-term performance.
+          </p>
+        </div>
+      </div>
           <h2>Recorded predictions</h2>
         </div>
       </div>
