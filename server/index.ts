@@ -1294,7 +1294,7 @@ if (payload.picks.length > 0) {
       screen: 'best-picks',
       count: payload.picks.length
     },
-    `ai-picks-${lagosDate(new Date())}`
+    `ai-picks-push-test-${lagosDate(new Date())}`
   );
 }
     const responsePayload = {
