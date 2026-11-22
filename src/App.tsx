@@ -813,45 +813,203 @@ useEffect(()=>{
                         objectFit:'cover'
                       }}
                     />
-                  ):(
-                    <span style={{
+
+<div style={{
+  display:'grid',
+  gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
+  gap:18,
+  marginBottom:24
+}}>
+  {(fixtureDetails.fixture?.participants||[]).map((team:any)=>{
+    const players=(fixtureDetails.fixture?.lineups||[])
+      .filter((item:any)=>
+        item.team_id===team.id &&
+        item.formation_field &&
+        item.type?.code==='lineup'
+      );
+
+    const lines=new Map<number,any[]>();
+
+    players.forEach((item:any)=>{
+      const [line]=String(item.formation_field).split(':').map(Number);
+      if(!Number.isFinite(line)) return;
+
+      if(!lines.has(line)) lines.set(line,[]);
+      lines.get(line)!.push(item);
+    });
+
+    const formation=Array.from(lines.entries())
+      .filter(([line])=>line!==1)
+      .sort((a,b)=>a[0]-b[0])
+      .map(([,items])=>items.length)
+      .join('-');
+
+    return (
+      <article key={`pitch-${team.id}`} style={{padding:14}}>
+        <div style={{
+          display:'flex',
+          justifyContent:'space-between',
+          alignItems:'center',
+          marginBottom:12
+        }}>
+          <div>
+            <b>{team.name}</b>
+            <small style={{display:'block',color:'#94a3b8'}}>
+              {team.meta?.location==='home'?'HOME':'AWAY'} TEAM
+            </small>
+          </div>
+          <b style={{color:'#d7bd72',fontSize:13}}>
+            {formation||'Formation unavailable'}
+          </b>
+        </div>
+
+        <div style={{
+          height:440,
+          position:'relative',
+          overflow:'hidden',
+          border:'2px solid rgba(255,255,255,.65)',
+          borderRadius:10,
+          background:'linear-gradient(90deg,#145c39,#197447,#145c39)'
+        }}>
+          <div style={{
+            position:'absolute',
+            inset:8,
+            border:'1px solid rgba(255,255,255,.55)'
+          }}/>
+
+          <div style={{
+            position:'absolute',
+            left:8,
+            right:8,
+            top:'50%',
+            borderTop:'1px solid rgba(255,255,255,.55)'
+          }}/>
+
+          <div style={{
+            position:'absolute',
+            width:90,
+            height:90,
+            border:'1px solid rgba(255,255,255,.55)',
+            borderRadius:'50%',
+            left:'50%',
+            top:'50%',
+            transform:'translate(-50%,-50%)'
+          }}/>
+
+          <div style={{
+            position:'absolute',
+            width:130,
+            height:48,
+            border:'1px solid rgba(255,255,255,.55)',
+            left:'50%',
+            top:8,
+            transform:'translateX(-50%)'
+          }}/>
+
+          <div style={{
+            position:'absolute',
+            width:130,
+            height:48,
+            border:'1px solid rgba(255,255,255,.55)',
+            left:'50%',
+            bottom:8,
+            transform:'translateX(-50%)'
+          }}/>
+
+          {players.map((item:any,index:number)=>{
+            const [line,lane]=String(item.formation_field)
+              .split(':').map(Number);
+
+            const sameLine=players.filter((p:any)=>
+              Number(String(p.formation_field).split(':')[0])===line
+            );
+
+            const maxLane=Math.max(
+              ...sameLine.map((p:any)=>
+                Number(String(p.formation_field).split(':')[1])||1
+              )
+            );
+
+            const left=((lane-0.5)/maxLane)*100;
+            const top=96-((line-1)*21);
+
+            return (
+              <button
+                key={item.id||item.player_id||index}
+                onClick={()=>setSelectedPlayerId(String(item.player_id))}
+                title={item.player?.display_name||item.player_name||'Player'}
+                style={{
+                  position:'absolute',
+                  left:`${left}%`,
+                  top:`${top}%`,
+                  transform:'translate(-50%,-50%)',
+                  width:64,
+                  minHeight:68,
+                  padding:'4px 2px',
+                  display:'flex',
+                  flexDirection:'column',
+                  alignItems:'center',
+                  gap:2,
+                  border:'1px solid #d7bd72',
+                  borderRadius:9,
+                  background:'rgba(5,20,16,.94)',
+                  color:'#fff',
+                  zIndex:2
+                }}
+              >
+                {item.player?.image_path?(
+                  <img
+                    src={item.player.image_path}
+                    alt=""
+                    style={{
                       width:32,
                       height:32,
                       borderRadius:'50%',
-                      background:'#34483d',
-                      display:'grid',
-                      placeItems:'center',
-                      fontSize:11
-                    }}>
-                      {item.jersey_number||'—'}
-                    </span>
-                  )}
-                  <small style={{fontWeight:800}}>
-                    #{item.jersey_number||'—'}
-                  </small>
-                  <small style={{
-                    width:'100%',
-                    overflow:'hidden',
-                    textOverflow:'ellipsis',
-                    whiteSpace:'nowrap',
-                    fontSize:9
+                      objectFit:'cover',
+                      border:'1px solid #d7bd72'
+                    }}
+                  />
+                ):(
+                  <span style={{
+                    width:32,
+                    height:32,
+                    display:'grid',
+                    placeItems:'center',
+                    borderRadius:'50%',
+                    background:'#34483d'
                   }}>
-                    {item.player?.display_name||item.player?.name||'Player'}
-                  </small>
-                </button>
-              ))}
-            </div>
-          );
-        })}
-      </div>
+                    {item.jersey_number||'—'}
+                  </span>
+                )}
 
-      <p className="muted" style={{fontSize:11}}>
-        Position-based layout from Sportmonks data. It is not a
-        confirmed formation.
-      </p>
-    </article>
-  ))}
+                <b style={{fontSize:10}}>
+                  #{item.jersey_number||'—'}
+                </b>
+
+                <small style={{
+                  width:'100%',
+                  fontSize:9,
+                  overflow:'hidden',
+                  textOverflow:'ellipsis',
+                  whiteSpace:'nowrap',
+                  textAlign:'center'
+                }}>
+                  {item.player?.display_name||item.player_name||'Player'}
+                </small>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="muted" style={{fontSize:11}}>
+          Tactical positions supplied by Sportmonks.
+          Formation calculated from the returned player coordinates.
+        </p>
+      </article>
+    );
+  })}
 </div>
+
           
 <article>
   <h3>Players returned by Sportmonks</h3>
