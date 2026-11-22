@@ -864,7 +864,20 @@ useEffect(()=>{
             </div>
 
             {notificationsLoading&&<p>Loading notifications...</p>}
+            <div style={{marginBottom:12}}>
+              <button
+                onClick={pushEnabled?disablePush:enablePush}
+                disabled={pushLoading||!deviceId}
+              >
+                {pushLoading
+                  ?'Please wait...'
+                  :pushEnabled
+                  ?'Disable phone notifications'
+                  :'Enable phone notifications'}
+              </button>
 
+              {pushMessage&&<p>{pushMessage}</p>}
+            </div>
             {!notificationsLoading&&notifications.length===0&&(
               <p>No notifications yet.</p>
             )}
