@@ -36,6 +36,12 @@ if (pushConfigured) {
     VAPID_PRIVATE_KEY
   );
 }
+app.get('/api/notifications/public-key', (_req, res) => {
+  res.json({
+    configured: pushConfigured,
+    publicKey: pushConfigured ? VAPID_PUBLIC_KEY : null
+  });
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
