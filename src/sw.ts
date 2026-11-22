@@ -3,7 +3,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 
 const sw = globalThis as any;
 
-precacheAndRoute(sw.__WB_MANIFEST);
+// @ts-expect-error Workbox injects this manifest during the build.
+precacheAndRoute(self.__WB_MANIFEST);
 
 sw.addEventListener('push', (event: any) => {
   let payload: any = {};
