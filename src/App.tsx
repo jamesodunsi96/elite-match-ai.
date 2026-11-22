@@ -132,6 +132,15 @@ type PlayerSeasonStatsResponse={
   seasonId:string;
   cached?:boolean;
 };
+type AppNotification={
+  id:string;
+  type:string;
+  title:string;
+  body:string;
+  data:Record<string,unknown>;
+  created_at:string;
+  read_at:string|null;
+};
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
