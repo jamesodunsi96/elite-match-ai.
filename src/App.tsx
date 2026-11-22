@@ -346,6 +346,30 @@ const[performanceError,setPerformanceError]=useState('');
       })
       .catch(()=>{});
   },[deviceId]);
+  const sendTestPush=async()=>{
+  setPushLoading(true);
+  setPushMessage('');
+
+  try{
+    const response=await fetch('/api/notifications/test-push',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({deviceId})
+    });
+
+    const data=await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error||'Test notification failed.');
+    }
+
+    setPushMessage('Test notification sent. Check your phone.');
+  }catch(error:any){
+    setPushMessage(error.message||'Unable to send test notification.');
+  }finally{
+    setPushLoading(false);
+  }
+};
     const enablePush=async()=>{
     setPushLoading(true);
     setPushMessage('');
