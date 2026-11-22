@@ -102,6 +102,72 @@ app.post('/api/notifications/register-device', async (req, res) => {
     });
   }
 });
+app.post('/api/notifications/subscribe', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid(),
+    subscription: z.object({
+      endpoint: z.string().url(),
+      keys: z.object({
+        p256dh: z.string().min(1),
+        auth: z.string().min(1)
+      })
+    })
+  }).safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'Invalid push subscription.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/push_subscriptions',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set('on_conflict', 'endpoint');
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        device_id: parsed.data.deviceId,
+        endpoint: parsed.data.subscription.endpoint,
+        p256dh: parsed.data.subscription.keys.p256dh,
+        auth: parsed.data.subscription.keys.auth,
+        updated_at: new Date().toISOString()
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Push subscription save failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not save push subscription.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
