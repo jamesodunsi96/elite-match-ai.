@@ -1954,10 +1954,21 @@ const latestRecords = Array.from(latestPicks.values());
 
 const dailyPicks = new Map<string, any>();
 
-for (const row of records) {
+for (const row of orderedRecords) {
   const key = `${row.match_id}:${row.market}:${row.prediction_day}`;
+  const existing = dailyPicks.get(key);
 
-  if (!dailyPicks.has(key)) {
+  const isSettled = row.status === 'WON' || row.status === 'LOST';
+  const existingIsSettled =
+    existing?.status === 'WON' || existing?.status === 'LOST';
+
+  if (
+    !existing ||
+    (isSettled && !existingIsSettled) ||
+    (isSettled === existingIsSettled &&
+      new Date(row.created_at).getTime() >
+      new Date(existing.created_at).getTime())
+  ) {
     dailyPicks.set(key, row);
   }
 }
