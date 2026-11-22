@@ -111,6 +111,14 @@ type PerformanceResponse={
   lost:number;
   settled:number;
   accuracy:number|null;
+  dailyTotal:number;
+  dailyPending:number;
+  dailyWon:number;
+  dailyLost:number;
+  dailySettled:number;
+  dailyAccuracy:number|null;
+  latestAccuracy:number|null;
+  latestRecords:PerformanceRecord[];
   records:PerformanceRecord[];
 };
 type FixtureDetailsResponse={
