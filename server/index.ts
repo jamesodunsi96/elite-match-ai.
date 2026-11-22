@@ -471,9 +471,23 @@ const awayGA = Number((
 ).toFixed(2));
 
 const match: Match = {
+  id: fixture.id,
+  competition: fixture.competition,
+  kickoff: fixture.kickoff,
+  home: fixture.home,
+  away: fixture.away,
+  status: fixture.status,
+  score: null,
+  homeForm: homeStats.form,
+  awayForm: awayStats.form,
+  homeGF,
+  homeGA,
+  awayGF,
+  awayGA,
+  dataLabel: 'DEMO'
+};
 
-    const prediction = predictMatch(match);
-
+const prediction = predictMatch(match);
     const candidates = getMarketCandidates(
       prediction.probabilities
     );
