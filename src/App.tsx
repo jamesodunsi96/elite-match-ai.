@@ -788,6 +788,11 @@ useEffect(()=>{
     </small>
   );
 })()}
+{playerCheck?.registeredTeam&&(
+  <small style={{display:'block',marginTop:3}}>
+    Registered club: {playerCheck.registeredTeam}
+  </small>
+)}
             </span>
 
             <b>
