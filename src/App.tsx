@@ -715,65 +715,6 @@ useEffect(()=>{
     </div>
 
 
-
-
-      <div style={{
-        background:'linear-gradient(180deg,#176b43,#104b32)',
-        border:'2px solid #75a98a',
-        borderRadius:12,
-        padding:'16px 8px',
-        position:'relative',
-        overflow:'hidden'
-      }}>
-        <div style={{
-          position:'absolute',
-          inset:8,
-          border:'1px solid rgba(255,255,255,.45)',
-          pointerEvents:'none'
-        }}/>
-        <div style={{
-          position:'absolute',
-          top:'50%',
-          left:8,
-          right:8,
-          borderTop:'1px solid rgba(255,255,255,.45)'
-        }}/>
-        <div style={{
-          position:'absolute',
-          top:'50%',
-          left:'50%',
-          width:64,
-          height:64,
-          border:'1px solid rgba(255,255,255,.45)',
-          borderRadius:'50%',
-          transform:'translate(-50%,-50%)'
-        }}/>
-
-        {(['FWD','MID','DEF','GK'] as const).map(role=>{
-          const players=(fixtureDetails.fixture?.lineups||[])
-            .filter((item:any)=>
-              item.team_id===team.id &&
-              getTacticalPosition(item.position?.name||'')===role
-            );
-
-          if(players.length===0) return null;
-
-          return (
-            <div key={role} style={{
-              position:'relative',
-              zIndex:1,
-              display:'flex',
-              justifyContent:'space-evenly',
-              alignItems:'center',
-              flexWrap:'wrap',
-              gap:10,
-              minHeight:role==='GK'?65:82,
-              padding:'5px 0'
-            }}>
-              {players.map((item:any,index:number)=>(
-                <button
-
-
 <div style={{
   display:'grid',
   gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
