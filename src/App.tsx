@@ -714,7 +714,31 @@ useEffect(()=>{
             <Menu/>
           </button>
           <span>ELITE MATCH AI　›　{page}</span>
-          <div className="right">
+          <          <div className="right">
+            <button
+              onClick={()=>{
+                setShowNotifications(!showNotifications);
+                loadNotifications();
+              }}
+              title="Notifications"
+              style={{position:'relative'}}
+            >
+              <Bell size={19}/>
+              {notifications.filter(n=>!n.read_at).length>0&&(
+                <span style={{
+                  position:'absolute',
+                  top:-6,
+                  right:-6,
+                  background:'#dc2626',
+                  color:'#fff',
+                  borderRadius:20,
+                  fontSize:10,
+                  padding:'2px 5px'
+                }}>
+                  {notifications.filter(n=>!n.read_at).length}
+                </span>
+              )}
+            </button>
             <small>
               <i className={isDemo?'amber':''}/>
               {source}
