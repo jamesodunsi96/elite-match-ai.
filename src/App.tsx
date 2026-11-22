@@ -714,7 +714,7 @@ useEffect(()=>{
             <Menu/>
           </button>
           <span>ELITE MATCH AI　›　{page}</span>
-          <          <div className="right">
+                    <div className="right">
             <button
               onClick={()=>{
                 setShowNotifications(!showNotifications);
