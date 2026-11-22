@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+            strategies: 'injectManifest',
+            srcDir: 'src',
+            filename: 'sw.ts',
+            registerType: 'autoUpdate',
       manifest: {
         name: 'Elite Match AI',
         short_name: 'Elite AI',
