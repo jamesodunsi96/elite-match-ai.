@@ -712,6 +712,9 @@ useEffect(()=>{
       </div>
     </div>
   )}
+  VERIFIED confirms club registration only; it does not confirm
+the starting XI or matchday squad.
+</p>
   {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
     <div key={team.id} style={{marginBottom:24}}>
       <div className="prob">
