@@ -522,11 +522,16 @@ const prediction = predictMatch(match);
     );
 
     const reasons = [
-      `${fixture.home} recent average goals scored: ${homeStats.averageGoalsScored}.`,
-      `${fixture.away} recent average goals scored: ${awayStats.averageGoalsScored}.`,
-      `${fixture.home} recent average goals conceded: ${homeStats.averageGoalsConceded}.`,
-      `${fixture.away} recent average goals conceded: ${awayStats.averageGoalsConceded}.`
-    ];
+  `${fixture.home} overall average goals scored: ${homeStats.averageGoalsScored}.`,
+  `${fixture.away} overall average goals scored: ${awayStats.averageGoalsScored}.`,
+  `${fixture.home} overall average goals conceded: ${homeStats.averageGoalsConceded}.`,
+  `${fixture.away} overall average goals conceded: ${awayStats.averageGoalsConceded}.`,
+  `${fixture.home} home-only average goals scored: ${homeVenueStats.averageGoalsScored}.`,
+  `${fixture.home} home-only average goals conceded: ${homeVenueStats.averageGoalsConceded}.`,
+  `${fixture.away} away-only average goals scored: ${awayVenueStats.averageGoalsScored}.`,
+  `${fixture.away} away-only average goals conceded: ${awayVenueStats.averageGoalsConceded}.`,
+  `Prediction uses 70% venue performance and 30% overall performance.`
+];
 
     return {
       matchId: fixture.id,
