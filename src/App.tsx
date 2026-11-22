@@ -785,34 +785,7 @@ useEffect(()=>{
             }}>
               {players.map((item:any,index:number)=>(
                 <button
-                  key={item.id||item.player_id||index}
-                  onClick={()=>setSelectedPlayerId(String(item.player_id))}
-                  title={item.player?.display_name||item.player?.name||'Player'}
-                  style={{
-                    background:'rgba(8,25,20,.88)',
-                    border:'1px solid #d7bd72',
-                    borderRadius:10,
-                    color:'#fff',
-                    padding:'5px 4px',
-                    width:65,
-                    minHeight:68,
-                    display:'flex',
-                    flexDirection:'column',
-                    alignItems:'center',
-                    gap:3
-                  }}
-                >
-                  {item.player?.image_path?(
-                    <img
-                      src={item.player.image_path}
-                      alt=""
-                      style={{
-                        width:32,
-                        height:32,
-                        borderRadius:'50%',
-                        objectFit:'cover'
-                      }}
-                    />
+
 
 <div style={{
   display:'grid',
