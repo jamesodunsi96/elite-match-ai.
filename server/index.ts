@@ -1200,7 +1200,18 @@ app.get('/api/best-picks', async (_req, res) => {
         archiveError
       );
     }
-
+if (payload.picks.length > 0) {
+  await createDeviceNotifications(
+    'ai_picks',
+    'New ELITE MATCH AI Best Picks',
+    `${payload.picks.length} experimental picks are available. Open the app to review them.`,
+    {
+      screen: 'best-picks',
+      count: payload.picks.length
+    },
+    `ai-picks-${lagosDate(new Date())}`
+  );
+}
     const responsePayload = {
       ...payload,
       archive: {
