@@ -1974,7 +1974,17 @@ const positionCategory=isGoalkeeper
     </p>
   </div>
 </div>
-
+<div className="notice">
+  <ShieldCheck/>
+  <div>
+    <b>How prediction records are counted</b>
+    <p>
+      This response contains {performance.entries} saved database entries,
+      grouped into {performance.total} unique predictions by match and market.
+      Duplicate saved copies are not counted as separate predictions.
+    </p>
+  </div>
+</div>
 <div className="section-title">
   <div>
     <label>DATABASE HISTORY</label>
