@@ -991,10 +991,11 @@ app.get('/api/verify-fixture-players/:fixtureId', async (req, res) => {
     const mismatches = results.filter(p => p.status === 'MISMATCH').length;
     const unverified = results.filter(p => p.status === 'UNVERIFIED').length;
 
-    return res.json({
-      source: 'SPORTMONKS',
-      fixtureId,
-      matchDate,
+  return res.json({
+    source: 'SPORTMONKS',
+    fixtureId,
+    checkedAt: new Date().toISOString(),
+    matchDate,
       totalChecked: results.length,
       verified,
       mismatches,
