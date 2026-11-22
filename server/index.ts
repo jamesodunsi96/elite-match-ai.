@@ -42,6 +42,66 @@ app.get('/api/notifications/public-key', (_req, res) => {
     publicKey: pushConfigured ? VAPID_PUBLIC_KEY : null
   });
 });
+app.post('/api/notifications/register-device', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid()
+  }).safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'A valid deviceId is required.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/notification_devices',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set('on_conflict', 'device_id');
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        device_id: parsed.data.deviceId,
+        last_seen_at: new Date().toISOString(),
+        active: true
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return res.json({
+      success: true,
+      deviceId: parsed.data.deviceId
+    });
+  } catch (error) {
+    console.error('Device registration failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not register this device.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
