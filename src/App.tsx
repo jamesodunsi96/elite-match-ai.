@@ -714,7 +714,145 @@ useEffect(()=>{
       </div>
     </div>
 
-    
+
+<div style={{
+  display:'grid',
+  gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
+  gap:18,
+  marginBottom:24
+}}>
+  {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
+    <article key={`pitch-${team.id}`} style={{padding:14}}>
+      <div className="prob">
+        <b>{team.name}</b>
+        <small>
+          {team.meta?.location==='home'?'HOME':'AWAY'}
+        </small>
+      </div>
+
+      <div style={{
+        background:'linear-gradient(180deg,#176b43,#104b32)',
+        border:'2px solid #75a98a',
+        borderRadius:12,
+        padding:'16px 8px',
+        position:'relative',
+        overflow:'hidden'
+      }}>
+        <div style={{
+          position:'absolute',
+          inset:8,
+          border:'1px solid rgba(255,255,255,.45)',
+          pointerEvents:'none'
+        }}/>
+        <div style={{
+          position:'absolute',
+          top:'50%',
+          left:8,
+          right:8,
+          borderTop:'1px solid rgba(255,255,255,.45)'
+        }}/>
+        <div style={{
+          position:'absolute',
+          top:'50%',
+          left:'50%',
+          width:64,
+          height:64,
+          border:'1px solid rgba(255,255,255,.45)',
+          borderRadius:'50%',
+          transform:'translate(-50%,-50%)'
+        }}/>
+
+        {(['FWD','MID','DEF','GK'] as const).map(role=>{
+          const players=(fixtureDetails.fixture?.lineups||[])
+            .filter((item:any)=>
+              item.team_id===team.id &&
+              getTacticalPosition(item.position?.name||'')===role
+            );
+
+          if(players.length===0) return null;
+
+          return (
+            <div key={role} style={{
+              position:'relative',
+              zIndex:1,
+              display:'flex',
+              justifyContent:'space-evenly',
+              alignItems:'center',
+              flexWrap:'wrap',
+              gap:10,
+              minHeight:role==='GK'?65:82,
+              padding:'5px 0'
+            }}>
+              {players.map((item:any,index:number)=>(
+                <button
+                  key={item.id||item.player_id||index}
+                  onClick={()=>setSelectedPlayerId(String(item.player_id))}
+                  title={item.player?.display_name||item.player?.name||'Player'}
+                  style={{
+                    background:'rgba(8,25,20,.88)',
+                    border:'1px solid #d7bd72',
+                    borderRadius:10,
+                    color:'#fff',
+                    padding:'5px 4px',
+                    width:65,
+                    minHeight:68,
+                    display:'flex',
+                    flexDirection:'column',
+                    alignItems:'center',
+                    gap:3
+                  }}
+                >
+                  {item.player?.image_path?(
+                    <img
+                      src={item.player.image_path}
+                      alt=""
+                      style={{
+                        width:32,
+                        height:32,
+                        borderRadius:'50%',
+                        objectFit:'cover'
+                      }}
+                    />
+                  ):(
+                    <span style={{
+                      width:32,
+                      height:32,
+                      borderRadius:'50%',
+                      background:'#34483d',
+                      display:'grid',
+                      placeItems:'center',
+                      fontSize:11
+                    }}>
+                      {item.jersey_number||'—'}
+                    </span>
+                  )}
+                  <small style={{fontWeight:800}}>
+                    #{item.jersey_number||'—'}
+                  </small>
+                  <small style={{
+                    width:'100%',
+                    overflow:'hidden',
+                    textOverflow:'ellipsis',
+                    whiteSpace:'nowrap',
+                    fontSize:9
+                  }}>
+                    {item.player?.display_name||item.player?.name||'Player'}
+                  </small>
+                </button>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="muted" style={{fontSize:11}}>
+        Position-based layout from Sportmonks data. It is not a
+        confirmed formation.
+      </p>
+    </article>
+  ))}
+</div>
+          
 <article>
   <h3>Players returned by Sportmonks</h3>
   <p className="muted">
