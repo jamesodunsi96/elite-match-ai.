@@ -447,22 +447,30 @@ if (
 const homeStats = summarizeTeam(homeOverallMatches);
 const awayStats = summarizeTeam(awayOverallMatches);
 
-    const match: Match = {
-      id: fixture.id,
-      competition: fixture.competition,
-      kickoff: fixture.kickoff,
-      home: fixture.home,
-      away: fixture.away,
-      status: fixture.status,
-      score: null,
-      homeForm: homeStats.form,
-      awayForm: awayStats.form,
-      homeGF: homeStats.averageGoalsScored!,
-      homeGA: homeStats.averageGoalsConceded!,
-      awayGF: awayStats.averageGoalsScored!,
-      awayGA: awayStats.averageGoalsConceded!,
-      dataLabel: 'DEMO'
-    };
+const homeVenueStats = summarizeTeam(homeVenueMatches);
+const awayVenueStats = summarizeTeam(awayVenueMatches);
+
+const homeGF = Number((
+  homeVenueStats.averageGoalsScored! * 0.7 +
+  homeStats.averageGoalsScored! * 0.3
+).toFixed(2));
+
+const homeGA = Number((
+  homeVenueStats.averageGoalsConceded! * 0.7 +
+  homeStats.averageGoalsConceded! * 0.3
+).toFixed(2));
+
+const awayGF = Number((
+  awayVenueStats.averageGoalsScored! * 0.7 +
+  awayStats.averageGoalsScored! * 0.3
+).toFixed(2));
+
+const awayGA = Number((
+  awayVenueStats.averageGoalsConceded! * 0.7 +
+  awayStats.averageGoalsConceded! * 0.3
+).toFixed(2));
+
+const match: Match = {
 
     const prediction = predictMatch(match);
 
