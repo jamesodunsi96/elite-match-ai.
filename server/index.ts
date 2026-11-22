@@ -1224,34 +1224,92 @@ app.get('/api/performance', async (_req, res) => {
     }
 
     const performanceRecords = Array.from(uniquePicks.values());
+const performanceRecords = Array.from(uniquePicks.values());
 
-    const won = performanceRecords.filter(
-      (row: any) => row.status === 'WON'
-    ).length;
+const latestPicks = new Map<string, any>();
 
-    const lost = performanceRecords.filter(
-      (row: any) => row.status === 'LOST'
-    ).length;
+for (const row of orderedRecords) {
+  const key = `${row.match_id}:${row.market}`;
+  latestPicks.set(key, row);
+}
 
-    const pending = performanceRecords.filter(
-      (row: any) => row.status === 'PENDING'
-    ).length;
+const latestRecords = Array.from(latestPicks.values());
 
-    const settled = won + lost;
+const dailyPicks = new Map<string, any>();
 
-    return res.json({
-      source: 'SUPABASE',
-      total: performanceRecords.length,
-      entries: records.length,
-      pending,
-      won,
-      lost,
-      settled,
-      accuracy: settled > 0
-        ? Number(((won / settled) * 100).toFixed(1))
-        : null,
-      records: performanceRecords
-    });
+for (const row of records) {
+  const key = `${row.match_id}:${row.market}:${row.prediction_day}`;
+
+  if (!dailyPicks.has(key)) {
+    dailyPicks.set(key, row);
+  }
+}
+
+const dailyRecords = Array.from(dailyPicks.values());
+
+const won = performanceRecords.filter(
+  (row: any) => row.status === 'WON'
+).length;
+
+const lost = performanceRecords.filter(
+  (row: any) => row.status === 'LOST'
+).length;
+
+const pending = performanceRecords.filter(
+  (row: any) => row.status === 'PENDING'
+).length;
+
+const settled = won + lost;
+
+const dailyWon = dailyRecords.filter(
+  (row: any) => row.status === 'WON'
+).length;
+
+const dailyLost = dailyRecords.filter(
+  (row: any) => row.status === 'LOST'
+).length;
+
+const dailyPending = dailyRecords.filter(
+  (row: any) => row.status === 'PENDING'
+).length;
+
+const dailySettled = dailyWon + dailyLost;
+
+const latestWon = latestRecords.filter(
+  (row: any) => row.status === 'WON'
+).length;
+
+const latestLost = latestRecords.filter(
+  (row: any) => row.status === 'LOST'
+).length;
+
+const latestSettled = latestWon + latestLost;
+
+return res.json({
+  source: 'SUPABASE',
+  total: performanceRecords.length,
+  entries: records.length,
+  pending,
+  won,
+  lost,
+  settled,
+  accuracy: settled > 0
+    ? Number(((won / settled) * 100).toFixed(1))
+    : null,
+  dailyTotal: dailyRecords.length,
+  dailyPending,
+  dailyWon,
+  dailyLost,
+  dailySettled,
+  dailyAccuracy: dailySettled > 0
+    ? Number(((dailyWon / dailySettled) * 100).toFixed(1))
+    : null,
+  latestAccuracy: latestSettled > 0
+    ? Number(((latestWon / latestSettled) * 100).toFixed(1))
+    : null,
+  latestRecords,
+  records: performanceRecords
+});
   } catch (error) {
     console.error('Supabase performance read error:', error);
 
