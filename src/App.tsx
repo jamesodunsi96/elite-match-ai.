@@ -766,33 +766,36 @@ useEffect(()=>{
   );
 
   return (
-    <small style={{
-      display:'block',
-      marginTop:5,
-      color:
-        playerCheck?.status==='VERIFIED'
-          ?'#22c55e'
+    <>
+      <small style={{
+        display:'block',
+        marginTop:5,
+        color:
+          playerCheck?.status==='VERIFIED'
+            ?'#22c55e'
+            :playerCheck?.status==='MISMATCH'
+            ?'#ef4444'
+            :'#f59e0b'
+      }}>
+        {verificationLoading
+          ?'Checking registration...'
+          :verificationError
+          ?'Verification unavailable'
+          :playerCheck?.status==='VERIFIED'
+          ?'✓ VERIFIED'
           :playerCheck?.status==='MISMATCH'
-          ?'#ef4444'
-          :'#f59e0b'
-    }}>
-      {verificationLoading
-  ?'Checking registration...'
-  :verificationError
-  ?'Verification unavailable'
-  :playerCheck?.status==='VERIFIED'
-  ?'✓ VERIFIED'
-  :playerCheck?.status==='MISMATCH'
-  ?'⚠ TEAM MISMATCH'
-  :'UNVERIFIED'}
-    </small>
+          ?'⚠ TEAM MISMATCH'
+          :'UNVERIFIED'}
+      </small>
+
+      {playerCheck?.registeredTeam&&(
+        <small style={{display:'block',marginTop:3}}>
+          Registered club: {playerCheck.registeredTeam}
+        </small>
+      )}
+    </>
   );
 })()}
-{playerCheck?.registeredTeam&&(
-  <small style={{display:'block',marginTop:3}}>
-    Registered club: {playerCheck.registeredTeam}
-  </small>
-)}
             </span>
 
             <b>
