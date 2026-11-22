@@ -221,7 +221,7 @@ type TeamMatch = {
   goalsAgainst: number;
 };
 
-async function getTeamRecentMatches(teamId: string) {
+async function getTeamRecentMatches(teamId: string, limit = 5) {
   const endDate = lagosDate(new Date());
   const startDate = addDays(endDate, -365);
 
