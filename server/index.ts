@@ -558,9 +558,11 @@ const prediction = predictMatch(match);
   awayVenue: awayVenueMatches.length
 },
       recentForm: {
-        home: homeStats.form,
-        away: awayStats.form
-      },
+  home: homeStats.form,
+  away: awayStats.form,
+  homeVenue: homeVenueStats.form,
+  awayVenue: awayVenueStats.form
+},
       reasons,
       riskFlags,
       model: prediction.model,
