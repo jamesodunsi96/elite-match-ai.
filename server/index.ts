@@ -550,9 +550,13 @@ const prediction = predictMatch(match);
       estimatedProbability: bestMarket.probability,
       expectedGoals: prediction.expectedGoals,
       sampleSize: {
-        home: homeStats.matchesPlayed,
-        away: awayStats.matchesPlayed
-      },
+  home: homeStats.matchesPlayed,
+  away: awayStats.matchesPlayed,
+  homeOverall: homeOverallMatches.length,
+  awayOverall: awayOverallMatches.length,
+  homeVenue: homeVenueMatches.length,
+  awayVenue: awayVenueMatches.length
+},
       recentForm: {
         home: homeStats.form,
         away: awayStats.form
