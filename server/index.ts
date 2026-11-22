@@ -1104,10 +1104,10 @@ app.get('/api/analyze/:homeTeamId/:awayTeamId', async (req, res) => {
       score: null,
       homeForm: homeStats.form,
       awayForm: awayStats.form,
-      homeGF: homeStats.averageGoalsScored!,
-      homeGA: homeStats.averageGoalsConceded!,
-      awayGF: awayStats.averageGoalsScored!,
-      awayGA: awayStats.averageGoalsConceded!,
+      homeGF,
+      homeGA,
+      awayGF,
+      awayGA,
       dataLabel: 'DEMO'
     };
 
