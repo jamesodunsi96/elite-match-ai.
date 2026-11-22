@@ -789,10 +789,20 @@ useEffect(()=>{
       </small>
 
       {playerCheck?.registeredTeam&&(
-        <small style={{display:'block',marginTop:3}}>
-          Registered club: {playerCheck.registeredTeam}
-        </small>
-      )}
+  <small style={{display:'block',marginTop:3}}>
+    Registered club: {playerCheck.registeredTeam}
+  </small>
+)}
+
+{playerCheck?.reason&&(
+  <small style={{
+    display:'block',
+    marginTop:3,
+    color:'#94a3b8'
+  }}>
+    Audit: {playerCheck.reason}
+  </small>
+)}
     </>
   );
 })()}
