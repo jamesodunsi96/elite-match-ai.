@@ -333,7 +333,7 @@ async function getTeamRecentMatches(teamId: string, limit = 5) {
 });
   }
 
-  return completed.slice(0, 5);
+  return completed.slice(0, limit);
 }
 
 function summarizeTeam(matches: TeamMatch[]) {
