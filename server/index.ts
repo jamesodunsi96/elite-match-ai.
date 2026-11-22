@@ -2055,12 +2055,27 @@ const ids = [
       }
 
       settled++;
-      results.push({
-        match_id: row.match_id,
-        market: row.market,
-        status: won ? 'WON' : 'LOST',
-        score: `${homeScore}-${awayScore}`
-      });
+
+const settlementStatus = won ? 'WON' : 'LOST';
+
+results.push({
+  match_id: row.match_id,
+  market: row.market,
+  status: settlementStatus,
+  score: `${homeScore}-${awayScore}`
+});
+
+await createDeviceNotifications(
+  'settlements',
+  `Prediction ${settlementStatus}`,
+  `${row.market}: ${homeScore}-${awayScore}. Your prediction is ${settlementStatus}.`,
+  {
+    screen: 'performance',
+    matchId: String(row.match_id),
+    status: settlementStatus
+  },
+  `settlement-${row.id}-${settlementStatus}`
+);
     }
 
     return res.json({
