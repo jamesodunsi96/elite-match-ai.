@@ -2065,17 +2065,6 @@ results.push({
   score: `${homeScore}-${awayScore}`
 });
 
-await createDeviceNotifications(
-  'settlements',
-  `Prediction ${settlementStatus}`,
-  `${row.market}: ${homeScore}-${awayScore}. Your prediction is ${settlementStatus}.`,
-  {
-    screen: 'performance',
-    matchId: String(row.match_id),
-    status: settlementStatus
-  },
-  `settlement-${row.id}-${settlementStatus}`
-);
     }
 
     return res.json({
