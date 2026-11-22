@@ -715,20 +715,7 @@ useEffect(()=>{
     </div>
 
 
-<div style={{
-  display:'grid',
-  gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
-  gap:18,
-  marginBottom:24
-}}>
-  {(fixtureDetails.fixture?.participants||[]).map((team:any)=>(
-    <article key={`pitch-${team.id}`} style={{padding:14}}>
-      <div className="prob">
-        <b>{team.name}</b>
-        <small>
-          {team.meta?.location==='home'?'HOME':'AWAY'}
-        </small>
-      </div>
+
 
       <div style={{
         background:'linear-gradient(180deg,#176b43,#104b32)',
