@@ -1963,23 +1963,24 @@ const positionCategory=isGoalkeeper
         </article>
       </div>
 
-      <div className="section-title">
-        <div>
-          <label>DATABASE HISTORY</label>
-                <div className="notice">
-        <ShieldCheck/>
-        <div>
-          <b>Early results — small sample</b>
-          <p>
-            Current accuracy is based on {performance.settled} settled
-            predictions: {performance.won} won and {performance.lost} lost.
-            This is an early sample, not proof of long-term performance.
-          </p>
-        </div>
-      </div>
-          <h2>Recorded predictions</h2>
-        </div>
-      </div>
+      <div className="notice">
+  <ShieldCheck/>
+  <div>
+    <b>Early results — small sample</b>
+    <p>
+      Current accuracy is based on {performance.settled} settled
+      predictions: {performance.won} won and {performance.lost} lost.
+      This is an early sample, not proof of long-term performance.
+    </p>
+  </div>
+</div>
+
+<div className="section-title">
+  <div>
+    <label>DATABASE HISTORY</label>
+    <h2>Recorded predictions</h2>
+  </div>
+</div>
 
       {performance.records.length===0?(
         <div className="empty">No prediction records found.</div>
