@@ -168,6 +168,72 @@ app.post('/api/notifications/subscribe', async (req, res) => {
     });
   }
 });
+
+app.post('/api/notifications/test-push', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid()
+  }).safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'A valid deviceId is required.' });
+  }
+
+  if (!pushConfigured) {
+    return res.status(503).json({ error: 'Push is not configured.' });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({ error: 'Notification storage is not configured.' });
+  }
+
+  try {
+    const endpoint = new URL('/rest/v1/push_subscriptions', supabaseUrl);
+    endpoint.searchParams.set('select', 'endpoint,p256dh,auth');
+    endpoint.searchParams.set('device_id', `eq.${parsed.data.deviceId}`);
+
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+
+    const subscriptions = await response.json();
+
+    if (!subscriptions.length) {
+      return res.status(404).json({ error: 'No push subscription found for this device.' });
+    }
+
+    let sent = 0;
+
+    for (const item of subscriptions) {
+      await webpush.sendNotification(
+        {
+          endpoint: item.endpoint,
+          keys: { p256dh: item.p256dh, auth: item.auth }
+        },
+        JSON.stringify({
+          title: 'ELITE MATCH AI',
+          body: 'Success! Your phone push notifications are working.',
+          url: '/'
+        })
+      );
+      sent++;
+    }
+
+    return res.json({ success: true, sent });
+  } catch (error) {
+    console.error('Test push failed:', error);
+    return res.status(500).json({ error: 'Test push could not be delivered.' });
+  }
+});
+
 app.post('/api/notifications/unsubscribe', async (req, res) => {
   const parsed = z.object({
     deviceId: z.string().uuid(),
