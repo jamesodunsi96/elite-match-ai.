@@ -752,7 +752,7 @@ useEffect(()=>{
             top:65,
             right:16,
             zIndex:10000,
-            width:'min(360px, calc(100vw - 32px)',
+            width:'min(360px, calc(100vw - 32px))',
             maxHeight:420,
             overflowY:'auto',
             background:'#10251d',
