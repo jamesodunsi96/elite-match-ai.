@@ -746,7 +746,58 @@ useEffect(()=>{
             <b>EM</b>
           </div>
         </header>
+        {showNotifications&&(
+          <section style={{
+            position:'absolute',
+            top:65,
+            right:16,
+            zIndex:10000,
+            width:'min(360px, calc(100vw - 32px)',
+            maxHeight:420,
+            overflowY:'auto',
+            background:'#10251d',
+            border:'1px solid #d7bd72',
+            borderRadius:12,
+            padding:16,
+            color:'#fff'
+          }}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <h3>Notifications</h3>
+              <button onClick={()=>setShowNotifications(false)}>
+                <X size={18}/>
+              </button>
+            </div>
 
+            {notificationsLoading&&<p>Loading notifications...</p>}
+
+            {!notificationsLoading&&notifications.length===0&&(
+              <p>No notifications yet.</p>
+            )}
+
+            {notifications.map(item=>(
+              <article key={item.id} style={{marginBottom:12,padding:10}}>
+                <b>{item.title}</b>
+                <p>{item.body}</p>
+                <small>{new Date(item.created_at).toLocaleString()}</small>
+                {!item.read_at&&(
+                  <button onClick={()=>{
+                    fetch(`/api/notifications/${item.id}/read`,{
+                      method:'PATCH',
+                      headers:{'Content-Type':'application/json'},
+                      body:JSON.stringify({deviceId})
+                    }).then(()=>{
+                      setNotifications(current=>current.map(n=>
+                        n.id===item.id?{...n,read_at:new Date().toISOString()}:n
+                      ));
+                    });
+                  }}>
+                    Mark as read
+                  </button>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
         <section className="content">
           {chosen?(
             <>
