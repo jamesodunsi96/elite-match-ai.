@@ -786,33 +786,97 @@ async function createDeviceNotifications(
   }
     }
         
+
+class SportmonksRateLimitError extends Error {
+  statusCode = 429;
+
+  constructor(message = 'Sportmonks rate limit reached.') {
+    super(message);
+    this.name = 'SportmonksRateLimitError';
+  }
+}
+
+let sportmonksCooldownUntil = 0;
+
+const sleep = (ms: number) =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
+function getRetryDelay(response: Response): number {
+  const retryAfter = response.headers.get('Retry-After');
+
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+
+    if (Number.isFinite(seconds)) {
+      return Math.max(1000, Math.min(seconds * 1000, 10000));
+    }
+
+    const retryDate = Date.parse(retryAfter);
+
+    if (Number.isFinite(retryDate)) {
+      return Math.max(1000, Math.min(retryDate - Date.now(), 10000));
+    }
+  }
+
+  return 3000;
+}
+
 async function sportmonksGet(url: URL) {
   if (!SPORTMONKS_TOKEN) {
     throw new Error('SPORTMONKS_API_TOKEN is not configured.');
   }
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: SPORTMONKS_TOKEN,
-      Accept: 'application/json'
-    },
-    signal: AbortSignal.timeout(15000)
-  });
+  const maxRetries = 2;
 
-  if (!response.ok) {
-  const detail = await response.text();
-  throw new Error(
-    `Sportmonks returned HTTP ${response.status}: ${detail}`
-  );
-}
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const remainingCooldown = sportmonksCooldownUntil - Date.now();
 
-  const result: any = await response.json();
+    if (remainingCooldown > 0) {
+      await sleep(remainingCooldown);
+    }
 
-  if (!Array.isArray(result.data) && !result.data) {
-    throw new Error('Unexpected Sportmonks response.');
+    const response = await fetch(url, {
+      headers: {
+        Authorization: SPORTMONKS_TOKEN,
+        Accept: 'application/json'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (response.status === 429) {
+      const retryDelay = getRetryDelay(response);
+
+      sportmonksCooldownUntil = Math.max(
+        sportmonksCooldownUntil,
+        Date.now() + retryDelay
+      );
+
+      if (attempt === maxRetries) {
+        throw new SportmonksRateLimitError();
+      }
+
+      await sleep(retryDelay);
+      continue;
+    }
+
+    if (!response.ok) {
+      const detail = await response.text();
+
+      throw new Error(
+        `Sportmonks returned HTTP ${response.status}: ${detail}`
+      );
+    }
+
+    const result: any = await response.json();
+
+    if (!Array.isArray(result.data) && !result.data) {
+      throw new Error('Unexpected Sportmonks response.');
+    }
+
+    return result.data;
   }
 
-  return result.data;
+  throw new SportmonksRateLimitError();
 }
 
 async function getSportmonksFixtures() {
