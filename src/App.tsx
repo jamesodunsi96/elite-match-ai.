@@ -336,6 +336,16 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
     if(deviceId) loadNotifications();
   },[deviceId]);
+    useEffect(()=>{
+    if(!deviceId||!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.ready
+      .then(registration=>registration.pushManager.getSubscription())
+      .then(subscription=>{
+        setPushEnabled(Boolean(subscription));
+      })
+      .catch(()=>{});
+  },[deviceId]);
     const enablePush=async()=>{
     setPushLoading(true);
     setPushMessage('');
