@@ -226,6 +226,71 @@ app.post('/api/notifications/unsubscribe', async (req, res) => {
     });
   }
 });
+app.get('/api/notifications', async (req, res) => {
+  const parsed = z.object({
+    deviceId: z.string().uuid()
+  }).safeParse({
+    deviceId: req.query.deviceId
+  });
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'A valid deviceId is required.'
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(503).json({
+      error: 'Notification storage is not configured.'
+    });
+  }
+
+  try {
+    const endpoint = new URL(
+      '/rest/v1/notifications',
+      supabaseUrl
+    );
+
+    endpoint.searchParams.set(
+      'device_id',
+      `eq.${parsed.data.deviceId}`
+    );
+    endpoint.searchParams.set(
+      'select',
+      'id,type,title,body,data,created_at,read_at'
+    );
+    endpoint.searchParams.set(
+      'order',
+      'created_at.desc'
+    );
+    endpoint.searchParams.set('limit', '50');
+
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    const notifications = await response.json();
+
+    return res.json({ notifications });
+  } catch (error) {
+    console.error('Notification history failed:', error);
+
+    return res.status(500).json({
+      error: 'Could not load notifications.'
+    });
+  }
+});
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
