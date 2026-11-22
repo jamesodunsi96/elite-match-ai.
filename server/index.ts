@@ -1024,7 +1024,13 @@ async function getTeamRecentMatches(teamId: string, limit = 5) {
 });
   }
 
-  return completed.slice(0, limit);
+  return completed
+  .filter(match => Number.isFinite(Date.parse(match.date)))
+  .sort(
+    (a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+  .slice(0, limit);
 }
 
 function summarizeTeam(matches: TeamMatch[]) {
