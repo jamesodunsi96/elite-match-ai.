@@ -287,6 +287,22 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
     loadFixtures();
   },[]);
+    useEffect(()=>{
+    let id=localStorage.getItem('elite-match-device-id');
+
+    if(!id){
+      id=crypto.randomUUID();
+      localStorage.setItem('elite-match-device-id',id);
+    }
+
+    setDeviceId(id);
+
+    fetch('/api/notifications/register-device',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({deviceId:id})
+    }).catch(()=>{});
+  },[]);
   const loadPerformance=()=>{
     setPerformanceLoading(true);
     setPerformanceError('');
