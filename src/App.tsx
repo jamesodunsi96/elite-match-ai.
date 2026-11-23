@@ -491,8 +491,8 @@ const[performanceError,setPerformanceError]=useState('');
         setPerformanceLoading(false);
       });
   };
-  useEffect(()=>{
-    if(page==='AI Best Picks'){
+    useEffect(()=>{
+    if(page==='AI Best Picks'||page==='Overview'){
       loadBestPicks();
     }
   },[page]);
