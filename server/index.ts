@@ -1437,6 +1437,12 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
         bookmakerName: item.bookmaker?.name ?? 'Unknown',
         label: item.label ?? null,
         decimalOdds: item.value ?? null,
+        name: item.name ?? null,
+        originalLabel: item.original_label ?? null,
+        handicap: item.handicap ?? null,
+        total: item.total ?? null,
+        participants: item.participants ?? null,
+        probability: item.probability ?? null,
         stopped: item.stopped === true,
         latestUpdate: item.latest_bookmaker_update ?? null,
         availableFields: Object.keys(item)
