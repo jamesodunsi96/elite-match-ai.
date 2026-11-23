@@ -2648,6 +2648,47 @@ async function runGoalMonitor() {
 
 runGoalMonitor();
 
+async function runPredictionSettlement() {
+  const settlementSecret = process.env.SETTLEMENT_CRON_SECRET;
+
+  try {
+    if (!settlementSecret) {
+      console.warn(
+        'Prediction settlement monitor skipped: secret is missing.'
+      );
+      return;
+    }
+
+    const response = await fetch(
+      `http://127.0.0.1:${PORT}/api/settle-predictions`,
+      {
+        method: 'POST',
+        headers: {
+          'x-settlement-secret': settlementSecret,
+          Accept: 'application/json'
+        },
+        signal: AbortSignal.timeout(120000)
+      }
+    );
+
+    const result = await response.text();
+
+    if (!response.ok) {
+      console.error(
+        `Prediction settlement monitor failed (HTTP ${response.status}): ${result}`
+      );
+    } else {
+      console.log('Prediction settlement monitor:', result);
+    }
+  } catch (error) {
+    console.error('Prediction settlement monitor error:', error);
+  } finally {
+    setTimeout(runPredictionSettlement, 5 * 60 * 1000);
+  }
+}
+
+setTimeout(runPredictionSettlement, 60 * 1000);
+
 // Serve the built React frontend.
     
 // Serve the built React frontend.
