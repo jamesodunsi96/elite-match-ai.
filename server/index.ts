@@ -2156,7 +2156,12 @@ while (true) {
 
   offset += pageSize;
 }
-
+// Sort records from oldest to newest for consistent grouping.
+const orderedRecords = [...records].sort(
+  (a, b) =>
+    new Date(a.created_at).getTime() -
+    new Date(b.created_at).getTime()
+);
     // Use the earliest saved copy for each match and market.
     
 // Combine duplicate copies of the same match and market.
