@@ -1366,9 +1366,10 @@ const bookmakerOdds = await getBestAvailableMarketOdds(
       kickoff: fixture.kickoff,
       home: fixture.home,
       away: fixture.away,
-      market: bestMarket.market,
+       market: bestMarket.market,
       estimatedProbability: bestMarket.probability,
       bookmakerOdds,
+      oddsComparison,
       expectedGoals: prediction.expectedGoals,
       sampleSize: {
   home: homeStats.matchesPlayed,
