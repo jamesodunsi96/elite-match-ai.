@@ -1830,3 +1830,201 @@ hr {
     padding: 16px;
   }
                     }
+
+/* ELITE MATCH AI — GLOBAL PREMIUM THEME */
+:root {
+  color-scheme: dark;
+  --bg: #070b16;
+  --panel: #101a2d;
+  --line: #293954;
+  --muted: #a0aec4;
+  --green: #18df79;
+  --gold: #f4c34f;
+}
+
+body,
+main {
+  background: var(--bg);
+  color: #f2f5ff;
+}
+
+.sidebar {
+  background: #0a1222;
+  border-right: 1px solid var(--line);
+}
+
+.brand b {
+  color: #f5f7ff;
+}
+
+.brand small,
+.sidebar > label {
+  color: var(--muted);
+}
+
+.mark {
+  background: linear-gradient(135deg, #18df79, #087b49);
+  color: #06150e;
+}
+
+.nav {
+  color: #a0aec4;
+}
+
+.nav.active,
+.nav:hover {
+  background: #142b28;
+  color: var(--green);
+}
+
+.nav.active {
+  box-shadow: inset 3px 0 var(--green);
+}
+
+.nav i {
+  background: #263b32;
+  color: var(--gold);
+}
+
+.side-note {
+  background: #101d2d;
+  border-color: var(--line);
+  color: var(--green);
+}
+
+.side-note div {
+  color: #f2f5ff;
+}
+
+header {
+  background: #080f1df2;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  backdrop-filter: blur(12px);
+}
+
+header .right b {
+  background: #142b28;
+  color: var(--green);
+}
+
+.content {
+  color: #f2f5ff;
+}
+
+.stats article,
+.details article,
+.match {
+  background: linear-gradient(145deg, #111e33, #0b1424);
+  border-color: var(--line);
+}
+
+.stats article div,
+.stats small {
+  color: var(--muted);
+}
+
+.stats svg {
+  color: var(--green);
+}
+
+.stats strong {
+  color: #f5f7ff;
+}
+
+.section-title h2,
+.welcome h1 {
+  color: #f5f7ff;
+}
+
+.section-title label,
+.welcome label {
+  color: var(--gold);
+}
+
+.section-title button {
+  color: var(--green);
+}
+
+.search {
+  background: #101a2d;
+  border-color: var(--line);
+}
+
+.search input {
+  color: #f5f7ff;
+}
+
+.hero {
+  background:
+    radial-gradient(ellipse at 90% 15%, #126b4580, transparent 48%),
+    linear-gradient(120deg, #111e33, #0b1424);
+  border-color: var(--line);
+}
+
+.hero label,
+.hero h2 em {
+  color: var(--green);
+}
+
+.hero p {
+  color: var(--muted);
+}
+
+.hero button {
+  background: var(--green);
+  color: #06150e;
+}
+
+.match:hover {
+  border-color: var(--green);
+}
+
+.meta {
+  color: var(--muted);
+}
+
+.meta i {
+  background: #263b32;
+  color: var(--gold);
+}
+
+.teams > div {
+  color: var(--gold);
+}
+
+.teams small,
+.match-foot {
+  color: var(--muted);
+}
+
+.teams > b span {
+  background: #17372b;
+  color: var(--green);
+}
+
+.match-foot strong {
+  color: var(--green);
+}
+
+footer {
+  background: #080f1d;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.date {
+  background: #101a2d;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+@media (max-width: 850px) {
+  main {
+    background: var(--bg);
+  }
+
+  .sidebar {
+    background: #0a1222;
+  }
+}
