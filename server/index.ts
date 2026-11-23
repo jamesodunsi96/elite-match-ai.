@@ -1398,105 +1398,6 @@ if (payload.picks.length > 0) {
   }
 });
 
-// Temporary read-only test for Sportmonks pre-match odds access.
-
-// Read-only odds inspection for Manchester United vs Brentford.
-app.get('/api/test-odds/19722086', async (_req, res) => {
-  try {
-    const url = new URL(
-      'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
-    );
-
-    url.searchParams.set('include', 'bookmaker;market;fixture');
-
-    const odds = await sportmonksGet(url);
-
-    if (!Array.isArray(odds)) {
-      return res.status(502).json({
-        source: 'SPORTMONKS',
-        endpointAccess: 'SUCCESS',
-        error: 'Unexpected odds response format.'
-      });
-    }
-
-    const activeOdds = odds.filter(
-      (item: any) => item.stopped !== true
-    );
-
-    const stoppedOdds = odds.filter(
-      (item: any) => item.stopped === true
-    );
-
-    const latestFirst = [...activeOdds].sort(
-      (a: any, b: any) =>
-        new Date(b.latest_bookmaker_update || 0).getTime() -
-        new Date(a.latest_bookmaker_update || 0).getTime()
-    );
-
-    const sample = latestFirst.slice(0, 20).map((item: any) => ({
-      id: item.id ?? null,
-      fixture_id: item.fixture_id ?? null,
-      market_id: item.market_id ?? null,
-      bookmaker_id: item.bookmaker_id ?? null,
-      label: item.label ?? null,
-      value: item.value ?? null,
-      odds: item.odds ?? null,
-      stopped: item.stopped ?? null,
-      latest_bookmaker_update: item.latest_bookmaker_update ?? null,
-      bookmaker: item.bookmaker ?? null,
-      market: item.market ?? null
-    }));
-
-    return res.json({
-
- // Read-only summary of available Sportmonks odds markets.
-app.get('/api/test-odds/19722086', async (_req, res) => {
-  try {
-    const url = new URL(
-      'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
-    );
-
-    url.searchParams.set('include', 'bookmaker;market;fixture');
-
-    const odds = await sportmonksGet(url);
-
-    if (!Array.isArray(odds)) {
-      return res.status(502).json({
-        source: 'SPORTMONKS',
-        endpointAccess: 'SUCCESS',
-        error: 'Unexpected odds response format.'
-      });
-    }
-
-    const markets = new Map<string, any>();
-
-    for (const item of odds) {
-      const marketId = item.market_id ?? 'unknown';
-      const bookmakerId = item.bookmaker_id ?? 'unknown';
-      const developerName =
-        item.market?.developer_name ?? 'UNKNOWN';
-
-      const key = `${marketId}:${bookmakerId}:${developerName}`;
-
-      if (!markets.has(key)) {
-        markets.set(key, {
-          marketId,
-          marketName: item.market?.name ?? 'Unknown market',
-          developerName,
-          bookmakerId,
-          bookmakerName: item.bookmaker?.name ?? 'Unknown bookmaker',
-          totalRecords: 0,
-          activeRecords: 0,
-          stoppedRecords: 0,
-          labels: [],
-          latestUpdate: null
-        });
-      }
-
-      const group = markets.get(key);
-
-      group.totalRecords += 1;
-
 // Read-only summary of available Sportmonks odds markets.
 app.get('/api/test-odds/19722086', async (_req, res) => {
   try {
@@ -1606,6 +1507,10 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
   }
 });
 
+
+
+      
+    
 
 
 
