@@ -1414,3 +1414,133 @@ main > header .right b {
     font-size: 7px;
   }
 }
+/* PREMIUM FIXTURE MATCH CARDS */
+.matches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.matches .match {
+  width: 100%;
+  min-width: 0;
+  padding: 19px;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(145deg, #111e33, #0b1424);
+  border: 1px solid #293954;
+  border-radius: 15px;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.matches .match:hover {
+  transform: translateY(-3px);
+  border-color: #d5ad4c;
+  box-shadow: 0 14px 30px #0004;
+}
+
+.matches .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 23px;
+  color: #a0aec4;
+  font-size: 10px;
+}
+
+.matches .meta i {
+  color: #6cf0a6;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.matches .teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.matches .teams > b {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #f2f5ff;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.matches .teams > b.away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.matches .teams > b span {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #344761;
+  border-radius: 50%;
+  background: #1a2c43;
+  color: #f4c34f;
+  font-size: 12px;
+}
+
+.matches .teams > div {
+  text-align: center;
+  color: #f4c34f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.matches .teams > div small {
+  display: block;
+  margin-top: 5px;
+  color: #8fa0ba;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.matches .match-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 13px;
+  border-top: 1px solid #293954;
+  color: #a0aec4;
+  font-size: 9px;
+}
+
+.matches .match-foot span,
+.matches .match-foot strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.matches .match-foot strong {
+  color: #6cf0a6;
+  font-size: 9px;
+}
+
+.matches .match-foot svg {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 760px) {
+  .matches {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .matches .match {
+    padding: 16px;
+  }
+}
