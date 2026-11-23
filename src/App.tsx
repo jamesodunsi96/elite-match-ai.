@@ -71,6 +71,12 @@ type BestPick={
   away:string;
   market:string;
   estimatedProbability:number;
+  bookmakerOdds:{
+  bookmaker:string;
+  decimalOdds:number;
+  updatedAt:string|null;
+  source:string;
+}|null;
   expectedGoals:{home:number;away:number};
   sampleSize:{home:number;away:number};
   recentForm:{home:string[];away:string[]};
