@@ -810,12 +810,38 @@ useEffect(()=>{
             <p>No matching active bookmaker price was returned for this market.</p>
           </div>
         </div>
+            )}
+
+      {pick.oddsComparison&&(
+        <>
+          <hr/>
+          <h3>Odds intelligence</h3>
+
+          <div className="prob">
+            <span>Raw bookmaker-implied probability</span>
+            <b>{pct(pick.oddsComparison.rawImpliedProbability)}</b>
+          </div>
+
+          <div className="prob">
+            <span>Model difference</span>
+            <b>
+              {pick.oddsComparison.modelMinusImpliedPercentagePoints>0?'+':''}
+              {pick.oddsComparison.modelMinusImpliedPercentagePoints.toFixed(1)}
+              {' percentage points'}
+            </b>
+          </div>
+
+          <p className="muted">
+            This comparison has not removed bookmaker margin.
+            A positive difference does not prove value or guarantee a result.
+          </p>
+        </>
       )}
+
       <div className="prob">
         <span>Expected goals</span>
         <b>{pick.expectedGoals.home.toFixed(2)} - {pick.expectedGoals.away.toFixed(2)}</b>
       </div>
-
       <div className="prob">
         <span>Recent form</span>
         <b>
