@@ -1398,12 +1398,19 @@ if (payload.picks.length > 0) {
   }
 });
 
-
-// Read-only inspection of five confirmed full-time Sportmonks markets.
-app.get('/api/test-odds/19722086', async (_req, res) => {
+// Read-only inspection of confirmed full-time Sportmonks odds markets.
+app.get('/api/fixture-odds/:fixtureId', async (req, res) => {
   try {
+    const fixtureId = Number(req.params.fixtureId);
+
+    if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) {
+      return res.status(400).json({
+        error: 'A valid fixture ID is required.'
+      });
+    }
+
     const url = new URL(
-      'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
+      `https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/${fixtureId}`
     );
 
     url.searchParams.set('include', 'bookmaker;market;fixture');
@@ -1413,24 +1420,23 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
     if (!Array.isArray(odds)) {
       return res.status(502).json({
         source: 'SPORTMONKS',
-        endpointAccess: 'SUCCESS',
+        fixtureId,
         error: 'Unexpected odds response format.'
       });
     }
 
-    // Exact confirmed full-time market IDs.
     const targetMarkets = new Set([80, 14, 1, 2, 6]);
 
     const records = odds
       .filter((item: any) =>
         targetMarkets.has(Number(item.market_id)) &&
-        item.stopped !== true
+        item.stopped !== true &&
+        Number(item.value) > 1
       )
       .map((item: any) => ({
-        marketId: item.market_id,
+        marketId: Number(item.market_id),
         marketName: item.market?.name ?? 'Unknown',
         developerName: item.market?.developer_name ?? 'UNKNOWN',
-        bookmakerId: item.bookmaker_id,
         bookmakerName: item.bookmaker?.name ?? 'Unknown',
         label: item.label ?? null,
         name: item.name ?? null,
@@ -1441,53 +1447,53 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
         participants: item.participants ?? null,
         impliedProbability: item.probability ?? null,
         latestUpdate: item.latest_bookmaker_update ?? null
-      }))
-      .sort((a: any, b: any) =>
-        a.marketId - b.marketId ||
-        a.bookmakerName.localeCompare(b.bookmakerName)
-      );
+      }));
 
-    const marketSummary = Array.from(targetMarkets).map(id => {
-      const marketRecords = records.filter(
-        (item: any) => Number(item.marketId) === id
+    const markets = [80, 14, 1, 2, 6].map(id => {
+      const selected = records.filter(
+        (item: any) => item.marketId === id
       );
 
       return {
         marketId: id,
-        records: marketRecords.length,
+        records: selected.length,
         bookmakers: [...new Set(
-          marketRecords.map((item: any) => item.bookmakerName)
+          selected.map((item: any) => item.bookmakerName)
         )]
       };
     });
 
     return res.json({
       source: 'SPORTMONKS',
-      fixtureId: 19722086,
+      fixtureId,
       endpointAccess: 'SUCCESS',
       totalOddsRecords: odds.length,
       selectedMarketRecords: records.length,
-      markets: marketSummary,
+      markets,
       records,
       notice:
-        'Active full-time odds only. Implied bookmaker probabilities are not verified AI probabilities. Read-only inspection.'
+        'Active full-time bookmaker odds. Implied probabilities are not verified AI probabilities. Read-only endpoint.'
     });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unknown error';
+
     const statusMatch = message.match(/HTTP (\d{3})/);
 
-    console.error('Sportmonks odds inspection failed:', message);
+    console.error('Sportmonks fixture odds failed:', message);
 
     return res.status(502).json({
       source: 'SPORTMONKS',
-      fixtureId: 19722086,
+      fixtureId: req.params.fixtureId,
       endpointAccess: 'FAILED',
       upstreamStatus: statusMatch ? Number(statusMatch[1]) : null,
-      error: 'Sportmonks odds inspection failed. Check server logs.'
+      error: 'Sportmonks odds request failed. Check server logs.'
     });
   }
 });
+
+
+    
 
 // Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
