@@ -571,7 +571,9 @@ function mapFixture(fixture: any) {
       ? `${fixture.starting_at.replace(' ', 'T')}Z`
       : '',
     home: home?.name || 'Home team',
-    away: away?.name || 'Away team',
+away: away?.name || 'Away team',
+homeLogo: home?.image_path || null,
+awayLogo: away?.image_path || null,
     status:
       fixture.state?.developer_name ||
       fixture.state?.name ||
