@@ -1305,6 +1305,23 @@ const bookmakerOdds = await getBestAvailableMarketOdds(
   Number(fixture.id),
   bestMarket.market
 );
+    const oddsComparison =
+  bookmakerOdds &&
+  Number.isFinite(bookmakerOdds.decimalOdds) &&
+  bookmakerOdds.decimalOdds > 1
+    ? {
+        rawImpliedProbability: Number(
+          (100 / bookmakerOdds.decimalOdds).toFixed(1)
+        ),
+        modelMinusImpliedPercentagePoints: Number(
+          (
+            bestMarket.probability -
+            100 / bookmakerOdds.decimalOdds
+          ).toFixed(1)
+        ),
+        method: 'RAW_IMPLIED_PROBABILITY_UNADJUSTED'
+      }
+    : null;
     const riskFlags: string[] = [];
 
     if (
