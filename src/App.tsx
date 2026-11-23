@@ -2245,7 +2245,7 @@ const positionCategory=isGoalkeeper
                                 </b>
 
                                 <div>
-                                  {m.score||'VS'}
+                                  {m.status==='NS'?'VS':m.score||'VS'}
                                   <small>
                                     {new Date(m.kickoff).toLocaleTimeString(
                                       'en-GB',
