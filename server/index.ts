@@ -1398,7 +1398,7 @@ if (payload.picks.length > 0) {
   }
 });
 
-// Read-only summary of available Sportmonks odds markets.
+// Read-only detailed inspection of key Sportmonks odds markets.
 app.get('/api/test-odds/19722086', async (_req, res) => {
   try {
     const url = new URL(
@@ -1417,95 +1417,71 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
       });
     }
 
-    const markets = new Map<string, any>();
+    const relevantMarkets = odds.filter((item: any) => {
+      const name = item.market?.name ?? '';
+      const developerName = item.market?.developer_name ?? '';
 
-    for (const item of odds) {
-      const marketId = item.market_id ?? 'unknown';
-      const bookmakerId = item.bookmaker_id ?? 'unknown';
-      const developerName =
-        item.market?.developer_name ?? 'UNKNOWN';
+      return /total goals|goal line|both teams to score|double chance|asian handicap|correct score|1st half goals/i.test(
+        `${name} ${developerName}`
+      );
+    });
 
-      const key = `${marketId}:${bookmakerId}:${developerName}`;
-
-      if (!markets.has(key)) {
-        markets.set(key, {
-          marketId,
-          marketName: item.market?.name ?? 'Unknown market',
-          developerName,
-          bookmakerId,
-          bookmakerName: item.bookmaker?.name ?? 'Unknown bookmaker',
-          totalRecords: 0,
-          activeRecords: 0,
-          stoppedRecords: 0,
-          labels: [],
-          latestUpdate: null
-        });
-      }
-
-      const group = markets.get(key);
-      group.totalRecords += 1;
-
-      if (item.stopped === true) {
-        group.stoppedRecords += 1;
-      } else {
-        group.activeRecords += 1;
-      }
-
-      if (
-        item.label &&
-        !group.labels.includes(item.label) &&
-        group.labels.length < 10
-      ) {
-        group.labels.push(item.label);
-      }
-
-      if (
-        item.latest_bookmaker_update &&
-        (!group.latestUpdate ||
-          new Date(item.latest_bookmaker_update).getTime() >
-          new Date(group.latestUpdate).getTime())
-      ) {
-        group.latestUpdate = item.latest_bookmaker_update;
-      }
-    }
-
-    const marketSummary = Array.from(markets.values()).sort(
-      (a, b) =>
-        a.marketName.localeCompare(b.marketName) ||
-        a.bookmakerName.localeCompare(b.bookmakerName)
-    );
+    const records = relevantMarkets
+      .map((item: any) => ({
+        id: item.id,
+        fixtureId: item.fixture_id,
+        marketId: item.market_id,
+        marketName: item.market?.name ?? 'Unknown',
+        developerName: item.market?.developer_name ?? 'UNKNOWN',
+        bookmakerId: item.bookmaker_id,
+        bookmakerName: item.bookmaker?.name ?? 'Unknown',
+        label: item.label ?? null,
+        decimalOdds: item.value ?? null,
+        stopped: item.stopped === true,
+        latestUpdate: item.latest_bookmaker_update ?? null,
+        availableFields: Object.keys(item)
+      }))
+      .sort(
+        (a: any, b: any) =>
+          a.marketName.localeCompare(b.marketName) ||
+          a.bookmakerName.localeCompare(b.bookmakerName) ||
+          String(a.label).localeCompare(String(b.label))
+      );
 
     return res.json({
       source: 'SPORTMONKS',
       fixtureId: 19722086,
       endpointAccess: 'SUCCESS',
       totalOddsRecords: odds.length,
-      uniqueMarketBookmakerGroups: marketSummary.length,
-      activeRecords: odds.filter(
-        (item: any) => item.stopped !== true
+      relevantRecords: records.length,
+      activeRecords: records.filter(
+        (item: any) => !item.stopped
       ).length,
-      stoppedRecords: odds.filter(
-        (item: any) => item.stopped === true
+      stoppedRecords: records.filter(
+        (item: any) => item.stopped
       ).length,
-      markets: marketSummary,
-      notice: 'Read-only market summary. No predictions or bets are changed.'
+      records,
+      notice:
+        'Read-only odds inspection. No predictions or bets are changed.'
     });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unknown error';
     const statusMatch = message.match(/HTTP (\d{3})/);
 
-    console.error('Sportmonks odds summary failed:', message);
+    console.error('Sportmonks detailed odds inspection failed:', message);
 
     return res.status(502).json({
       source: 'SPORTMONKS',
       fixtureId: 19722086,
       endpointAccess: 'FAILED',
       upstreamStatus: statusMatch ? Number(statusMatch[1]) : null,
-      error: 'Sportmonks odds summary failed. Check server logs.'
+      error: 'Sportmonks odds inspection failed. Check server logs.'
     });
   }
 });
+
+    
 
 
 
