@@ -1398,7 +1398,8 @@ if (payload.picks.length > 0) {
   }
 });
 
-// Read-only detailed inspection of key Sportmonks odds markets.
+
+// Read-only inspection of five confirmed full-time Sportmonks markets.
 app.get('/api/test-odds/19722086', async (_req, res) => {
   try {
     const url = new URL(
@@ -1417,75 +1418,66 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
       });
     }
 
-   
-    // Summarise every Sportmonks market without returning hundreds of odds records.
-    const marketGroups = new Map<string, any>();
+    // Exact confirmed full-time market IDs.
+    const targetMarkets = new Set([80, 14, 1, 2, 6]);
 
-    for (const item of odds) {
-      const marketName = item.market?.name ?? 'Unknown';
-      const developerName = item.market?.developer_name ?? 'UNKNOWN';
-      const marketId = item.market_id;
-      const key = `${marketId}:${developerName}`;
-
-      if (!marketGroups.has(key)) {
-        marketGroups.set(key, {
-          marketId,
-          marketName,
-          developerName,
-          totalRecords: 0,
-          activeRecords: 0,
-          stoppedRecords: 0,
-          bookmakers: new Set<string>(),
-          latestUpdate: null
-        });
-      }
-
-      const group = marketGroups.get(key);
-
-      group.totalRecords += 1;
-
-      if (item.stopped === true) {
-        group.stoppedRecords += 1;
-      } else {
-        group.activeRecords += 1;
-      }
-
-      group.bookmakers.add(item.bookmaker?.name ?? 'Unknown');
-
-      const update = item.latest_bookmaker_update ?? null;
-
-      if (update && (!group.latestUpdate || update > group.latestUpdate)) {
-        group.latestUpdate = update;
-      }
-    }
-
-    const markets = Array.from(marketGroups.values())
-      .map((market: any) => ({
-        ...market,
-        bookmakers: Array.from(market.bookmakers).sort()
+    const records = odds
+      .filter((item: any) =>
+        targetMarkets.has(Number(item.market_id)) &&
+        item.stopped !== true
+      )
+      .map((item: any) => ({
+        marketId: item.market_id,
+        marketName: item.market?.name ?? 'Unknown',
+        developerName: item.market?.developer_name ?? 'UNKNOWN',
+        bookmakerId: item.bookmaker_id,
+        bookmakerName: item.bookmaker?.name ?? 'Unknown',
+        label: item.label ?? null,
+        name: item.name ?? null,
+        originalLabel: item.original_label ?? null,
+        decimalOdds: item.value ?? null,
+        handicap: item.handicap ?? null,
+        total: item.total ?? null,
+        participants: item.participants ?? null,
+        impliedProbability: item.probability ?? null,
+        latestUpdate: item.latest_bookmaker_update ?? null
       }))
       .sort((a: any, b: any) =>
-        a.marketName.localeCompare(b.marketName)
+        a.marketId - b.marketId ||
+        a.bookmakerName.localeCompare(b.bookmakerName)
       );
+
+    const marketSummary = Array.from(targetMarkets).map(id => {
+      const marketRecords = records.filter(
+        (item: any) => Number(item.marketId) === id
+      );
+
+      return {
+        marketId: id,
+        records: marketRecords.length,
+        bookmakers: [...new Set(
+          marketRecords.map((item: any) => item.bookmakerName)
+        )]
+      };
+    });
 
     return res.json({
       source: 'SPORTMONKS',
       fixtureId: 19722086,
       endpointAccess: 'SUCCESS',
       totalOddsRecords: odds.length,
-      uniqueMarkets: markets.length,
-      activeRecords: odds.filter((item: any) => item.stopped !== true).length,
-      stoppedRecords: odds.filter((item: any) => item.stopped === true).length,
-      markets,
-      notice: 'Read-only market summary. No predictions or bets are changed.'
+      selectedMarketRecords: records.length,
+      markets: marketSummary,
+      records,
+      notice:
+        'Active full-time odds only. Implied bookmaker probabilities are not verified AI probabilities. Read-only inspection.'
     });
-
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unknown error';
     const statusMatch = message.match(/HTTP (\d{3})/);
 
-    console.error('Sportmonks detailed odds inspection failed:', message);
+    console.error('Sportmonks odds inspection failed:', message);
 
     return res.status(502).json({
       source: 'SPORTMONKS',
@@ -1496,15 +1488,6 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
     });
   }
 });
-
-    
-
-
-
-      
-    
-
-
 
 // Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
