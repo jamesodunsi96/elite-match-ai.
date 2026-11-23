@@ -2120,27 +2120,42 @@ app.get('/api/performance', async (_req, res) => {
       'select',
       'id,match_id,prediction_day,competition,kickoff,home_team,away_team,market,estimated_probability,status,actual_home_score,actual_away_score,created_at'
     );
-    endpoint.searchParams.set('order', 'created_at.desc');
-    endpoint.searchParams.set('limit', '100');
+    
+endpoint.searchParams.set('order', 'created_at.desc');
 
-    const response = await fetch(endpoint, {
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`
-      },
-      signal: AbortSignal.timeout(15000)
-    });
+// Read the complete prediction history in pages.
+const pageSize = 1000;
+const records: any[] = [];
+let offset = 0;
 
-    if (!response.ok) {
-      throw new Error(`Supabase read failed: HTTP ${response.status}`);
-    }
+while (true) {
+  const response = await fetch(endpoint, {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Range: `${offset}-${offset + pageSize - 1}`
+    },
+    signal: AbortSignal.timeout(15000)
+  });
 
-    const records = await response.json();
-    const orderedRecords = [...records].sort(
-  (a: any, b: any) =>
-    new Date(a.created_at).getTime() -
-    new Date(b.created_at).getTime()
-);
+  if (!response.ok) {
+    throw new Error(`Supabase read failed: HTTP ${response.status}`);
+  }
+
+  const page = await response.json();
+
+  if (!Array.isArray(page)) {
+    throw new Error('Supabase returned an invalid predictions response.');
+  }
+
+  records.push(...page);
+
+  if (page.length < pageSize) {
+    break;
+  }
+
+  offset += pageSize;
+}
 
     // Use the earliest saved copy for each match and market.
     
