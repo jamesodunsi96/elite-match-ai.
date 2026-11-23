@@ -1301,7 +1301,10 @@ const prediction = predictMatch(match);
     if (!bestMarket || bestMarket.probability < 65) {
       return null;
     }
-
+const bookmakerOdds = await getBestAvailableMarketOdds(
+  Number(fixture.id),
+  bestMarket.market
+);
     const riskFlags: string[] = [];
 
     if (
