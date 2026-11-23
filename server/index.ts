@@ -2626,7 +2626,7 @@ async function checkLiveGoalEvents() {
 
 
 async function runGoalMonitor() {
-  let nextCheckDelay = 120000; // 2 minutes
+  let nextCheckDelay = 300000; // 5 minutes
 
   try {
     await checkLiveGoalEvents();
