@@ -509,7 +509,9 @@ const[performanceError,setPerformanceError]=useState('');
     ),
     [matches,query]
   );
-
+const visibleMatches = page === 'Overview'
+  ? filtered.slice(0, 5)
+  : filtered;
   const chosen=matches.find(m=>m.id===selected);
   const isReal=source==='SPORTMONKS';
   const isDemo=source==='DEMO_DATA';
@@ -2059,9 +2061,17 @@ const positionCategory=isGoalkeeper
                           :'Upcoming fixtures'}
                       </h2>
                     </div>
-                    <button onClick={loadFixtures}>
-                      Refresh fixtures
-                    </button>
+                    <div className="section-actions">
+  {page === 'Overview' && (
+    <button onClick={() => setPage('Fixtures')}>
+      View all fixtures →
+    </button>
+  )}
+
+  <button onClick={loadFixtures}>
+    Refresh fixtures
+  </button>
+</div>
                   </div>
 
                   {page==='Performance'?(
@@ -2220,7 +2230,7 @@ const positionCategory=isGoalkeeper
                         <div className="empty">No matching fixtures found.</div>
                       ):(
                         <div className="matches">
-                          {filtered.map(m=>(
+                          {visibleMatches.map(m=>(
                             <button
                               className="match"
                               key={m.id}
