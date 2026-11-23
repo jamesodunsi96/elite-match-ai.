@@ -923,3 +923,148 @@ footer span {
   }
   }
   
+/* ELITE MATCH AI — PREMIUM DESIGN */
+:root {
+  color-scheme: dark;
+  --bg: #070b16;
+  --panel: #101a2d;
+  --line: #293954;
+  --muted: #a0aec4;
+  --green: #18df79;
+  --gold: #f4c34f;
+}
+
+html, body {
+  background: #070b16;
+  color: #eef3ff;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 80% 0%, #16365a55, transparent 40%),
+    #070b16;
+}
+
+.sidebar {
+  background: linear-gradient(180deg,#080e1b,#0b1424);
+  border-color: #293954;
+}
+
+.mark {
+  background: linear-gradient(145deg,#ffe18a,#d79b25);
+  color: #111827;
+  box-shadow: 0 0 22px #e8b63c35;
+}
+
+.nav { color: #b0bdd2; }
+
+.nav.active, .nav:hover {
+  color: #ffe08a;
+  background: linear-gradient(90deg,#5b461c88,#1b263b);
+  box-shadow: inset 3px 0 #f4c34f;
+}
+
+header {
+  background: #080e1bed;
+  border-color: #293954;
+  backdrop-filter: blur(16px);
+}
+
+header .right i {
+  background: #18df79;
+  box-shadow: 0 0 10px #18df79aa;
+}
+
+.content { width: min(1220px,93%); }
+
+.welcome h1, .heading h1,
+.section-title h2 { color: #f6f8ff; }
+
+.welcome p, .heading p { color: #a0aec4; }
+
+.date, .search {
+  background: #101a2d;
+  border: 1px solid #293954;
+  color: #d4def0;
+  border-radius: 11px;
+}
+
+.hero {
+  border: 1px solid #314563;
+  border-radius: 19px;
+  background:
+    linear-gradient(90deg,#050b16f5,#07101fd9 55%,#07101f55),
+    radial-gradient(ellipse at 85% 100%,#246b43,#102d28 45%,#152744);
+  box-shadow: 0 18px 48px #0005;
+}
+
+.hero label { color: #f2c95c; }
+.hero h2 em { color: #18df79; }
+
+.hero button {
+  background: linear-gradient(135deg,#f6d36c,#dcae3f);
+  color: #151b28;
+  border-radius: 9px;
+}
+
+.stats article, .details article, .match {
+  background: linear-gradient(150deg,#111b2e,#0b1220);
+  border: 1px solid #293954;
+  border-radius: 15px;
+  box-shadow: 0 10px 28px #0003;
+}
+
+.stats article { padding: 18px; }
+.stats article div { color: #aab9d1; }
+.stats svg, .details h3 svg { color: #f4c34f; }
+.stats strong { color: #fff; }
+.stats small { color: #9aa9c2; }
+
+.match:hover { border-color: #d8ad48; }
+
+.teams > b span {
+  background: #1a2c43;
+  color: #e7c15d;
+  border: 1px solid #344761;
+}
+
+.match-foot { border-color: #293954; }
+.match-foot strong { color: #18df79; }
+
+.notice {
+  background: linear-gradient(120deg,#17233a,#111a2b);
+  border: 1px solid #34445f;
+  border-radius: 13px;
+  color: #f2cf70;
+}
+
+.notice p, .muted { color: #aebbd0; }
+
+.empty {
+  background: #0d1627;
+  border-color: #3a4b68;
+  color: #aebbd0;
+}
+
+.prob { color: #aab8ce; }
+.prob b { color: #f1f5ff; }
+.bar { background: #24334b; }
+.bar i {
+  background: linear-gradient(90deg,#13b96a,#28e68a);
+}
+
+hr, .score { border-color: #293954; }
+.xg b { color: #25e38a; }
+
+footer {
+  background: #080e1a;
+  border-color: #293954;
+  color: #8b9bb5;
+}
+
+@media (max-width:650px) {
+  .sidebar { background: #080e1b; }
+  .content { width: 92%; }
+  .hero { border-radius: 15px; }
+  }
+
