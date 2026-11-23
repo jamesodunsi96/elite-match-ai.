@@ -1793,34 +1793,31 @@ const positionCategory=isGoalkeeper
             </>
           ):(
             <>
-              <div className="welcome">
-                <div>
-                  <label>● FOOTBALL INTELLIGENCE PLATFORM</label>
-                  <h1>
-                    {page==='Overview'
-                      ?'Your football command centre'
-                      :page}
-                  </h1>
-                  <p>
-                    {page==='Overview'
-                      ?'A clearer view of the game, powered by data.'
-                      :page==='AI Best Picks'
-                      ?'Automatically ranked statistical estimates from real fixtures.'
-                      :page==='Performance'
-                      ?'Honest tracking starts with recording every prediction.'
-                      :'Explore fixtures and match information.'}
-                  </p>
-                </div>
-
-                <div className="date">
-                  <CalendarDays/>
-                  {new Date().toLocaleDateString('en-GB',{
-                    weekday:'short',
-                    day:'2-digit',
-                    month:'short'
-                  })}
-                </div>
-              </div>
+              {page !== 'Overview' && (
+  <div className="welcome">
+    <div>
+      <label>● FOOTBALL INTELLIGENCE PLATFORM</label>
+      <h1>
+        {page}
+      </h1>
+      <p>
+        {page === 'AI Best Picks'
+          ? 'Automatically ranked statistical estimates from real fixtures.'
+          : page === 'Performance'
+          ? 'Honest tracking starts with recording every prediction.'
+          : 'Explore fixtures and match information.'}
+      </p>
+    </div>
+    <div className="date">
+      <CalendarDays/>
+      {new Date().toLocaleDateString('en-GB',{
+        weekday:'short',
+        day:'2-digit',
+        month:'short'
+      })}
+    </div>
+  </div>
+)}
 
               {page==='Overview'&&(
                 <div className="hero">
