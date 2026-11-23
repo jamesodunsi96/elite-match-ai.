@@ -764,7 +764,48 @@ useEffect(()=>{
           <i style={{width:pct(pick.estimatedProbability)}}/>
         </div>
       </div>
+            <hr/>
 
+      <h3>Live bookmaker odds</h3>
+
+      {pick.bookmakerOdds?(
+        <>
+          <div className="prob">
+            <span>Bookmaker</span>
+            <b>{pick.bookmakerOdds.bookmaker}</b>
+          </div>
+
+          <div className="prob">
+            <span>Decimal odds</span>
+            <b>{pick.bookmakerOdds.decimalOdds.toFixed(2)}</b>
+          </div>
+
+          <div className="prob">
+            <span>Last bookmaker update</span>
+            <b>
+              {pick.bookmakerOdds.updatedAt
+                ?new Date(pick.bookmakerOdds.updatedAt).toLocaleString(
+                  'en-GB',
+                  {timeZone:'Africa/Lagos'}
+                )+' WAT'
+                :'Update time unavailable'}
+            </b>
+          </div>
+
+          <p className="muted">
+            Odds supplied by Sportmonks. Prices may differ from SportyBet
+            and can change.
+          </p>
+        </>
+      ):(
+        <div className="notice">
+          <ShieldCheck/>
+          <div>
+            <b>Odds unavailable</b>
+            <p>No matching active bookmaker price was returned for this market.</p>
+          </div>
+        </div>
+      )}
       <div className="prob">
         <span>Expected goals</span>
         <b>{pick.expectedGoals.home.toFixed(2)} - {pick.expectedGoals.away.toFixed(2)}</b>
