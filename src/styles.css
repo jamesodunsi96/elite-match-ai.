@@ -1649,3 +1649,99 @@ hr {
     grid-template-columns: 1fr;
   }
 }
+
+/* PREMIUM PERFORMANCE DASHBOARD */
+.details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.details article {
+  position: relative;
+  overflow: hidden;
+  min-height: 112px;
+  padding: 19px;
+  border: 1px solid #293954;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #14233a, #0b1424);
+}
+
+.details article h3 {
+  color: #a0aec4;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.details article h2 {
+  margin-top: 12px;
+  color: #f5f7ff;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.details article:nth-child(4) h2 {
+  color: #18df79;
+}
+
+.details article:nth-child(5) h2 {
+  color: #ff7777;
+}
+
+.details article:nth-child(6) h2 {
+  color: #f4c34f;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  margin: 14px 0;
+  border: 1px solid #293954;
+  border-radius: 12px;
+  background: #101a2d;
+}
+
+.notice svg {
+  flex-shrink: 0;
+  color: #18df79;
+}
+
+.notice b {
+  color: #f4d477;
+  font-size: 12px;
+}
+
+.notice p {
+  color: #a0aec4;
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 6px;
+}
+
+.section-title {
+  margin: 25px 0 15px;
+}
+
+.section-title h2 {
+  color: #f5f7ff;
+  font-size: 19px;
+}
+
+@media (max-width: 650px) {
+  .details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .details article {
+    min-height: 100px;
+    padding: 14px;
+  }
+
+  .details article h2 {
+    font-size: 23px;
+  }
+  }
