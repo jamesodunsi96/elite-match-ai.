@@ -1399,40 +1399,81 @@ if (payload.picks.length > 0) {
 });
 
 // Temporary read-only test for Sportmonks pre-match odds access.
+
+// Read-only odds inspection for Manchester United vs Brentford.
 app.get('/api/test-odds/19722086', async (_req, res) => {
   try {
     const url = new URL(
       'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
     );
+
     url.searchParams.set('include', 'bookmaker;market;fixture');
 
     const odds = await sportmonksGet(url);
+
+    if (!Array.isArray(odds)) {
+      return res.status(502).json({
+        source: 'SPORTMONKS',
+        endpointAccess: 'SUCCESS',
+        error: 'Unexpected odds response format.'
+      });
+    }
+
+    const activeOdds = odds.filter(
+      (item: any) => item.stopped !== true
+    );
+
+    const stoppedOdds = odds.filter(
+      (item: any) => item.stopped === true
+    );
+
+    const latestFirst = [...activeOdds].sort(
+      (a: any, b: any) =>
+        new Date(b.latest_bookmaker_update || 0).getTime() -
+        new Date(a.latest_bookmaker_update || 0).getTime()
+    );
+
+    const sample = latestFirst.slice(0, 20).map((item: any) => ({
+      id: item.id ?? null,
+      fixture_id: item.fixture_id ?? null,
+      market_id: item.market_id ?? null,
+      bookmaker_id: item.bookmaker_id ?? null,
+      label: item.label ?? null,
+      value: item.value ?? null,
+      odds: item.odds ?? null,
+      stopped: item.stopped ?? null,
+      latest_bookmaker_update: item.latest_bookmaker_update ?? null,
+      bookmaker: item.bookmaker ?? null,
+      market: item.market ?? null
+    }));
 
     return res.json({
       source: 'SPORTMONKS',
       fixtureId: 19722086,
       endpointAccess: 'SUCCESS',
-      oddsFound: Array.isArray(odds) ? odds.length : null,
-      data: odds,
-      notice: Array.isArray(odds) && odds.length === 0
-        ? 'Endpoint responded, but no odds were returned for this fixture.'
-        : 'Read-only odds access test.'
+      totalOddsRecords: odds.length,
+      activeRecords: activeOdds.length,
+      stoppedRecords: stoppedOdds.length,
+      sampleReturned: sample.length,
+      data: sample,
+      notice: 'Read-only inspection. Only records not marked stopped are shown.'
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     const statusMatch = message.match(/HTTP (\d{3})/);
 
-    console.error('Sportmonks odds access test failed:', message);
+    console.error('Sportmonks odds inspection failed:', message);
 
     return res.status(502).json({
       source: 'SPORTMONKS',
       fixtureId: 19722086,
       endpointAccess: 'FAILED',
       upstreamStatus: statusMatch ? Number(statusMatch[1]) : null,
-      error: 'Sportmonks did not allow the odds request. Check server logs.'
+      error: 'Sportmonks odds inspection failed. Check server logs.'
     });
   }
 });
+
 
 // Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
