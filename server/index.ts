@@ -1398,6 +1398,42 @@ if (payload.picks.length > 0) {
   }
 });
 
+// Temporary read-only test for Sportmonks pre-match odds access.
+app.get('/api/test-odds/19722086', async (_req, res) => {
+  try {
+    const url = new URL(
+      'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
+    );
+    url.searchParams.set('include', 'bookmaker;market;fixture');
+
+    const odds = await sportmonksGet(url);
+
+    return res.json({
+      source: 'SPORTMONKS',
+      fixtureId: 19722086,
+      endpointAccess: 'SUCCESS',
+      oddsFound: Array.isArray(odds) ? odds.length : null,
+      data: odds,
+      notice: Array.isArray(odds) && odds.length === 0
+        ? 'Endpoint responded, but no odds were returned for this fixture.'
+        : 'Read-only odds access test.'
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const statusMatch = message.match(/HTTP (\d{3})/);
+
+    console.error('Sportmonks odds access test failed:', message);
+
+    return res.status(502).json({
+      source: 'SPORTMONKS',
+      fixtureId: 19722086,
+      endpointAccess: 'FAILED',
+      upstreamStatus: statusMatch ? Number(statusMatch[1]) : null,
+      error: 'Sportmonks did not allow the odds request. Check server logs.'
+    });
+  }
+});
+
 // Get real fixtures from Sportmonks.
 app.get('/api/matches', async (_req, res) => {
   try {
