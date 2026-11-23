@@ -1497,6 +1497,53 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
 
       group.totalRecords += 1;
 
+// Read-only summary of available Sportmonks odds markets.
+app.get('/api/test-odds/19722086', async (_req, res) => {
+  try {
+    const url = new URL(
+      'https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/19722086'
+    );
+
+    url.searchParams.set('include', 'bookmaker;market;fixture');
+
+    const odds = await sportmonksGet(url);
+
+    if (!Array.isArray(odds)) {
+      return res.status(502).json({
+        source: 'SPORTMONKS',
+        endpointAccess: 'SUCCESS',
+        error: 'Unexpected odds response format.'
+      });
+    }
+
+    const markets = new Map<string, any>();
+
+    for (const item of odds) {
+      const marketId = item.market_id ?? 'unknown';
+      const bookmakerId = item.bookmaker_id ?? 'unknown';
+      const developerName =
+        item.market?.developer_name ?? 'UNKNOWN';
+
+      const key = `${marketId}:${bookmakerId}:${developerName}`;
+
+      if (!markets.has(key)) {
+        markets.set(key, {
+          marketId,
+          marketName: item.market?.name ?? 'Unknown market',
+          developerName,
+          bookmakerId,
+          bookmakerName: item.bookmaker?.name ?? 'Unknown bookmaker',
+          totalRecords: 0,
+          activeRecords: 0,
+          stoppedRecords: 0,
+          labels: [],
+          latestUpdate: null
+        });
+      }
+
+      const group = markets.get(key);
+      group.totalRecords += 1;
+
       if (item.stopped === true) {
         group.stoppedRecords += 1;
       } else {
@@ -1558,6 +1605,7 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
     });
   }
 });
+
 
 
 
