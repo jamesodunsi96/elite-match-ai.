@@ -15,6 +15,8 @@ type Match={
   kickoff:string;
   home:string;
   away:string;
+  homeLogo?:string|null;
+  awayLogo?:string|null;
   status:string;
   score:string|null;
   dataLabel:string;
