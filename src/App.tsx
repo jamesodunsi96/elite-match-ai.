@@ -2226,7 +2226,7 @@ const positionCategory=isGoalkeeper
                       ):filtered.length===0?(
                         <div className="empty">No matching fixtures found.</div>
                       ):(
-                        <div className="matches">
+                        <div className={`matches ${page === 'Overview' ? 'overview-matches' : ''}`}>
                           {visibleMatches.map(m=>(
                             <button
                               className="match"
