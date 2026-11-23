@@ -1418,13 +1418,22 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
     }
 
     const relevantMarkets = odds.filter((item: any) => {
-      const name = item.market?.name ?? '';
-      const developerName = item.market?.developer_name ?? '';
+  const name = item.market?.name ?? '';
+  const developerName = item.market?.developer_name ?? '';
+  const marketText = `${name} ${developerName}`;
 
-      return /total goals|goal line|both teams to score|double chance|asian handicap|correct score|1st half goals/i.test(
-        `${name} ${developerName}`
-      );
-    });
+  const isTargetMarket =
+    /total goals|goals over\/under|goal line|both teams to score|double chance|match winner|full time result|full-time result|1x2|asian handicap/i.test(
+      marketText
+    );
+
+  const isHalfTimeMarket =
+    /1st half|first half|2nd half|second half|half time/i.test(
+      marketText
+    );
+
+  return isTargetMarket && !isHalfTimeMarket;
+});
 
     const records = relevantMarkets
       .map((item: any) => ({
