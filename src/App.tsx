@@ -77,6 +77,11 @@ type BestPick={
   updatedAt:string|null;
   source:string;
 }|null;
+  oddsComparison:{
+  rawImpliedProbability:number;
+  modelMinusImpliedPercentagePoints:number;
+  method:string;
+}|null;
   expectedGoals:{home:number;away:number};
   sampleSize:{home:number;away:number};
   recentForm:{home:string[];away:string[]};
