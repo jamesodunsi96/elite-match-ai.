@@ -1417,50 +1417,55 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
       });
     }
 
-    const relevantMarkets = odds.filter((item: any) => {
-  const name = item.market?.name ?? '';
-  const developerName = item.market?.developer_name ?? '';
-  const marketText = `${name} ${developerName}`;
+   
+    // Summarise every Sportmonks market without returning hundreds of odds records.
+    const marketGroups = new Map<string, any>();
 
-  const isTargetMarket =
-    /total goals|goals over\/under|goal line|both teams to score|double chance|match winner|full time result|full-time result|1x2|asian handicap/i.test(
-      marketText
-    );
+    for (const item of odds) {
+      const marketName = item.market?.name ?? 'Unknown';
+      const developerName = item.market?.developer_name ?? 'UNKNOWN';
+      const marketId = item.market_id;
+      const key = `${marketId}:${developerName}`;
 
-  const isHalfTimeMarket =
-    /1st half|first half|2nd half|second half|half time/i.test(
-      marketText
-    );
+      if (!marketGroups.has(key)) {
+        marketGroups.set(key, {
+          marketId,
+          marketName,
+          developerName,
+          totalRecords: 0,
+          activeRecords: 0,
+          stoppedRecords: 0,
+          bookmakers: new Set<string>(),
+          latestUpdate: null
+        });
+      }
 
-  return isTargetMarket && !isHalfTimeMarket;
-});
+      const group = marketGroups.get(key);
 
-    const records = relevantMarkets
-      .map((item: any) => ({
-        id: item.id,
-        fixtureId: item.fixture_id,
-        marketId: item.market_id,
-        marketName: item.market?.name ?? 'Unknown',
-        developerName: item.market?.developer_name ?? 'UNKNOWN',
-        bookmakerId: item.bookmaker_id,
-        bookmakerName: item.bookmaker?.name ?? 'Unknown',
-        label: item.label ?? null,
-        decimalOdds: item.value ?? null,
-        name: item.name ?? null,
-        originalLabel: item.original_label ?? null,
-        handicap: item.handicap ?? null,
-        total: item.total ?? null,
-        participants: item.participants ?? null,
-        probability: item.probability ?? null,
-        stopped: item.stopped === true,
-        latestUpdate: item.latest_bookmaker_update ?? null,
-        availableFields: Object.keys(item)
+      group.totalRecords += 1;
+
+      if (item.stopped === true) {
+        group.stoppedRecords += 1;
+      } else {
+        group.activeRecords += 1;
+      }
+
+      group.bookmakers.add(item.bookmaker?.name ?? 'Unknown');
+
+      const update = item.latest_bookmaker_update ?? null;
+
+      if (update && (!group.latestUpdate || update > group.latestUpdate)) {
+        group.latestUpdate = update;
+      }
+    }
+
+    const markets = Array.from(marketGroups.values())
+      .map((market: any) => ({
+        ...market,
+        bookmakers: Array.from(market.bookmakers).sort()
       }))
-      .sort(
-        (a: any, b: any) =>
-          a.marketName.localeCompare(b.marketName) ||
-          a.bookmakerName.localeCompare(b.bookmakerName) ||
-          String(a.label).localeCompare(String(b.label))
+      .sort((a: any, b: any) =>
+        a.marketName.localeCompare(b.marketName)
       );
 
     return res.json({
@@ -1468,17 +1473,13 @@ app.get('/api/test-odds/19722086', async (_req, res) => {
       fixtureId: 19722086,
       endpointAccess: 'SUCCESS',
       totalOddsRecords: odds.length,
-      relevantRecords: records.length,
-      activeRecords: records.filter(
-        (item: any) => !item.stopped
-      ).length,
-      stoppedRecords: records.filter(
-        (item: any) => item.stopped
-      ).length,
-      records,
-      notice:
-        'Read-only odds inspection. No predictions or bets are changed.'
+      uniqueMarkets: markets.length,
+      activeRecords: odds.filter((item: any) => item.stopped !== true).length,
+      stoppedRecords: odds.filter((item: any) => item.stopped === true).length,
+      markets,
+      notice: 'Read-only market summary. No predictions or bets are changed.'
     });
+
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unknown error';
