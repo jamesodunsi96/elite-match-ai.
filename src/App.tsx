@@ -1842,7 +1842,94 @@ const positionCategory=isGoalkeeper
                   <div className="ball">⚽</div>
                 </div>
               )}
+              {page==='Overview'&&(
+                <section style={{marginBottom:28}}>
+                  <div className="section-title">
+                    <div>
+                      <label>MARKET COMPARISON · EXPERIMENTAL</label>
+                      <h2>Odds Intelligence</h2>
+                    </div>
+                    <button onClick={loadBestPicks} disabled={bestLoading}>
+                      {bestLoading?'Updating…':'Refresh odds'}
+                    </button>
+                  </div>
 
+                  {bestError?(
+                    <div className="notice">
+                      <ShieldCheck/>
+                      <div>
+                        <b>Odds intelligence unavailable</b>
+                        <p>{bestError}</p>
+                      </div>
+                    </div>
+                  ):(
+                    <>
+                      <div className="stats">
+                        <article>
+                          <div><ChartNoAxesCombined/>Comparisons available</div>
+                          <strong>{bestPicks.filter(p=>p.oddsComparison).length}</strong>
+                          <small>Current experimental picks</small>
+                        </article>
+                        <article>
+                          <div><Target/>Positive model gaps</div>
+                          <strong>{bestPicks.filter(p=>p.oddsComparison&&p.oddsComparison.modelMinusImpliedPercentagePoints>0).length}</strong>
+                          <small>Before bookmaker-margin adjustment</small>
+                        </article>
+                        <article>
+                          <div><Activity/>Bookmaker prices</div>
+                          <strong>{bestPicks.filter(p=>p.bookmakerOdds).length}</strong>
+                          <small>Prices returned by Sportmonks</small>
+                        </article>
+                        <article>
+                          <div><ShieldCheck/>Validation status</div>
+                          <strong style={{fontSize:15}}>Experimental</strong>
+                          <small>Not calibrated or backtested</small>
+                        </article>
+                      </div>
+
+                      <article className="match">
+                        <h3>Largest positive model-price gaps</h3>
+                        {bestPicks
+                          .filter(p=>p.oddsComparison!==null)
+                          .sort((a,b)=>
+                            (b.oddsComparison?.modelMinusImpliedPercentagePoints??-Infinity)-
+                            (a.oddsComparison?.modelMinusImpliedPercentagePoints??-Infinity)
+                          )
+                          .slice(0,3)
+                          .map(p=>(
+                            <div className="score" key={p.matchId}>
+                              <span>
+                                <b>{p.home} vs {p.away}</b>
+                                <small style={{display:'block',marginTop:4}}>
+                                  {p.market} · {p.bookmakerOdds?.bookmaker||'Bookmaker unavailable'}
+                                </small>
+                              </span>
+                              <b>
+                                {p.oddsComparison!.modelMinusImpliedPercentagePoints>0?'+':''}
+                                {p.oddsComparison!.modelMinusImpliedPercentagePoints.toFixed(1)} pp
+                              </b>
+                            </div>
+                          ))}
+                        {bestPicks.length===0&&(
+                          <p className="muted">Loading current odds comparisons…</p>
+                        )}
+                      </article>
+
+                      <div className="notice">
+                        <ShieldCheck/>
+                        <div>
+                          <b>Comparison is not a value-bet signal</b>
+                          <p>
+                            Implied probabilities are raw calculations from decimal odds.
+                            Bookmaker margin has not been removed, and the model is not validated.
+                            Prices may differ from SportyBet and can change.
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </section>
+              )}
               {page==='AI Best Picks'?(
                 <>
                   <div className="stats">
