@@ -12,3 +12,25 @@
     gap: 8px;
   }
 }
+.overview-matches .match {
+  padding: 11px 13px;
+  border-radius: 9px;
+}
+
+.overview-matches .teams {
+  padding: 12px 0;
+}
+
+.overview-matches .teams > b {
+  font-size: 10px;
+}
+
+.overview-matches .teams > b span {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+}
+
+.overview-matches .match-foot {
+  padding-top: 8px;
+}
