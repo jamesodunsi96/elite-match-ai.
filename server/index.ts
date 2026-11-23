@@ -2624,14 +2624,26 @@ async function checkLiveGoalEvents() {
   goalMonitorStarted = true;
 }
 
+
 async function runGoalMonitor() {
+  let nextCheckDelay = 120000; // 2 minutes
+
   try {
     await checkLiveGoalEvents();
   } catch (error) {
     console.error('Live goal monitor error:', error);
+
+    const isRateLimit =
+      error instanceof Error &&
+      error.name === 'SportmonksRateLimitError';
+
+    if (isRateLimit) {
+      nextCheckDelay = 300000; // 5 minutes after rate limit
+      console.warn('Sportmonks rate limit reached. Goal monitor paused for 5 minutes.');
+    }
   }
 
-  setTimeout(runGoalMonitor, 30000);
+  setTimeout(runGoalMonitor, nextCheckDelay);
 }
 
 runGoalMonitor();
