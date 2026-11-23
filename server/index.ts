@@ -1109,7 +1109,110 @@ function getMarketCandidates(probabilities: any) {
       Number.isFinite(item.probability)
   );
 }
+async function getBestAvailableMarketOdds(
+  fixtureId: number,
+  market: string
+) {
+  const marketRules: Record<string, {
+    marketId: number;
+    matches: (item: any) => boolean;
+  }> = {
+    'Over 1.5 Goals': {
+      marketId: 80,
+      matches: item =>
+        item.label?.toLowerCase() === 'over' &&
+        Number(item.total) === 1.5
+    },
+    'Under 3.5 Goals': {
+      marketId: 80,
+      matches: item =>
+        item.label?.toLowerCase() === 'under' &&
+        Number(item.total) === 3.5
+    },
+    'Over 2.5 Goals': {
+      marketId: 80,
+      matches: item =>
+        item.label?.toLowerCase() === 'over' &&
+        Number(item.total) === 2.5
+    },
+    'BTTS - Yes': {
+      marketId: 14,
+      matches: item =>
+        item.label?.toLowerCase() === 'yes'
+    },
+    'BTTS - No': {
+      marketId: 14,
+      matches: item =>
+        item.label?.toLowerCase() === 'no'
+    },
+    'Home or Draw': {
+      marketId: 2,
+      matches: item => {
+        const label = (item.label ?? '').toLowerCase();
+        return label.includes('home') && label.includes('draw');
+      }
+    },
+    'Away or Draw': {
+      marketId: 2,
+      matches: item => {
+        const label = (item.label ?? '').toLowerCase();
+        return label.includes('away') && label.includes('draw');
+      }
+    }
+  };
 
+  const rule = marketRules[market];
+
+  if (!rule) {
+    return null;
+  }
+
+  try {
+    const url = new URL(
+      `https://api.sportmonks.com/v3/football/odds/pre-match/fixtures/${fixtureId}`
+    );
+
+    url.searchParams.set('include', 'bookmaker;market');
+
+    const odds = await sportmonksGet(url);
+
+    if (!Array.isArray(odds)) {
+      return null;
+    }
+
+    const matchingOdds = odds
+      .filter((item: any) =>
+        Number(item.market_id) === rule.marketId &&
+        item.stopped !== true &&
+        Number(item.value) > 1 &&
+        rule.matches(item)
+      )
+      .sort(
+        (a: any, b: any) =>
+          Number(b.value) - Number(a.value)
+      );
+
+    if (matchingOdds.length === 0) {
+      return null;
+    }
+
+    const best = matchingOdds[0];
+
+    return {
+      bookmaker: best.bookmaker?.name ?? 'Unknown',
+      decimalOdds: Number(best.value),
+      updatedAt: best.latest_bookmaker_update ?? null,
+      source: 'SPORTMONKS'
+    };
+  } catch (error) {
+    console.error(
+      `Odds lookup failed for fixture ${fixtureId}:`,
+      error
+    );
+
+    return null;
+  }
+      }
 async function analyseFixtureForBestPick(fixture: any) {
   if (!fixture.homeTeamId || !fixture.awayTeamId) {
     return null;
