@@ -1028,6 +1028,25 @@ useEffect(()=>{
           </section>
         )}
         <section className="content">
+          
+{!chosen && page === 'Overview' && (
+  <div className="dashboard-heading">
+    <div>
+      <span className="eyebrow">ELITE MATCH AI / WORKSPACE</span>
+      <h1>Command Centre</h1>
+      <p>
+        Your football intelligence dashboard. Explore fixtures,
+        statistical analysis and prediction performance.
+      </p>
+    </div>
+
+    <div className={`connection-pill ${isReal ? 'connected' : 'disconnected'}`}>
+      <span className="connection-dot" />
+      {isReal ? 'SPORTMONKS CONNECTED' : source}
+    </div>
+  </div>
+)}
+  
           {chosen?(
             <>
               <button className="back" onClick={()=>setSelected(null)}>
