@@ -2244,6 +2244,11 @@ const positionCategory=isGoalkeeper
                 minute:'2-digit'
               })}
             </small>
+                        <small>
+              Starts in {Math.max(0,Math.ceil(
+                (new Date(m.kickoff).getTime()-Date.now())/86400000
+              ))} days
+            </small>
           </div>
 
           <b className="away team-with-logo">
