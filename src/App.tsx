@@ -2255,8 +2255,7 @@ const positionCategory=isGoalkeeper
   {(() => {
     const remaining = Math.max(
       0,
-      new Date(m.kickoff).getTime() - Date.now()
-    );
+      (new Date(m.kickoff).getTime() - countdownNow
 
     const days = Math.floor(remaining / 86400000);
     const hours = Math.floor((remaining % 86400000) / 3600000);
