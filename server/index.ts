@@ -1368,17 +1368,35 @@ const bookmakerOdds = await getBestAvailableMarketOdds(
         method: 'RAW_IMPLIED_PROBABILITY_UNADJUSTED'
       }
     : null;
+    
     const valueEdge =
-  oddsComparison?.modelMinusImpliedPercentagePoints ?? null;
+      oddsComparison?.modelMinusImpliedPercentagePoints ?? null;
 
-const rankingScore =
-  valueEdge === null
-    ? null
-    : Number((
-        valueEdge -
-        (bookmakerOdds?.freshness?.status === 'STALE' ? 5 : 0) -
-        (bookmakerOdds?.freshness?.status === 'UNAVAILABLE' ? 10 : 0)
-      ).toFixed(1));
+    const freshnessPenalty =
+      bookmakerOdds?.freshness?.status === 'STALE'
+        ? 5
+        : bookmakerOdds?.freshness?.status === 'UNAVAILABLE'
+          ? 10
+          : 0;
+
+    const rankingScore =
+      valueEdge === null
+        ? null
+        : Number((valueEdge - freshnessPenalty).toFixed(1));
+
+    const rankingBreakdown = {
+      rawDifference: valueEdge,
+      freshnessPenalty,
+      finalScore: rankingScore,
+      penaltyReason:
+        freshnessPenalty === 5
+          ? 'STALE_ODDS'
+          : freshnessPenalty === 10
+            ? 'FRESHNESS_UNAVAILABLE'
+            : 'NONE',
+      method: 'EXPERIMENTAL_RAW_IMPLIED_DIFFERENCE_MINUS_FRESHNESS_PENALTY'
+    };
+
     const riskFlags: string[] = [];
 
 if (bookmakerOdds?.freshness?.status === 'STALE') {
