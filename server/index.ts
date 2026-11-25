@@ -1370,6 +1370,21 @@ const bookmakerOdds = await getBestAvailableMarketOdds(
     : null;
     const riskFlags: string[] = [];
 
+if (bookmakerOdds?.freshness?.status === 'STALE') {
+  riskFlags.push(
+    'Bookmaker odds are older than 24 hours.'
+  );
+}
+
+if (
+  !bookmakerOdds ||
+  bookmakerOdds.freshness?.status === 'UNAVAILABLE'
+) {
+  riskFlags.push(
+    'Bookmaker odds freshness could not be verified.'
+  );
+}
+
     if (
       homeStats.matchesPlayed < 5 ||
       awayStats.matchesPlayed < 5
