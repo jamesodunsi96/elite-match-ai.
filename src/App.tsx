@@ -874,23 +874,41 @@ useEffect(()=>{
             <p>There is not enough reliable bookmaker information to calculate an experimental ranking score.</p>
           </div>
         </div>
+      
+      {pick.rankingScore === null ? (
+        <div className="notice">
+          <ShieldCheck/>
+          <div>
+            <b>Ranking unavailable</b>
+            <p>There is not enough reliable bookmaker information to calculate an experimental ranking score.</p>
+          </div>
+        </div>
+      ) : pick.valueEdge !== null && pick.valueEdge > 0 && pick.rankingScore <= 0 ? (
+        <div className="notice">
+          <Clock3/>
+          <div>
+            <b>Positive raw difference, but ranking penalised</b>
+            <p>The model estimate exceeds the raw market-implied probability, but the experimental ranking is reduced by the bookmaker odds freshness penalty.</p>
+          </div>
+        </div>
       ) : pick.rankingScore > 0 ? (
         <div className="notice">
           <ShieldCheck/>
           <div>
             <b>Potential statistical advantage</b>
-            <p>The model estimate is above the raw bookmaker-implied probability. This is experimental, not proof of value or a guarantee.</p>
+            <p>The model estimate exceeds the raw bookmaker-implied probability and has a positive experimental ranking score. This is not proof of value or a guarantee.</p>
           </div>
         </div>
       ) : (
         <div className="notice">
           <ShieldCheck/>
           <div>
-            <b>No positive model-market difference</b>
-            <p>The experimental ranking does not show a positive difference against the available raw market price.</p>
+            <b>No positive raw model-market difference</b>
+            <p>The model estimate does not exceed the available raw bookmaker-implied probability.</p>
           </div>
         </div>
       )}
+
 
       {pick.bookmakerOdds?.freshness.status === 'STALE' && (
         <div className="notice">
