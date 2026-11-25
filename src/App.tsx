@@ -2200,9 +2200,7 @@ const positionCategory=isGoalkeeper
                       </p>
                     </div>
                   )}
-                </>
-              ):(
-              <div className="section-title">
+                  <div className="section-title">
   <div>
     <label>COMING UP</label>
     <h2>Upcoming matches</h2>
@@ -2258,6 +2256,9 @@ const positionCategory=isGoalkeeper
       </button>
     ))}
 </div>
+                </>
+              ):(
+              
                 <>
                   <div className="stats">
                     {[
