@@ -2217,7 +2217,7 @@ const positionCategory=isGoalkeeper
 <div className="matches">
   {matches
     .filter(m =>
-      new Date(m.kickoff).getTime() > Date.now() &&
+     new Date(m.kickoff).getTime() > countdownNow &&
       !/(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY|FINISHED|FT)/i.test(m.status)
     )
     .slice(0,8)
