@@ -71,6 +71,8 @@ type BestPick={
   kickoff:string;
   home:string;
   away:string;
+  homeLogo?:string|null;
+  awayLogo?:string|null;
   market:string;
   estimatedProbability:number;
   bookmakerOdds:{
