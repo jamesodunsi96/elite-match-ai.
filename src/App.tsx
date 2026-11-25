@@ -159,6 +159,7 @@ type AppNotification={
 const nav=[
   {name:'Overview',icon:Activity},
   {name:'Fixtures',icon:CalendarDays},
+  {name:'Football Live',icon:Wifi},
   {name:'AI Best Picks',icon:Sparkles},
   {name:'Performance',icon:ChartNoAxesCombined}
 ];
