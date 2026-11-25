@@ -1368,6 +1368,17 @@ const bookmakerOdds = await getBestAvailableMarketOdds(
         method: 'RAW_IMPLIED_PROBABILITY_UNADJUSTED'
       }
     : null;
+    const valueEdge =
+  oddsComparison?.modelMinusImpliedPercentagePoints ?? null;
+
+const rankingScore =
+  valueEdge === null
+    ? null
+    : Number((
+        valueEdge -
+        (bookmakerOdds?.freshness?.status === 'STALE' ? 5 : 0) -
+        (bookmakerOdds?.freshness?.status === 'UNAVAILABLE' ? 10 : 0)
+      ).toFixed(1));
     const riskFlags: string[] = [];
 
 if (bookmakerOdds?.freshness?.status === 'STALE') {
