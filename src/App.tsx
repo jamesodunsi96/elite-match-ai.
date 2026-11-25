@@ -2245,11 +2245,21 @@ const positionCategory=isGoalkeeper
               })}
             </small>
                         <small>
-              Starts in {Math.max(0,Math.ceil(
-                (new Date(m.kickoff).getTime()-Date.now())/86400000
-              ))} days
-            </small>
-          </div>
+  {(() => {
+    const remaining = Math.max(
+      0,
+      new Date(m.kickoff).getTime() - Date.now()
+    );
+
+    const days = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+
+    if (days > 0) return `Starts in ${days}d ${hours}h`;
+    if (hours > 0) return `Starts in ${hours}h ${minutes}m`;
+    return `Starts in ${minutes}m`;
+  })()}
+</small>
 
           <b className="away team-with-logo">
             {m.away}
