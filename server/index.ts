@@ -2553,7 +2553,17 @@ const ids = [
         fixture.state?.developer_name || fixture.state?.name || ''
       ).toUpperCase();
 
-      if (!['FT', 'FINISHED', 'FULL_TIME'].includes(state)) {
+      const completedStates = [
+  'FT',
+  'AET',
+  'FT_PEN',
+  'FINISHED',
+  'FULL_TIME',
+  'AFTER_EXTRA_TIME',
+  'AFTER_PENALTIES'
+];
+
+if (!completedStates.includes(state)) {
         skipped++;
         continue;
       }
