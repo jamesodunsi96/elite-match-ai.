@@ -77,6 +77,13 @@ type BestPick={
   estimatedProbability:number;
   valueEdge:number|null;
   rankingScore:number|null;
+  rankingBreakdown:{
+  rawDifference:number|null;
+  freshnessPenalty:number;
+  finalScore:number|null;
+  penaltyReason:string;
+  method:string;
+};
   bookmakerOdds:{
   bookmaker:string;
   decimalOdds:number;
