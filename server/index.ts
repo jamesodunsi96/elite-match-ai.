@@ -1111,6 +1111,32 @@ function getMarketCandidates(probabilities: any) {
       Number.isFinite(item.probability)
   );
 }
+function assessOddsFreshness(updatedAt: string | null) {
+  if (!updatedAt) {
+    return {
+      status: 'UNAVAILABLE',
+      ageHours: null
+    };
+  }
+
+  const updatedTime = Date.parse(updatedAt);
+
+  if (!Number.isFinite(updatedTime) || updatedTime > Date.now()) {
+    return {
+      status: 'UNAVAILABLE',
+      ageHours: null
+    };
+  }
+
+  const ageHours = Number(
+    ((Date.now() - updatedTime) / (1000 * 60 * 60)).toFixed(1)
+  );
+
+  return {
+    status: ageHours <= 24 ? 'FRESH' : 'STALE',
+    ageHours
+  };
+}
 async function getBestAvailableMarketOdds(
   fixtureId: number,
   market: string
