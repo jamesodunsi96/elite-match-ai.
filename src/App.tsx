@@ -1057,9 +1057,27 @@ useEffect(()=>{
 
               <div className="heading">
                 <label>MATCH CENTRE · {chosen.competition}</label>
-                <h1>
-                  {chosen.home} <em>vs</em> {chosen.away}
-                </h1>
+                <div className="match-centre-teams">
+  <div>
+    {chosen.homeLogo ? (
+      <img src={chosen.homeLogo} alt={`${chosen.home} logo`} />
+    ) : (
+      <span>{chosen.home[0]}</span>
+    )}
+    <b>{chosen.home}</b>
+  </div>
+
+  <em>VS</em>
+
+  <div>
+    {chosen.awayLogo ? (
+      <img src={chosen.awayLogo} alt={`${chosen.away} logo`} />
+    ) : (
+      <span>{chosen.away[0]}</span>
+    )}
+    <b>{chosen.away}</b>
+  </div>
+</div>
                 <p>
                   Kick-off {formatKickoff(chosen.kickoff)}
                   · {statusLabel(chosen.status)}
