@@ -2117,7 +2117,7 @@ const positionCategory=isGoalkeeper
                       <label>LIVE FOOTBALL CENTRE</label>
                       <h2>Matches happening now</h2>
                     </div>
-                    <button onClick={loadFixtures}>
+                    <button onClick={loadLiveMatches}>
                       <RefreshCw/>
                       Refresh
                     </button>
