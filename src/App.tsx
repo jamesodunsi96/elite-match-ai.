@@ -754,7 +754,11 @@ useEffect(()=>{
 
       <div className="teams">
   <b className="team-with-logo">
-    <span>{pick.home[0]}</span>
+    {pick.homeLogo ? (
+      <img src={pick.homeLogo} alt={`${pick.home} logo`} />
+    ) : (
+      <span>{pick.home[0]}</span>
+    )}
     {pick.home}
   </b>
 
@@ -765,7 +769,11 @@ useEffect(()=>{
 
   <b className="away team-with-logo">
     {pick.away}
-    <span>{pick.away[0]}</span>
+    {pick.awayLogo ? (
+      <img src={pick.awayLogo} alt={`${pick.away} logo`} />
+    ) : (
+      <span>{pick.away[0]}</span>
+    )}
   </b>
 </div>
 
