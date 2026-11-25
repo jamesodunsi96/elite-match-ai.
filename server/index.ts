@@ -1442,6 +1442,8 @@ if (
       awayLogo: fixture.awayLogo || null,
       market: bestMarket.market,
       estimatedProbability: bestMarket.probability,
+      valueEdge,
+      rankingScore,
       bookmakerOdds,
       oddsComparison,
       expectedGoals: prediction.expectedGoals,
