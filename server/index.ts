@@ -1462,6 +1462,7 @@ if (
       estimatedProbability: bestMarket.probability,
       valueEdge,
       rankingScore,
+      rankingBreakdown,
       bookmakerOdds,
       oddsComparison,
       expectedGoals: prediction.expectedGoals,
