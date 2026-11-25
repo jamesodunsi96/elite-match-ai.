@@ -1226,12 +1226,15 @@ async function getBestAvailableMarketOdds(
 
     const best = matchingOdds[0];
 
-    return {
-      bookmaker: best.bookmaker?.name ?? 'Unknown',
-      decimalOdds: Number(best.value),
-      updatedAt: best.latest_bookmaker_update ?? null,
-      source: 'SPORTMONKS'
-    };
+    const updatedAt = best.latest_bookmaker_update ?? null;
+
+return {
+  bookmaker: best.bookmaker?.name ?? 'Unknown',
+  decimalOdds: Number(best.value),
+  updatedAt,
+  freshness: assessOddsFreshness(updatedAt),
+  source: 'SPORTMONKS'
+};
   } catch (error) {
     console.error(
       `Odds lookup failed for fixture ${fixtureId}:`,
