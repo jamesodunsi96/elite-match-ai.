@@ -2070,6 +2070,81 @@ const positionCategory=isGoalkeeper
                     </div>
                   )}
                 </>
+                            ):page==='Football Live'?(
+                <>
+                  <div className="section-title">
+                    <div>
+                      <label>LIVE FOOTBALL CENTRE</label>
+                      <h2>Matches happening now</h2>
+                    </div>
+                    <button onClick={loadFixtures}>
+                      <RefreshCw/>
+                      Refresh
+                    </button>
+                  </div>
+
+                  <div className="notice">
+                    <Wifi/>
+                    <div>
+                      <b>Live match data · Sportmonks</b>
+                      <p>
+                        Live scores and match status update when you refresh.
+                        Select a match to open its Match Centre.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="matches">
+                    {matches.filter(m =>
+                      /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
+                    ).map(m=>(
+                      <button
+                        className="match"
+                        key={m.id}
+                        onClick={()=>setSelected(m.id)}
+                      >
+                        <div className="meta">
+                          <span>{m.competition}</span>
+                          <i>● LIVE</i>
+                        </div>
+
+                        <div className="teams">
+                          <b className="team-with-logo">
+                            {m.homeLogo
+                              ? <img src={m.homeLogo} alt={`${m.home} logo`}/>
+                              : <span>{m.home[0]}</span>}
+                            {m.home}
+                          </b>
+
+                          <div>
+                            <strong>{m.score||'LIVE'}</strong>
+                            <small>Match Centre</small>
+                          </div>
+
+                          <b className="away team-with-logo">
+                            {m.away}
+                            {m.awayLogo
+                              ? <img src={m.awayLogo} alt={`${m.away} logo`}/>
+                              : <span>{m.away[0]}</span>}
+                          </b>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {matches.filter(m =>
+                    /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
+                  ).length===0&&(
+                    <div className="empty">
+                      <Wifi/>
+                      <h3>No live matches found right now</h3>
+                      <p>
+                        Refresh later when matches are in progress.
+                        Upcoming fixtures are still available in Fixtures.
+                      </p>
+                    </div>
+                  )}
+                </>
               ):(
                 <>
                   <div className="stats">
