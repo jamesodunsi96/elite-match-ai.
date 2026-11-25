@@ -2121,3 +2121,45 @@ footer {
     font-size: 11px;
   }
 }
+/* BEST PICKS TEAM CREST SIZE FIX */
+.details .teams .team-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.details .teams .team-with-logo img {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  border-radius: 50%;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #293954;
+}
+
+@media (max-width: 650px) {
+  .details .teams {
+    grid-template-columns: minmax(0,1fr) 40px minmax(0,1fr);
+    gap: 5px;
+  }
+
+  .details .teams .team-with-logo {
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  .details .teams .team-with-logo img,
+  .details .teams .team-with-logo span {
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    max-width: 29px;
+    flex-basis: 29px;
+  }
+}
