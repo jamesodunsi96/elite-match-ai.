@@ -2255,7 +2255,8 @@ const positionCategory=isGoalkeeper
   {(() => {
     const remaining = Math.max(
       0,
-      (new Date(m.kickoff).getTime() - countdownNow
+      new Date(m.kickoff).getTime() - countdownNow
+    );
 
     const days = Math.floor(remaining / 86400000);
     const hours = Math.floor((remaining % 86400000) / 3600000);
@@ -2266,6 +2267,7 @@ const positionCategory=isGoalkeeper
     return `Starts in ${minutes}m`;
   })()}
 </small>
+</div>
 
           <b className="away team-with-logo">
             {m.away}
