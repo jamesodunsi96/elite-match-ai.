@@ -314,6 +314,19 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
     loadFixtures();
   },[]);
+  useEffect(()=>{
+  if(page!=='Football Live') return;
+
+  loadFixtures();
+
+  const timer=window.setInterval(()=>{
+    loadFixtures();
+  },60000);
+
+  return ()=>{
+    window.clearInterval(timer);
+  };
+},[page]);
     useEffect(()=>{
     let id=localStorage.getItem('elite-match-device-id');
 
