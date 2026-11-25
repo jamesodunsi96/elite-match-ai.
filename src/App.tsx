@@ -2135,7 +2135,7 @@ const positionCategory=isGoalkeeper
                   </div>
 
                   <div className="matches">
-                    {matches.filter(m =>
+                    liveMatches.filter(m =>
                       /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
                     ).map(m=>(
                       <button
