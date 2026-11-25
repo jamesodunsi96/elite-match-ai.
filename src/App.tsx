@@ -865,16 +865,6 @@ useEffect(()=>{
       </div>
 
       <hr/>
-
-      {pick.rankingScore === null ? (
-        <div className="notice">
-          <ShieldCheck/>
-          <div>
-            <b>Ranking unavailable</b>
-            <p>There is not enough reliable bookmaker information to calculate an experimental ranking score.</p>
-          </div>
-        </div>
-      
       {pick.rankingScore === null ? (
         <div className="notice">
           <ShieldCheck/>
