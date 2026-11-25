@@ -751,13 +751,21 @@ useEffect(()=>{
       </div>
 
       <div className="teams">
-        <b>{pick.home}</b>
-        <div>
-          VS
-          <small>{formatKickoff(pick.kickoff)}</small>
-        </div>
-        <b className="away">{pick.away}</b>
-      </div>
+  <b className="team-with-logo">
+    <span>{pick.home[0]}</span>
+    {pick.home}
+  </b>
+
+  <div>
+    VS
+    <small>{formatKickoff(pick.kickoff)}</small>
+  </div>
+
+  <b className="away team-with-logo">
+    {pick.away}
+    <span>{pick.away[0]}</span>
+  </b>
+</div>
 
       <hr/>
 
