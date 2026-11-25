@@ -846,7 +846,25 @@ useEffect(()=>{
           <i style={{width:pct(pick.estimatedProbability)}}/>
         </div>
       </div>
-            <hr/>
+                  <div className="prob">
+        <span>Experimental value score</span>
+        <b>
+          {pick.rankingScore === null
+            ? 'Unavailable'
+            : `${pick.rankingScore.toFixed(1)} pts`}
+        </b>
+      </div>
+
+      <div className="prob">
+        <span>Model vs raw market</span>
+        <b>
+          {pick.valueEdge === null
+            ? 'Unavailable'
+            : `${pick.valueEdge > 0 ? '+' : ''}${pick.valueEdge.toFixed(1)} pts`}
+        </b>
+      </div>
+
+      <hr/>
 
       <h3>Live bookmaker odds</h3>
 
