@@ -75,10 +75,16 @@ type BestPick={
   awayLogo?:string|null;
   market:string;
   estimatedProbability:number;
+  valueEdge:number|null;
+  rankingScore:number|null;
   bookmakerOdds:{
   bookmaker:string;
   decimalOdds:number;
   updatedAt:string|null;
+  freshness:{
+  status:string;
+  ageHours:number|null;
+};
   source:string;
 }|null;
   oddsComparison:{
