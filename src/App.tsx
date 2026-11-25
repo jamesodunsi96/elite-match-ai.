@@ -283,6 +283,30 @@ const[performanceError,setPerformanceError]=useState('');
     });
   };
 
+  const loadLiveMatches=()=>{
+    setLiveLoading(true);
+    setLiveError('');
+
+    fetch('/api/live-matches')
+      .then(async r=>{
+        const data=await r.json();
+        if(!r.ok){
+          throw new Error(data.warning||'Live matches request failed.');
+        }
+        return data;
+      })
+      .then(data=>{
+        setLiveMatches(data.matches||[]);
+      })
+      .catch(error=>{
+        setLiveMatches([]);
+        setLiveError(error.message||'Unable to load live matches.');
+      })
+      .finally(()=>{
+        setLiveLoading(false);
+      });
+  };
+  
   const loadBestPicks=()=>{
     setBestLoading(true);
     setBestError('');
