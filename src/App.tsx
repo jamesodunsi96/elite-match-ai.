@@ -2162,7 +2162,7 @@ const positionCategory=isGoalkeeper
                       /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
                     ).map(m=>(
                       <button
-                        className="match"
+                        className="match live-match"
                         key={m.id}
                         onClick={()=>setSelected(m.id)}
                       >
