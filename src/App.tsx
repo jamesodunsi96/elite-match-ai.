@@ -2202,6 +2202,62 @@ const positionCategory=isGoalkeeper
                   )}
                 </>
               ):(
+              <div className="section-title">
+  <div>
+    <label>COMING UP</label>
+    <h2>Upcoming matches</h2>
+  </div>
+</div>
+
+<div className="matches">
+  {matches
+    .filter(m =>
+      new Date(m.kickoff).getTime() > Date.now() &&
+      !/(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY|FINISHED|FT)/i.test(m.status)
+    )
+    .slice(0,8)
+    .map(m=>(
+      <button
+        className="match"
+        key={m.id}
+        onClick={()=>setSelected(m.id)}
+      >
+        <div className="meta">
+          <span>{m.competition}</span>
+          <i>UPCOMING</i>
+        </div>
+
+        <div className="teams">
+          <b className="team-with-logo">
+            {m.homeLogo
+              ? <img src={m.homeLogo} alt={`${m.home} logo`}/>
+              : <span>{m.home[0]}</span>}
+            {m.home}
+          </b>
+
+          <div>
+            <strong>VS</strong>
+            <small>
+              {new Date(m.kickoff).toLocaleString('en-NG',{
+                timeZone:'Africa/Lagos',
+                day:'numeric',
+                month:'short',
+                hour:'2-digit',
+                minute:'2-digit'
+              })}
+            </small>
+          </div>
+
+          <b className="away team-with-logo">
+            {m.away}
+            {m.awayLogo
+              ? <img src={m.awayLogo} alt={`${m.away} logo`}/>
+              : <span>{m.away[0]}</span>}
+          </b>
+        </div>
+      </button>
+    ))}
+</div>
                 <>
                   <div className="stats">
                     {[
