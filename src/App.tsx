@@ -891,7 +891,15 @@ useEffect(()=>{
                 :'Update time unavailable'}
             </b>
           </div>
-
+          <div className="prob">
+            <span>Odds freshness</span>
+            <b>
+              {pick.bookmakerOdds.freshness.status}
+              {pick.bookmakerOdds.freshness.ageHours !== null
+                ? ` · ${pick.bookmakerOdds.freshness.ageHours} hours old`
+                : ''}
+            </b>
+          </div>
           <p className="muted">
             Odds supplied by Sportmonks. Prices may differ from SportyBet
             and can change.
