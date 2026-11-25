@@ -2141,6 +2141,15 @@ const positionCategory=isGoalkeeper
     <p>Getting the latest match data from Sportmonks.</p>
   </div>
 )}
+                  {liveError&&(
+  <div className="notice">
+    <Wifi/>
+    <div>
+      <b>Live data unavailable</b>
+      <p>{liveError}</p>
+    </div>
+  </div>
+)}
                   <div className="matches">
                     {liveMatches.filter(m =>
                       /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
