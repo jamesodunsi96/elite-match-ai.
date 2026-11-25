@@ -2172,7 +2172,7 @@ const positionCategory=isGoalkeeper
                       ['Fixtures found',bestMeta?.fixturesFound??'—'],
                       ['Fixtures analysed',bestMeta?.fixturesAnalysed??'—'],
                       ['Picks returned',bestMeta?.picksReturned??'—'],
-                      ['Engine','100.0']
+                      ['Engine version','100.0']
                     ].map(([title,value])=>(
                       <article key={String(title)}>
                         <div><BrainCircuit/>{title}</div>
@@ -2184,7 +2184,7 @@ const positionCategory=isGoalkeeper
 
                   <div className="section-title">
                     <div>
-                      <label>ELITE MATCH AI 100.0</label>
+                      <label>ELITE MATCH AI · ENGINE VERSION 100.0</label>
                       <h2>Automatically ranked Best Picks</h2>
                     </div>
                     <button
