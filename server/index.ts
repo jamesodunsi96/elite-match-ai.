@@ -1215,33 +1215,45 @@ async function getBestAvailableMarketOdds(
     return null;
   }
       }
+function weightedGoalAverage(
+  matches: TeamMatch[],
+  field: 'goalsFor' | 'goalsAgainst'
+) {
+  if (!matches.length) return 0;
+
+  let weightedTotal = 0;
+  let totalWeight = 0;
+
+  matches.forEach((match, index) => {
+    const weight = 1 / (1 + index * 0.08);
+    weightedTotal += match[field] * weight;
+    totalWeight += weight;
+  });
+
+  return Number((weightedTotal / totalWeight).toFixed(2));
+}
 async function analyseFixtureForBestPick(fixture: any) {
   if (!fixture.homeTeamId || !fixture.awayTeamId) {
     return null;
   }
 
   try {
-    const [homeMatches, awayMatches] = await Promise.all([
-  getTeamRecentMatches(fixture.homeTeamId, 50),
-  getTeamRecentMatches(fixture.awayTeamId, 50)
-]);
-
-    const homeOverallMatches = homeMatches.slice(0, 5);
-const awayOverallMatches = awayMatches.slice(0, 5);
+    const homeOverallMatches = homeMatches.slice(0, 10);
+const awayOverallMatches = awayMatches.slice(0, 10);
 
 const homeVenueMatches = homeMatches
   .filter(match => match.venue === 'HOME')
-  .slice(0, 5);
+  .slice(0, 8);
 
 const awayVenueMatches = awayMatches
   .filter(match => match.venue === 'AWAY')
-  .slice(0, 5);
+  .slice(0, 8);
 
 if (
-  homeOverallMatches.length < 4 ||
-  awayOverallMatches.length < 4 ||
-  homeVenueMatches.length < 3 ||
-  awayVenueMatches.length < 3
+  homeOverallMatches.length < 6 ||
+  awayOverallMatches.length < 6 ||
+  homeVenueMatches.length < 4 ||
+  awayVenueMatches.length < 4
 ) {
   return null;
 }
@@ -1253,25 +1265,24 @@ const homeVenueStats = summarizeTeam(homeVenueMatches);
 const awayVenueStats = summarizeTeam(awayVenueMatches);
 
 const homeGF = Number((
-  homeVenueStats.averageGoalsScored! * 0.7 +
-  homeStats.averageGoalsScored! * 0.3
+  weightedGoalAverage(homeVenueMatches, 'goalsFor') * 0.7 +
+  weightedGoalAverage(homeOverallMatches, 'goalsFor') * 0.3
 ).toFixed(2));
 
 const homeGA = Number((
-  homeVenueStats.averageGoalsConceded! * 0.7 +
-  homeStats.averageGoalsConceded! * 0.3
+  weightedGoalAverage(homeVenueMatches, 'goalsAgainst') * 0.7 +
+  weightedGoalAverage(homeOverallMatches, 'goalsAgainst') * 0.3
 ).toFixed(2));
 
 const awayGF = Number((
-  awayVenueStats.averageGoalsScored! * 0.7 +
-  awayStats.averageGoalsScored! * 0.3
+  weightedGoalAverage(awayVenueMatches, 'goalsFor') * 0.7 +
+  weightedGoalAverage(awayOverallMatches, 'goalsFor') * 0.3
 ).toFixed(2));
 
 const awayGA = Number((
-  awayVenueStats.averageGoalsConceded! * 0.7 +
-  awayStats.averageGoalsConceded! * 0.3
+  weightedGoalAverage(awayVenueMatches, 'goalsAgainst') * 0.7 +
+  weightedGoalAverage(awayOverallMatches, 'goalsAgainst') * 0.3
 ).toFixed(2));
-
 const match: Match = {
   id: fixture.id,
   competition: fixture.competition,
