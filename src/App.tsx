@@ -2260,30 +2260,38 @@ const positionCategory=isGoalkeeper
                               </div>
 
                               <div className="teams">
-                                <b>
-                                  <span>{m.home[0]}</span>
-                                  {m.home}
-                                </b>
+  <b className="team-with-logo">
+    {m.homeLogo ? (
+      <img src={m.homeLogo} alt={`${m.home} logo`} />
+    ) : (
+      <span>{m.home[0]}</span>
+    )}
+    {m.home}
+  </b>
 
-                                <div>
-                                  {m.status==='NS'?'VS':m.score||'VS'}
-                                  <small>
-                                    {new Date(m.kickoff).toLocaleTimeString(
-                                      'en-GB',
-                                      {
-                                        hour:'2-digit',
-                                        minute:'2-digit',
-                                        timeZone:'Africa/Lagos'
-                                      }
-                                    )} WAT
-                                  </small>
-                                </div>
+  <div>
+    {m.status==='NS'?'VS':m.score||'VS'}
+    <small>
+      {new Date(m.kickoff).toLocaleTimeString(
+        'en-GB',
+        {
+          hour:'2-digit',
+          minute:'2-digit',
+          timeZone:'Africa/Lagos'
+        }
+      )} WAT
+    </small>
+  </div>
 
-                                <b className="away">
-                                  {m.away}
-                                  <span>{m.away[0]}</span>
-                                </b>
-                              </div>
+  <b className="away team-with-logo">
+    {m.away}
+    {m.awayLogo ? (
+      <img src={m.awayLogo} alt={`${m.away} logo`} />
+    ) : (
+      <span>{m.away[0]}</span>
+    )}
+  </b>
+</div>
 
                               <div className="match-foot">
                                 <span>
