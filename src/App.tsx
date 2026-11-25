@@ -866,6 +866,52 @@ useEffect(()=>{
 
       <hr/>
 
+      {pick.rankingScore === null ? (
+        <div className="notice">
+          <ShieldCheck/>
+          <div>
+            <b>Ranking unavailable</b>
+            <p>There is not enough reliable bookmaker information to calculate an experimental ranking score.</p>
+          </div>
+        </div>
+      ) : pick.rankingScore > 0 ? (
+        <div className="notice">
+          <ShieldCheck/>
+          <div>
+            <b>Potential statistical advantage</b>
+            <p>The model estimate is above the raw bookmaker-implied probability. This is experimental, not proof of value or a guarantee.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="notice">
+          <ShieldCheck/>
+          <div>
+            <b>No positive model-market difference</b>
+            <p>The experimental ranking does not show a positive difference against the available raw market price.</p>
+          </div>
+        </div>
+      )}
+
+      {pick.bookmakerOdds?.freshness.status === 'STALE' && (
+        <div className="notice">
+          <Clock3/>
+          <div>
+            <b>Price needs updating before assessment</b>
+            <p>This bookmaker price is older than 24 hours. Check a current price before relying on this comparison.</p>
+          </div>
+        </div>
+      )}
+
+      {pick.bookmakerOdds?.freshness.status === 'UNAVAILABLE' && (
+        <div className="notice">
+          <Clock3/>
+          <div>
+            <b>Odds freshness not verified</b>
+            <p>The update time could not be verified. Treat this comparison with caution.</p>
+          </div>
+        </div>
+      )}
+      
       <h3>Live bookmaker odds</h3>
 
       {pick.bookmakerOdds?(
