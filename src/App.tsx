@@ -339,15 +339,16 @@ const[performanceError,setPerformanceError]=useState('');
   };
 
   useEffect(()=>{
-    loadFixtures();
-  },[]);
-  useEffect(()=>{
+  loadFixtures();
+},[]);
+
+useEffect(()=>{
   if(page!=='Football Live') return;
 
-  loadFixtures();
+  loadLiveMatches();
 
   const timer=window.setInterval(()=>{
-    loadFixtures();
+    loadLiveMatches();
   },60000);
 
   return ()=>{
