@@ -342,7 +342,13 @@ const[performanceError,setPerformanceError]=useState('');
   useEffect(()=>{
   loadFixtures();
 },[]);
+useEffect(()=>{
+  const timer=window.setInterval(()=>{
+    setCountdownNow(Date.now());
+  },60000);
 
+  return ()=>window.clearInterval(timer);
+},[]);
 useEffect(()=>{
   if(page!=='Football Live') return;
 
