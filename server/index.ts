@@ -1238,6 +1238,10 @@ async function analyseFixtureForBestPick(fixture: any) {
   }
 
   try {
+        const [homeMatches, awayMatches] = await Promise.all([
+      getTeamRecentMatches(String(fixture.homeTeamId), 50),
+      getTeamRecentMatches(String(fixture.awayTeamId), 50)
+    ]);
     const homeOverallMatches = homeMatches.slice(0, 10);
 const awayOverallMatches = awayMatches.slice(0, 10);
 
