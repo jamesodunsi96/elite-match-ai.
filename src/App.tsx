@@ -2136,8 +2136,8 @@ const positionCategory=isGoalkeeper
                     <div>
                       <b>Live match data · Sportmonks</b>
                       <p>
-                        Live scores and match status update when you refresh.
-                        Select a match to open its Match Centre.
+                        Live scores and match status automatically refresh every 60 seconds.
+                        You can also refresh manually. Select a match to open its Match Centre.
                       </p>
                     </div>
                   </div>
