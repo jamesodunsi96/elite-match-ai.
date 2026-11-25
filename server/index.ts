@@ -1646,6 +1646,41 @@ app.get('/api/matches', async (_req, res) => {
   }
 });
 
+// Get fixtures currently in play from Sportmonks.
+app.get('/api/live-matches', async (_req, res) => {
+  try {
+    const url = new URL(
+      'https://api.sportmonks.com/v3/football/livescores/inplay'
+    );
+
+    url.searchParams.set(
+      'include',
+      'participants;league;state;scores'
+    );
+
+    const data = await sportmonksGet(url);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Unexpected Sportmonks live response.');
+    }
+
+    return res.json({
+      source: 'SPORTMONKS',
+      live: true,
+      matches: data.map(mapFixture)
+    });
+  } catch (error) {
+    console.error('Sportmonks live matches error:', error);
+
+    return res.status(503).json({
+      source: 'SPORTMONKS',
+      live: false,
+      warning: 'Live match data is temporarily unavailable.',
+      matches: []
+    });
+  }
+});
+
 // Get recent statistics for both teams.
 app.get('/api/team-stats/:homeTeamId/:awayTeamId', async (req, res) => {
   const { homeTeamId, awayTeamId } = req.params;
