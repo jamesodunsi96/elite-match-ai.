@@ -862,7 +862,7 @@ useEffect(()=>{
         </b>
       </div>
 
-      <div className="prob">
+            <div className="prob">
         <span>Model vs raw market</span>
         <b>
           {pick.valueEdge === null
@@ -872,6 +872,43 @@ useEffect(()=>{
       </div>
 
       <hr/>
+
+      <h3>Ranking breakdown</h3>
+
+      <div className="prob">
+        <span>Raw model-market difference</span>
+        <b>
+          {pick.rankingBreakdown.rawDifference === null
+            ? 'Unavailable'
+            : `${pick.rankingBreakdown.rawDifference > 0 ? '+' : ''}${pick.rankingBreakdown.rawDifference.toFixed(1)} pts`}
+        </b>
+      </div>
+
+      <div className="prob">
+        <span>Odds freshness penalty</span>
+        <b>
+          {pick.rankingBreakdown.freshnessPenalty > 0
+            ? `-${pick.rankingBreakdown.freshnessPenalty.toFixed(1)} pts`
+            : '0.0 pts'}
+        </b>
+      </div>
+
+      <div className="prob">
+        <span>Final experimental ranking</span>
+        <b>
+          {pick.rankingBreakdown.finalScore === null
+            ? 'Unavailable'
+            : `${pick.rankingBreakdown.finalScore > 0 ? '+' : ''}${pick.rankingBreakdown.finalScore.toFixed(1)} pts`}
+        </b>
+      </div>
+
+      <small className="muted">
+        {pick.rankingBreakdown.penaltyReason === 'STALE_ODDS'
+          ? 'Penalty applied: bookmaker odds are stale.'
+          : pick.rankingBreakdown.penaltyReason === 'FRESHNESS_UNAVAILABLE'
+            ? 'Penalty applied: odds freshness could not be verified.'
+            : 'No odds freshness penalty applied.'}
+      </small>
       {pick.rankingScore === null ? (
         <div className="notice">
           <ShieldCheck/>
