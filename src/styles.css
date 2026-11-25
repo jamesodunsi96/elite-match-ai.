@@ -2028,3 +2028,35 @@ footer {
     background: #0a1222;
   }
 }
+/* OFFICIAL TEAM CRESTS */
+.matches .teams .team-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.matches .teams .team-with-logo img {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  border-radius: 50%;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #293954;
+}
+
+@media(max-width:650px) {
+  .matches .teams .team-with-logo {
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  .matches .teams .team-with-logo img,
+  .matches .teams .team-with-logo span {
+    width: 29px;
+    height: 29px;
+    flex-basis: 29px;
+  }
+}
