@@ -1548,6 +1548,30 @@ app.get('/api/best-picks', async (_req, res) => {
   return b.estimatedProbability - a.estimatedProbability;
 });
 
+        const eligiblePicks = picks.filter((pick: any) =>
+      pick.rankingScore !== null &&
+      pick.rankingScore > 0 &&
+      pick.valueEdge !== null &&
+      pick.valueEdge > 0 &&
+      pick.bookmakerOdds?.freshness?.status === 'FRESH' &&
+      Boolean(pick.oddsComparison)
+    );
+
+    const screening = {
+      eligible: eligiblePicks.length,
+      staleOdds: picks.filter((pick: any) =>
+        pick.bookmakerOdds?.freshness?.status === 'STALE'
+      ).length,
+      insufficientMarketData: picks.filter((pick: any) =>
+        !pick.bookmakerOdds ||
+        !pick.oddsComparison ||
+        pick.rankingScore === null ||
+        pick.bookmakerOdds?.freshness?.status === 'UNAVAILABLE'
+      ).length
+    };
+
+    const qualifiedPicks = eligiblePicks.slice(0, 10);
+
     const payload = {
       source: 'SPORTMONKS',
       engine: 'ELITE_MATCH_AI_100.0_BEST_PICKS',
@@ -1555,11 +1579,12 @@ app.get('/api/best-picks', async (_req, res) => {
       generatedAt: new Date().toISOString(),
       fixturesFound: allFixtures.length,
       fixturesAnalysed: upcomingFixtures.length,
-      picksReturned: Math.min(picks.length, 10),
+      picksReturned: qualifiedPicks.length,
       minimumEstimatedProbability: 65,
-      picks: picks.slice(0, 10),
+      screening,
+      picks: qualifiedPicks,
       notice:
-        'These are experimental statistical estimates, not verified betting probabilities or guaranteed outcomes. A 65% screening threshold is not proof of a 65% real-world chance. No pick is better than a weak pick.'
+        'Only picks with a positive experimental ranking score and fresh bookmaker odds are shown. These remain experimental estimates, not guaranteed outcomes or verified betting probabilities.'
     };
 
     let archive: {
