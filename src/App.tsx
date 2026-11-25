@@ -2134,7 +2134,13 @@ const positionCategory=isGoalkeeper
                       </p>
                     </div>
                   </div>
-
+{liveLoading&&(
+  <div className="empty">
+    <RefreshCw/>
+    <h3>Loading live matches...</h3>
+    <p>Getting the latest match data from Sportmonks.</p>
+  </div>
+)}
                   <div className="matches">
                     {liveMatches.filter(m =>
                       /(LIVE|INPLAY|1ST_HALF|2ND_HALF|HALF_TIME|EXTRA_TIME|PENALTY)/i.test(m.status)
