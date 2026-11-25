@@ -1518,10 +1518,16 @@ app.get('/api/best-picks', async (_req, res) => {
       }
     }
 
-    picks.sort(
-      (a, b) =>
-        b.estimatedProbability - a.estimatedProbability
-    );
+    picks.sort((a, b) => {
+  const scoreA = a.rankingScore ?? -Infinity;
+  const scoreB = b.rankingScore ?? -Infinity;
+
+  if (scoreA !== scoreB) {
+    return scoreB - scoreA;
+  }
+
+  return b.estimatedProbability - a.estimatedProbability;
+});
 
     const payload = {
       source: 'SPORTMONKS',
