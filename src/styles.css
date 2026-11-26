@@ -2332,3 +2332,76 @@ footer {
   color: #829b88;
   font-size: 9px;
 }
+
+/* PREMIUM PERFORMANCE BREAKDOWN */
+.performance-breakdown {
+  margin: 18px 0;
+  padding: 20px;
+  border: 1px solid #294b36;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #102319, #0a1711);
+}
+
+.performance-breakdown-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.performance-breakdown-heading span {
+  color: #8cae96;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.performance-breakdown-heading h3 {
+  margin: 6px 0 0;
+  color: #e5f2e8;
+  font-size: 16px;
+}
+
+.performance-breakdown-heading strong {
+  color: #b9e99b;
+  font-size: 12px;
+}
+
+.performance-breakdown-bar {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #27342b;
+}
+
+.breakdown-won {
+  background: #69c77b;
+}
+
+.breakdown-lost {
+  background: #e16d6d;
+}
+
+.performance-breakdown-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  color: #b8c9bd;
+  font-size: 11px;
+}
+
+@media (max-width: 650px) {
+  .performance-breakdown {
+    padding: 15px;
+  }
+
+  .performance-breakdown-legend {
+    font-size: 10px;
+    gap: 8px;
+  }
+  }
