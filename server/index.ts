@@ -2422,6 +2422,57 @@ const latestLost = latestRecords.filter(
 
 const latestSettled = latestWon + latestLost;
 
+// Enrich saved prediction cards with official Sportmonks team logos.
+try {
+  const fixtureIds = Array.from(
+    new Set(
+      [...performanceRecords, ...latestRecords]
+        .map((row: any) => String(row.match_id))
+        .filter((id: string) => /^\d+$/.test(id))
+    )
+  );
+
+  const logoMap = new Map<string, any>();
+
+  for (let i = 0; i < fixtureIds.length; i += 50) {
+    const batch = fixtureIds.slice(i, i + 50);
+
+    const fixtures = await sportmonksGet(
+      new URL(
+        `https://api.sportmonks.com/v3/football/fixtures/multi/${batch.join(',')}?include=participants`
+      )
+    );
+
+    for (const fixture of fixtures) {
+      const participants = fixture.participants || [];
+
+      const home = participants.find(
+        (team: any) => team.meta?.location === 'home'
+      );
+
+      const away = participants.find(
+        (team: any) => team.meta?.location === 'away'
+      );
+
+      logoMap.set(String(fixture.id), {
+        homeLogo: home?.image_path || null,
+        awayLogo: away?.image_path || null
+      });
+    }
+  }
+
+  for (const row of [...performanceRecords, ...latestRecords]) {
+    const logos = logoMap.get(String(row.match_id));
+
+    if (logos) {
+      row.homeLogo = logos.homeLogo;
+      row.awayLogo = logos.awayLogo;
+    }
+  }
+} catch (logoError) {
+  console.error('Performance team logo enrichment error:', logoError);
+}
+
 return res.json({
   source: 'SUPABASE',
   total: performanceRecords.length,
