@@ -2566,23 +2566,30 @@ const positionCategory=isGoalkeeper
       {performance.records.length===0?(
         <div className="empty">No prediction records found.</div>
       ):performance.records.map(record=>(
-        <article className="match" key={`${record.match_id}-${record.market}`}>
-          <div className="teams">
-            <b>{record.home_team}</b>
-            <div>VS</div>
-            <b className="away">{record.away_team}</b>
-          </div>
+        
+<article
+  className={`match performance-record status-${record.status.toLowerCase()}`}
+  key={`${record.match_id}-${record.market}`}
+>
+  <div className="performance-record-top">
+    <span className="performance-record-label">
+      ELITE MATCH · RECORDED PICK
+    </span>
+    <span className="performance-status">{record.status}</span>
+  </div>
 
-          <div className="prob">
-            <span>Market</span>
-            <b>{record.market}</b>
-          </div>
+  <div className="teams">
+    <b>{record.home_team}</b>
+    <div>VS</div>
+    <b className="away">{record.away_team}</b>
+  </div>
 
-          <div className="meta">
-            <span>Prediction status</span>
-            <i>{record.status}</i>
-          </div>
-        </article>
+  <div className="performance-record-bottom">
+    <span>Market</span>
+    <strong>{record.market}</strong>
+  </div>
+</article>
+
       ))}
 
       <div className="notice">
