@@ -2232,3 +2232,77 @@ footer {
     height: 27px;
   }
 }
+
+/* PERFORMANCE HISTORY CARDS */
+.performance-record {
+  padding: 15px 17px;
+  margin: 0 0 11px;
+  border-color: #294033;
+  background: linear-gradient(135deg, #0d1d15, #0a1711);
+}
+
+.performance-record-top,
+.performance-record-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.performance-record-label {
+  color: #789485;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.performance-status {
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 9px;
+  font-weight: 800;
+  background: #3a3018;
+  color: #f0ca72;
+}
+
+.performance-record.status-won .performance-status {
+  background: #173c28;
+  color: #9ee4ae;
+}
+
+.performance-record.status-lost .performance-status {
+  background: #482323;
+  color: #ffaaaa;
+}
+
+.performance-record .teams {
+  padding: 17px 0 13px;
+}
+
+.performance-record-bottom {
+  border-top: 1px solid #20372a;
+  padding-top: 11px;
+  color: #829b8c;
+  font-size: 10px;
+}
+
+.performance-record-bottom strong {
+  color: #d8e9dc;
+  font-size: 10px;
+}
+
+@media (max-width: 650px) {
+  .performance-record {
+    padding: 13px;
+  }
+
+  .performance-record .teams {
+    grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .performance-record .teams > b {
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+}
