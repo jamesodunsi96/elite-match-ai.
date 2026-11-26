@@ -601,15 +601,16 @@ useEffect(()=>{
       });
   };
     useEffect(()=>{
-    if(page==='AI Best Picks'||page==='Overview'){
-      loadBestPicks();
-    }
-  useEffect(()=>{
+if(page==='AI Best Picks'||page==='Overview'){
+loadBestPicks();
+}
+},[page]);
+
+useEffect(()=>{
 if(page==='Performance'||page==='Trust Centre'){
 loadPerformance();
+}
 },[page]);
-    }
-  },[page]);
   const filtered=useMemo(
     ()=>matches.filter(m=>
       `${m.home} ${m.away} ${m.competition}`
