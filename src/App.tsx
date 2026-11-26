@@ -2649,7 +2649,21 @@ const positionCategory=isGoalkeeper
       onChange={e => setPerformanceSearch(e.target.value)}
     />
   </div>
+<div className="performance-date-filters">
+  <input
+    type="date"
+    aria-label="From date"
+    value={performanceDateFrom}
+    onChange={e => setPerformanceDateFrom(e.target.value)}
+  />
 
+  <input
+    type="date"
+    aria-label="To date"
+    value={performanceDateTo}
+    onChange={e => setPerformanceDateTo(e.target.value)}
+  />
+</div>
   <select
     value={performanceFilter}
     onChange={e => setPerformanceFilter(e.target.value)}
