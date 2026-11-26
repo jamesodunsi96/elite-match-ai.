@@ -2405,3 +2405,50 @@ footer {
     gap: 8px;
   }
   }
+
+/* ELITE MATCH RECORDED TEAM LOGOS */
+.performance-record .performance-teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 35px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.performance-record .performance-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  text-align: center;
+}
+
+.performance-record .performance-team img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.performance-record .performance-team b {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.performance-record .performance-vs {
+  color: #8da99a;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .performance-record .performance-team img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .performance-record .performance-team b {
+    font-size: 10px;
+  }
+}
