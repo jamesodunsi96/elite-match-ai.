@@ -2653,9 +2653,11 @@ const positionCategory=isGoalkeeper
   Showing {filteredPerformanceRecords.length} of {performance.records.length} predictions
 </div>
       
-{performance.records.length===0?(
-  <div className="empty">No prediction records found.</div>
-):performance.records.map(record=>(
+{filteredPerformanceRecords.length===0?(
+  <div className="empty">
+    No matching prediction records found.
+  </div>
+):filteredPerformanceRecords.map(record=>(
   <article
     className={`match performance-record status-${record.status.toLowerCase()}`}
     key={`${record.match_id}-${record.market}`}
