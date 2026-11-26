@@ -2175,7 +2175,78 @@ const positionCategory=isGoalkeeper
     </div>
   </div>
 )}
+{page === 'Trust Centre' && (
 
+  <section className="trust-centre">
+    <div className="stats">
+      <article>
+        <div><ShieldCheck /> Data source</div>
+        <strong>Sportmonks</strong>
+        <small>Football fixture data provider</small>
+      </article>  <article>
+    <div><BrainCircuit /> AI model</div>
+    <strong>Experimental</strong>
+    <small>Not independently validated</small>
+  </article>
+
+  <article>
+    <div><ChartNoAxesCombined /> Performance</div>
+    <strong>Tracked</strong>
+    <small>Settled predictions are recorded</small>
+  </article>
+</div>
+
+<div className="details">
+  <article>
+    <h3><Database /> Our data</h3>
+    <p>
+      ELITE MATCH AI uses football fixture information
+      from Sportmonks. Data availability and completeness
+      may vary between matches.
+    </p>
+  </article>
+
+  <article>
+    <h3><BrainCircuit /> How our analysis works</h3>
+    <p>
+      Statistical models estimate possible match outcomes
+      and probabilities. Estimates are not guaranteed
+      results or validated betting advice.
+    </p>
+  </article>
+
+  <article>
+    <h3><ChartNoAxesCombined /> Performance transparency</h3>
+    <p>
+      Predictions are recorded and their outcomes are
+      tracked when results are available. Past performance
+      does not guarantee future results.
+    </p>
+  </article>
+
+  <article>
+    <h3><ShieldCheck /> Our commitment</h3>
+    <p>
+      We aim to show data limitations honestly and avoid
+      fabricated predictions or claims of guaranteed wins.
+    </p>
+  </article>
+</div>
+
+<div className="notice">
+  <ShieldCheck />
+  <div>
+    <b>Important notice</b>
+    <p>
+      Football is unpredictable. ELITE MATCH AI provides
+      statistical information for insight only. Please
+      make your own decisions responsibly.
+    </p>
+  </div>
+</div>
+
+  </section>
+)}
               {page==='Overview'&&(
                 <div className="hero">
                   <div>
