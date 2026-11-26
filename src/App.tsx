@@ -2192,18 +2192,19 @@ const positionCategory=isGoalkeeper
 
   <article>
     <div><ChartNoAxesCombined /> Performance</div>
-    {performance
-? performance.accuracy === null
-? 'Not available'
-: pct(performance.accuracy)
-: performanceLoading
-? 'Loading...'
-: 'Unavailable'}
+    <strong>
+  {performance
+    ? performance.accuracy === null
+      ? 'Not available'
+      : pct(performance.accuracy)
+    : performanceLoading
+      ? 'Loading...'
+      : 'Unavailable'}
 </strong>
 <small>
-{performance
-? "${performance.settled} settled · ${performance.won} won · ${performance.lost} lost"
-: 'Live performance data'}
+  {performance
+    ? `${performance.settled} settled · ${performance.won} won · ${performance.lost} lost`
+    : 'Live performance data'}
 </small>
   </article>
 </div>
