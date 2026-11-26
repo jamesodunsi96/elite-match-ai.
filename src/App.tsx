@@ -1114,7 +1114,83 @@ useEffect(()=>{
       ))}
     </article>
   );
+if (showLanding) {
+return (
+<div className="landing-page">
+<nav className="landing-nav">
+<div className="landing-brand">
+<span className="landing-mark">EM</span>
+<div>
+<strong>ELITE MATCH</strong>
+<small>AI FOOTBALL INTELLIGENCE</small>
+</div>
+</div>
+<button className="landing-login" onClick={() => setShowLanding(false)}>
+Open Dashboard <ChevronRight size={16}/>
+</button>
+</nav>
 
+    <section className="landing-hero">
+      <div className="landing-copy">
+        <span className="landing-eyebrow">THE FUTURE OF FOOTBALL INTELLIGENCE</span>
+        <h1>See the game<br/><em>with more insight.</em></h1>
+        <p>
+          Explore fixtures, understand match data and follow AI-assisted
+          football analysis — all in one intelligent workspace.
+        </p>
+        <div className="landing-actions">
+          <button onClick={() => { setPage('Fixtures'); setShowLanding(false); }}>
+            Explore Fixtures <ChevronRight size={17}/>
+          </button>
+          <button className="landing-secondary" onClick={() => { setPage('AI Best Picks'); setShowLanding(false); }}>
+            View AI Best Picks
+          </button>
+        </div>
+        <div className="landing-trust">
+          <ShieldCheck size={17}/>
+          <span>Transparent by design. No guaranteed wins.</span>
+        </div>
+      </div>
+      <div className="landing-visual">
+        <div className="landing-orbit landing-orbit-one"></div>
+        <div className="landing-orbit landing-orbit-two"></div>
+        <div className="landing-ball">⚽</div>
+        <div className="landing-visual-label">
+          <span>ELITE MATCH AI</span>
+          <strong>Football. Data. Insight.</strong>
+        </div>
+      </div>
+    </section>
+
+    <section className="landing-features">
+      <div>
+        <span>01 / FIXTURES</span>
+        <h3>Follow the matches</h3>
+        <p>Explore football fixtures and match information in one place.</p>
+        <button onClick={() => { setPage('Fixtures'); setShowLanding(false); }}>Explore fixtures →</button>
+      </div>
+      <div>
+        <span>02 / AI ANALYSIS</span>
+        <h3>Understand the numbers</h3>
+        <p>Review statistical insights, probabilities and prediction risks.</p>
+        <button onClick={() => { setPage('AI Best Picks'); setShowLanding(false); }}>Explore analysis →</button>
+      </div>
+      <div>
+        <span>03 / PERFORMANCE</span>
+        <h3>Track real records</h3>
+        <p>Review recorded outcomes and prediction performance transparently.</p>
+        <button onClick={() => { setPage('Performance'); setShowLanding(false); }}>View performance →</button>
+      </div>
+    </section>
+
+    <footer className="landing-footer">
+      <span>© {new Date().getFullYear()} ELITE MATCH AI</span>
+      <span>Football intelligence, with transparency.</span>
+    </footer>
+  </div>
+);
+
+        }
   return (
     <div className="shell">
       <aside className={`sidebar ${menu?'open':''}`}>
