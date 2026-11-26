@@ -2192,8 +2192,19 @@ const positionCategory=isGoalkeeper
 
   <article>
     <div><ChartNoAxesCombined /> Performance</div>
-    <strong>Tracked</strong>
-    <small>Settled predictions are recorded</small>
+    {performance
+? performance.accuracy === null
+? 'Not available'
+: pct(performance.accuracy)
+: performanceLoading
+? 'Loading...'
+: 'Unavailable'}
+</strong>
+<small>
+{performance
+? "${performance.settled} settled · ${performance.won} won · ${performance.lost} lost"
+: 'Live performance data'}
+</small>
   </article>
 </div>
 
