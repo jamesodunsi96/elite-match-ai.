@@ -283,6 +283,8 @@ const[performanceLoading,setPerformanceLoading]=useState(false);
 const[performanceError,setPerformanceError]=useState('');
   const [performanceSearch, setPerformanceSearch] = useState('');
 const [performanceFilter, setPerformanceFilter] = useState('ALL');
+const [performanceDateFrom, setPerformanceDateFrom] = useState('');
+const [performanceDateTo, setPerformanceDateTo] = useState('');
 
 const filteredPerformanceRecords = (performance?.records || []).filter(record => {
   const search = performanceSearch.trim().toLowerCase();
@@ -295,10 +297,20 @@ const filteredPerformanceRecords = (performance?.records || []).filter(record =>
     record.market.toLowerCase().includes(search);
 
   const matchesStatus =
-    performanceFilter === 'ALL' ||
-    record.status.toUpperCase() === performanceFilter;
+  performanceFilter === 'ALL' ||
+  record.status.toUpperCase() === performanceFilter;
 
-  return matchesSearch && matchesStatus;
+const recordDate = record.prediction_day?.slice(0, 10) || '';
+
+const matchesDateFrom =
+  !performanceDateFrom ||
+  (recordDate && recordDate >= performanceDateFrom);
+
+const matchesDateTo =
+  !performanceDateTo ||
+  (recordDate && recordDate <= performanceDateTo);
+
+return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
 });
   const loadFixtures=()=>{
     setLoading(true);
