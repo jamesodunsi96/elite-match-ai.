@@ -2306,3 +2306,29 @@ footer {
     overflow-wrap: anywhere;
   }
 }
+
+/* PREMIUM OVERALL ACCURACY CARD */
+.performance-accuracy {
+  border: 1px solid #527b48 !important;
+  background: linear-gradient(135deg, #14291b, #0b1912) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.performance-accuracy h3 {
+  color: #a9c99e;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.performance-accuracy h2 {
+  color: #c5f59e;
+  font-size: 30px;
+  font-weight: 800;
+  margin: 12px 0 6px;
+}
+
+.performance-accuracy span {
+  color: #829b88;
+  font-size: 9px;
+}
