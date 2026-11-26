@@ -2524,14 +2524,15 @@ const positionCategory=isGoalkeeper
           <h2>{performance.lost}</h2>
         </article>
 
-        <article>
-          <h3>Accuracy</h3>
-          <h2>
-            {performance.accuracy===null
-              ?'Not available'
-              :pct(performance.accuracy)}
-          </h2>
-        </article>
+        <article className="performance-accuracy">
+  <h3>Overall accuracy</h3>
+  <h2>
+    {performance.accuracy===null
+      ?'Not available'
+      :pct(performance.accuracy)}
+  </h2>
+  <span>Based on settled predictions</span>
+</article>
       </div>
 
       <div className="notice">
