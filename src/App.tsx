@@ -184,7 +184,7 @@ const nav=[
   {name:'Fixtures',icon:CalendarDays},
   {name:'Football Live',icon:Wifi},
   {name:'AI Best Picks',icon:Sparkles},
-  {name:'Performance',icon:ChartNoAxesCombined}
+  {name:'Performance',icon:ChartNoAxesCombined},
   {name:'Trust Centre',icon:ShieldCheck}
 ];
 
