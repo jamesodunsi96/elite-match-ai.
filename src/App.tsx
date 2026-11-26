@@ -2627,7 +2627,31 @@ const positionCategory=isGoalkeeper
     <h2>Recorded predictions</h2>
   </div>
 </div>
+<div className="performance-filters">
+  <div className="performance-search">
+    <Search />
+    <input
+      type="text"
+      placeholder="Search teams, league or market..."
+      value={performanceSearch}
+      onChange={e => setPerformanceSearch(e.target.value)}
+    />
+  </div>
 
+  <select
+    value={performanceFilter}
+    onChange={e => setPerformanceFilter(e.target.value)}
+  >
+    <option value="ALL">All predictions</option>
+    <option value="PENDING">Pending</option>
+    <option value="WON">Won</option>
+    <option value="LOST">Lost</option>
+  </select>
+</div>
+
+<div className="performance-results-count">
+  Showing {filteredPerformanceRecords.length} of {performance.records.length} predictions
+</div>
       
 {performance.records.length===0?(
   <div className="empty">No prediction records found.</div>
