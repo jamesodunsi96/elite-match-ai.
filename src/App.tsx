@@ -604,11 +604,9 @@ useEffect(()=>{
     if(page==='AI Best Picks'||page==='Overview'){
       loadBestPicks();
     }
-  },[page]);
   useEffect(()=>{
 if(page==='Performance'||page==='Trust Centre'){
 loadPerformance();
-}
 },[page]);
     }
   },[page]);
