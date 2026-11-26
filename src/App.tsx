@@ -2535,6 +2535,41 @@ const positionCategory=isGoalkeeper
 </article>
       </div>
 
+<div className="performance-breakdown">
+  <div className="performance-breakdown-heading">
+    <div>
+      <span>RESULTS OVERVIEW</span>
+      <h3>Prediction breakdown</h3>
+    </div>
+    <strong>{performance.settled} Settled</strong>
+  </div>
+
+  <div className="performance-breakdown-bar">
+    <div
+      className="breakdown-won"
+      style={{
+        width: `${performance.settled > 0
+          ? (performance.won / performance.settled) * 100
+          : 0}%`
+      }}
+    />
+    <div
+      className="breakdown-lost"
+      style={{
+        width: `${performance.settled > 0
+          ? (performance.lost / performance.settled) * 100
+          : 0}%`
+      }}
+    />
+  </div>
+
+  <div className="performance-breakdown-legend">
+    <span>Won: {performance.won}</span>
+    <span>Lost: {performance.lost}</span>
+    <span>Pending: {performance.pending}</span>
+  </div>
+</div>
+      
       <div className="notice">
   <ShieldCheck/>
   <div>
