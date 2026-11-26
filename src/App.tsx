@@ -2614,11 +2614,25 @@ const positionCategory=isGoalkeeper
     <span className="performance-status">{record.status}</span>
   </div>
 
-  <div className="teams">
+  
+<div className="teams performance-teams">
+  <div className="performance-team">
+    {record.homeLogo && (
+      <img src={record.homeLogo} alt="" />
+    )}
     <b>{record.home_team}</b>
-    <div>VS</div>
-    <b className="away">{record.away_team}</b>
   </div>
+
+  <div className="performance-vs">VS</div>
+
+  <div className="performance-team">
+    {record.awayLogo && (
+      <img src={record.awayLogo} alt="" />
+    )}
+    <b>{record.away_team}</b>
+  </div>
+</div>
+
 
   <div className="performance-record-bottom">
     <span>Market</span>
