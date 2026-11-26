@@ -2676,7 +2676,21 @@ const positionCategory=isGoalkeeper
 </div>
 
 <div className="performance-results-count">
-  Showing {filteredPerformanceRecords.length} of {performance.records.length} predictions
+  <span>
+    Showing {filteredPerformanceRecords.length} of {performance.records.length} predictions
+  </span>
+
+  <button
+    type="button"
+    onClick={() => {
+      setPerformanceSearch('');
+      setPerformanceFilter('ALL');
+      setPerformanceDateFrom('');
+      setPerformanceDateTo('');
+    }}
+  >
+    Clear filters
+  </button>
 </div>
       
 {filteredPerformanceRecords.length===0?(
