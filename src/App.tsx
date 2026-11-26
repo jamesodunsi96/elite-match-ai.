@@ -241,6 +241,7 @@ function urlBase64ToUint8Array(base64String:string){
 }
 export default function App(){
   const[page,setPage]=useState('Overview');
+  const [showLanding, setShowLanding] = useState(true);
   const [notifications,setNotifications]=useState<AppNotification[]>([]);
 const [notificationsLoading,setNotificationsLoading]=useState(false);
 const [showNotifications,setShowNotifications]=useState(false);
