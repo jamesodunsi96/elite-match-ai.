@@ -3047,7 +3047,7 @@ const positionCategory=isGoalkeeper
               )}
             </>
           )}
-              )}
+              </>)}
         </section>
 
         <footer>
