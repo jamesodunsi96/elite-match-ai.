@@ -2528,3 +2528,40 @@ footer {
     padding: 13px;
   }
 }
+/* PERFORMANCE DATE FILTERS */
+.performance-date-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.performance-date-filters input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px 9px;
+  border: 1px solid #294b36;
+  border-radius: 10px;
+  background: #0b1911;
+  color: #d8e9dc;
+  font: inherit;
+  font-size: 12px;
+  color-scheme: dark;
+}
+
+.performance-date-filters input:focus {
+  outline: none;
+  border-color: #75b77d;
+}
+
+@media (max-width: 650px) {
+  .performance-date-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .performance-date-filters input {
+    padding: 13px 7px;
+    font-size: 11px;
+  }
+}
