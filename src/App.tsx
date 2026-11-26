@@ -606,8 +606,10 @@ useEffect(()=>{
     }
   },[page]);
   useEffect(()=>{
-    if(page==='Performance'){
-      loadPerformance();
+if(page==='Performance'||page==='Trust Centre'){
+loadPerformance();
+}
+},[page]);
     }
   },[page]);
   const filtered=useMemo(
