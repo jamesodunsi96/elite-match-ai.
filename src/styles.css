@@ -2760,8 +2760,8 @@ footer {
   border: 1px solid #294533;
   border-radius: 28px;
   background:
-    radial-gradient(circle at center, rgba(184, 230, 155, .16), transparent 42%),
-    linear-gradient(145deg, #14291e, #09140f 75%);
+linear-gradient(rgba(4, 15, 10, .45), rgba(4, 15, 10, .78)),
+url("/1795724082151.jpg") center / cover no-repeat;
 }
 
 .landing-orbit {
