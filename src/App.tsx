@@ -185,6 +185,7 @@ const nav=[
   {name:'Football Live',icon:Wifi},
   {name:'AI Best Picks',icon:Sparkles},
   {name:'Performance',icon:ChartNoAxesCombined}
+  {name:'Trust Centre',icon:ShieldCheck}
 ];
 
 const pct=(n?:number)=>`${(n??0).toFixed(1)}%`;
