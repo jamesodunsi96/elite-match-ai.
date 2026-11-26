@@ -2,7 +2,7 @@
 
 import {useEffect,useMemo,useState} from 'react';
 import {
-  Activity,BrainCircuit,CalendarDays,ChartNoAxesCombined,
+  Activity,BrainCircuit,CalendarDays,ChartNoAxesCombined,Database,
 ChevronRight,Clock3,Menu,Search,ShieldCheck,Sparkles,
 Target,Trophy,Wifi,X,RefreshCw,Bell
 } from 'lucide-react';
