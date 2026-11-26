@@ -123,14 +123,21 @@ type BestPicksResponse={
   error?:string;
 };
 
-type PerformanceRecord={
-  match_id:string;
-  home_team:string;
-  away_team:string;
-  homeLogo?:string | null;
-  awayLogo?:string | null;
-  market:string;
-  status:string;
+
+type PerformanceRecord = {
+  match_id: string;
+  home_team: string;
+  away_team: string;
+  homeLogo?: string | null;
+  awayLogo?: string | null;
+  competition?: string | null;
+  kickoff?: string | null;
+  prediction_day?: string | null;
+  estimated_probability?: number | null;
+  actual_home_score?: number | null;
+  actual_away_score?: number | null;
+  market: string;
+  status: string;
 };
 
 type PerformanceResponse={
@@ -2602,48 +2609,78 @@ const positionCategory=isGoalkeeper
   </div>
 </div>
 
-      {performance.records.length===0?(
-        <div className="empty">No prediction records found.</div>
-      ):performance.records.map(record=>(
-        
-<article
-  className={`match performance-record status-${record.status.toLowerCase()}`}
-  key={`${record.match_id}-${record.market}`}
->
-  <div className="performance-record-top">
-    <span className="performance-record-label">
-      ELITE MATCH · RECORDED PICK
-    </span>
-    <span className="performance-status">{record.status}</span>
-  </div>
+      
+{performance.records.length===0?(
+  <div className="empty">No prediction records found.</div>
+):performance.records.map(record=>(
+  <article
+    className={`match performance-record status-${record.status.toLowerCase()}`}
+    key={`${record.match_id}-${record.market}`}
+  >
+    <div className="performance-record-top">
+      <span className="performance-record-label">
+        ELITE MATCH · RECORDED PICK
+      </span>
+      <span className="performance-status">{record.status}</span>
+    </div>
 
-  
-<div className="teams performance-teams">
-  <div className="performance-team">
-    {record.homeLogo && (
-      <img src={record.homeLogo} alt="" />
+    {record.competition && (
+      <div className="performance-record-competition">
+        {record.competition}
+      </div>
     )}
-    <b>{record.home_team}</b>
-  </div>
 
-  <div className="performance-vs">VS</div>
+    <div className="teams performance-teams">
+      <div className="performance-team">
+        {record.homeLogo && <img src={record.homeLogo} alt="" />}
+        <b>{record.home_team}</b>
+      </div>
 
-  <div className="performance-team">
-    {record.awayLogo && (
-      <img src={record.awayLogo} alt="" />
+      <div className="performance-vs">
+        {record.actual_home_score != null &&
+         record.actual_away_score != null ? (
+          <strong className="performance-final-score">
+            {record.actual_home_score} - {record.actual_away_score}
+          </strong>
+        ) : (
+          <span>VS</span>
+        )}
+        <small>
+          {record.status === 'WON' || record.status === 'LOST'
+            ? 'FULL TIME'
+            : 'PENDING'}
+        </small>
+      </div>
+
+      <div className="performance-team">
+        {record.awayLogo && <img src={record.awayLogo} alt="" />}
+        <b>{record.away_team}</b>
+      </div>
+    </div>
+
+    <div className="performance-record-bottom">
+      <div>
+        <span>Market</span>
+        <strong>{record.market}</strong>
+      </div>
+      <div>
+        <span>Estimated probability</span>
+        <strong>
+          {record.estimated_probability == null
+            ? '—'
+            : pct(record.estimated_probability)}
+        </strong>
+      </div>
+    </div>
+
+    {record.prediction_day && (
+      <div className="performance-record-date">
+        Prediction date: {record.prediction_day}
+      </div>
     )}
-    <b>{record.away_team}</b>
-  </div>
-</div>
+  </article>
+))}
 
-
-  <div className="performance-record-bottom">
-    <span>Market</span>
-    <strong>{record.market}</strong>
-  </div>
-</article>
-
-      ))}
 
       <div className="notice">
         <ShieldCheck/>
