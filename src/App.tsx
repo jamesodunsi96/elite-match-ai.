@@ -2160,7 +2160,9 @@ const positionCategory=isGoalkeeper
           ? 'Automatically ranked statistical estimates from real fixtures.'
           : page === 'Performance'
           ? 'Honest tracking starts with recording every prediction.'
-          : 'Explore fixtures and match information.'}
+          : page === 'Trust Centre'
+? 'See how ELITE MATCH AI uses data, estimates probabilities and tracks performance.'
+: 'Explore fixtures and match information.'}
       </p>
     </div>
     <div className="date">
