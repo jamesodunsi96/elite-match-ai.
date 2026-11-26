@@ -281,6 +281,25 @@ const[verificationError,setVerificationError]=useState('');
 const[performance,setPerformance]=useState<PerformanceResponse|null>(null);
 const[performanceLoading,setPerformanceLoading]=useState(false);
 const[performanceError,setPerformanceError]=useState('');
+  const [performanceSearch, setPerformanceSearch] = useState('');
+const [performanceFilter, setPerformanceFilter] = useState('ALL');
+
+const filteredPerformanceRecords = (performance?.records || []).filter(record => {
+  const search = performanceSearch.trim().toLowerCase();
+
+  const matchesSearch =
+    !search ||
+    record.home_team.toLowerCase().includes(search) ||
+    record.away_team.toLowerCase().includes(search) ||
+    (record.competition || '').toLowerCase().includes(search) ||
+    record.market.toLowerCase().includes(search);
+
+  const matchesStatus =
+    performanceFilter === 'ALL' ||
+    record.status.toUpperCase() === performanceFilter;
+
+  return matchesSearch && matchesStatus;
+});
   const loadFixtures=()=>{
     setLoading(true);
 
