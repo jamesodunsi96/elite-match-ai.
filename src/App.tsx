@@ -122,10 +122,13 @@ type BestPicksResponse={
   cached?:boolean;
   error?:string;
 };
+
 type PerformanceRecord={
   match_id:string;
   home_team:string;
   away_team:string;
+  homeLogo?:string | null;
+  awayLogo?:string | null;
   market:string;
   status:string;
 };
