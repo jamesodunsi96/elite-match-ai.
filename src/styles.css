@@ -2932,8 +2932,8 @@ url("/1795724082151.jpg") center / cover no-repeat;
 }
 
 /* ELITE MATCH AI — MOBILE PREMIUM REFINEMENT */
-@media (max-width: 650px) {
-  .content {
+@media (max-width: 760px) {
+  content {
     width: 94%;
     padding: 25px 0 40px;
   }
