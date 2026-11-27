@@ -3032,3 +3032,30 @@ url("/1795724082151.jpg") center / cover no-repeat;
     font-size: 7px;
   }
 }
+/* ELITE MATCH AI — COMMAND CENTRE REFINEMENT */
+.dashboard-heading {
+  padding: 22px;
+  border: 1px solid rgba(184, 230, 155, 0.16);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #101d2d, #0b1421);
+  margin-bottom: 25px;
+}
+
+.dashboard-heading h1 {
+  letter-spacing: -0.8px;
+}
+
+.connection-pill {
+  flex-shrink: 0;
+}
+
+@media (max-width: 760px) {
+  .dashboard-heading {
+    padding: 17px;
+    gap: 16px;
+  }
+
+  .connection-pill {
+    font-size: 9px;
+  }
+}
