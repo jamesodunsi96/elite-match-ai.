@@ -885,13 +885,11 @@ useEffect(()=>{
 
       <hr/>
 
-      <div className="prob">
-        <span>Model's leading market</span>
+<div className="prob pick-market">
         <b>{pick.market}</b>
       </div>
 
-      <div className="prob">
-        <span>Experimental model estimate</span>
+      <div className="prob pick-estimate">
         <b>{pct(pick.estimatedProbability)}</b>
         <div className="bar">
           <i style={{width:pct(pick.estimatedProbability)}}/>
