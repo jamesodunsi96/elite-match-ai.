@@ -3059,3 +3059,27 @@ url("/1795724082151.jpg") center / cover no-repeat;
     font-size: 9px;
   }
 }
+/* ELITE MATCH AI — PREMIUM MATCH CARDS */
+.matches .match {
+  background: linear-gradient(145deg, #14243a, #0b1525);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 17px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.matches .match:hover {
+  border-color: #d5ad4c;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.matches .meta {
+  margin-bottom: 20px;
+}
+
+.matches .teams {
+  min-height: 75px;
+}
+
+.matches .match-foot {
+  padding-top: 15px;
+}
