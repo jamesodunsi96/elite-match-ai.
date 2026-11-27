@@ -3002,3 +3002,33 @@ url("/1795724082151.jpg") center / cover no-repeat;
     line-height: 1.7;
   }
 }
+/* ELITE MATCH AI — REFINED MOBILE HEADER */
+@media (max-width: 760px) {
+  main > header.app-header {
+    min-height: 62px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  main > header.app-header > span {
+    font-size: 9px;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  main > header.app-header .right {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  main > header.app-header .right button {
+    width: 34px;
+    height: 34px;
+  }
+
+  main > header.app-header .right small {
+    font-size: 7px;
+  }
+}
