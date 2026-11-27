@@ -3609,3 +3609,44 @@ url("/1795724082151.jpg") center / cover no-repeat;
     flex-basis: 42px;
   }
 }
+/* ELITE MATCH AI — PREMIUM RANKING BADGES */
+
+.best-picks-grid .pick-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border: 1px solid rgba(213, 173, 76, 0.35);
+  border-radius: 30px;
+  background: rgba(213, 173, 76, 0.1);
+  color: #e8c66e;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+
+.best-picks-grid .pick-rank.rank-1 {
+  background: linear-gradient(135deg, #d5ad4c, #f3d98c);
+  color: #17202c;
+  border-color: #f3d98c;
+  box-shadow: 0 4px 14px rgba(213, 173, 76, 0.2);
+}
+
+.best-picks-grid .pick-rank.rank-2 {
+  border-color: rgba(190, 205, 220, 0.5);
+  color: #dce6f1;
+}
+
+.best-picks-grid .pick-rank.rank-3 {
+  border-color: rgba(190, 130, 90, 0.5);
+  color: #e0ad89;
+}
+
+@media (max-width: 760px) {
+  .best-picks-grid .pick-rank {
+    padding: 6px 10px;
+    font-size: 9px;
+  }
+}
