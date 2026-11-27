@@ -3333,3 +3333,93 @@ url("/1795724082151.jpg") center / cover no-repeat;
     grid-template-columns: 1fr;
   }
 }
+/* ELITE MATCH AI — PREMIUM BEST PICKS */
+.best-picks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.best-picks-grid > .match {
+  padding: 20px;
+  border: 1px solid rgba(213, 173, 76, 0.22);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #172a42, #0a1423);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+}
+
+.best-picks-grid > .match .meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.best-picks-grid > .match .meta i {
+  color: #d5ad4c;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.best-picks-grid > .match .teams {
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+  gap: 7px;
+  padding: 20px 0;
+}
+
+.best-picks-grid .team-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.best-picks-grid .team-with-logo img,
+.best-picks-grid .team-with-logo span {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.best-picks-grid .team-with-logo img {
+  background: #fff;
+  padding: 4px;
+}
+
+.best-picks-grid .prob {
+  margin: 13px 0;
+  line-height: 1.6;
+}
+
+.best-picks-grid .prob > b {
+  color: #e8edf5;
+}
+
+.best-picks-grid .bar {
+  overflow: hidden;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+
+.best-picks-grid h3 {
+  margin: 18px 0 12px;
+  font-size: 13px;
+  color: #d5ad4c;
+}
+
+@media (max-width: 760px) {
+  .best-picks-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .best-picks-grid > .match {
+    padding: 16px;
+  }
+}
