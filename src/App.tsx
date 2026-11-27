@@ -3073,3 +3073,55 @@ const positionCategory=isGoalkeeper
     </div>
   );
 }
+/* ELITE MATCH AI — EXPANDABLE PICK ANALYSIS */
+.pick-details {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pick-details summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 13px 15px;
+  border: 1px solid rgba(213, 173, 76, 0.3);
+  border-radius: 12px;
+  background: rgba(213, 173, 76, 0.08);
+  color: #e8c66e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pick-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.pick-details summary::after {
+  content: "+";
+  float: right;
+  font-size: 17px;
+}
+
+.pick-details[open] summary::after {
+  content: "−";
+}
+
+.pick-details[open] summary {
+  margin-bottom: 18px;
+}
+
+.pick-details h3 {
+  margin-top: 20px;
+}
+
+.pick-details .prob {
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+@media (max-width: 760px) {
+  .pick-details summary {
+    padding: 14px;
+    font-size: 12px;
+  }
+    }
