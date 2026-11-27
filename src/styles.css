@@ -2930,3 +2930,75 @@ url("/1795724082151.jpg") center / cover no-repeat;
     width: 100%;
   }
 }
+
+/* ELITE MATCH AI — MOBILE PREMIUM REFINEMENT */
+@media (max-width: 650px) {
+  .content {
+    width: 94%;
+    padding: 25px 0 40px;
+  }
+
+  .dashboard-heading {
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .dashboard-heading h1 {
+    font-size: 27px;
+    line-height: 1.2;
+  }
+
+  .dashboard-heading p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .section-title h2 {
+    font-size: 20px;
+  }
+
+  .matches {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .match {
+    padding: 17px;
+    border-radius: 14px;
+  }
+
+  .teams {
+    padding: 19px 0;
+  }
+
+  .teams > b {
+    font-size: 12px;
+  }
+
+  .teams > div {
+    font-size: 11px;
+  }
+
+  .match-foot {
+    font-size: 10px;
+  }
+
+  .stats {
+    gap: 9px;
+  }
+
+  .stats article {
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  .stats strong {
+    font-size: 23px;
+  }
+
+  .notice,
+  .empty {
+    border-radius: 13px;
+    line-height: 1.7;
+  }
+}
