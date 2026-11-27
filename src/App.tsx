@@ -2439,7 +2439,7 @@ const positionCategory=isGoalkeeper
                       The engine will not invent selections.
                     </div>
                   ):(
-                    <div className="details">
+                    <div className="details best-picks-grid">
                       {bestPicks.map(renderBestPick)}
                     </div>
                   )}
