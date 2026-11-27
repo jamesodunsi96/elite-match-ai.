@@ -855,7 +855,7 @@ useEffect(()=>{
     <article className="match" key={pick.matchId}>
       <div className="meta">
         <span>{pick.competition}</span>
-        <i>RANK #{index+1}</i>
+        <i className={`pick-rank rank-${index+1}`}>RANK #{index+1}</i>
       </div>
 
       <div className="teams">
