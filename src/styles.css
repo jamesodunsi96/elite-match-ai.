@@ -3100,3 +3100,44 @@ url("/1795724082151.jpg") center / cover no-repeat;
 .stats article small {
   line-height: 1.6;
 }
+/* ELITE MATCH AI — FIXTURE CARD READABILITY */
+.matches .meta {
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.matches .teams {
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  gap: 8px;
+  padding: 23px 0;
+}
+
+.matches .teams > b {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.matches .teams > b span {
+  flex-shrink: 0;
+}
+
+.matches .match-foot {
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .matches .teams {
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .matches .teams > b {
+    font-size: 11px;
+  }
+}
