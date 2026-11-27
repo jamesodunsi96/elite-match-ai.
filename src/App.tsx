@@ -1237,7 +1237,7 @@ Open Dashboard <ChevronRight size={16}/>
       {menu&&<div className="scrim" onClick={()=>setMenu(false)}/>}
 
       <main>
-        <header>
+        <header className="app-header">
           <button className="hamb" onClick={()=>setMenu(true)}>
             <Menu/>
           </button>
