@@ -3083,3 +3083,20 @@ url("/1795724082151.jpg") center / cover no-repeat;
 .matches .match-foot {
   padding-top: 15px;
 }
+/* ELITE MATCH AI — DASHBOARD STATISTICS */
+.stats article {
+  background: linear-gradient(145deg, #14243a, #0b1525);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.stats article:hover {
+  border-color: #d5ad4c;
+  transform: translateY(-2px);
+}
+
+.stats article small {
+  line-height: 1.6;
+}
