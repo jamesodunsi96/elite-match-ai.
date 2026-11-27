@@ -897,6 +897,8 @@ useEffect(()=>{
           <i style={{width:pct(pick.estimatedProbability)}}/>
         </div>
       </div>
+            <details className="pick-details">
+        <summary>View full analysis, odds & risks</summary>
                   <div className="prob">
         <span>Experimental value score</span>
         <b>
@@ -1111,9 +1113,10 @@ useEffect(()=>{
       ))}
 
       <h3>Risk warnings</h3>
-      {pick.riskFlags.map((flag,i)=>(
+            {pick.riskFlags.map((flag,i)=>(
         <p className="muted" key={i}>⚠ {flag}</p>
       ))}
+      </details>
     </article>
   );
 if (showLanding) {
