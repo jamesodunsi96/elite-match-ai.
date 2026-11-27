@@ -3141,3 +3141,195 @@ url("/1795724082151.jpg") center / cover no-repeat;
     font-size: 11px;
   }
 }
+/* ELITE MATCH AI — PREMIUM VISUAL REFINEMENT */
+
+/* Cleaner section headings */
+.section-title {
+  align-items: center;
+  gap: 14px;
+  margin: 30px 0 18px;
+}
+
+.section-title h2 {
+  font-size: 19px;
+  letter-spacing: -0.4px;
+  line-height: 1.35;
+}
+
+.section-title label {
+  letter-spacing: 1.7px;
+}
+
+/* Premium fixture and prediction cards */
+.matches {
+  gap: 16px;
+}
+
+.matches .match {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #172a42, #0a1423);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+}
+
+.matches .match:hover {
+  border-color: rgba(213, 173, 76, 0.75);
+  transform: translateY(-3px);
+}
+
+/* Team names and crests */
+.matches .teams {
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  gap: 10px;
+  padding: 25px 0;
+}
+
+.matches .teams > b {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.matches .teams > b span,
+.matches .teams > b img {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.matches .teams > b img {
+  background: #fff;
+  padding: 4px;
+}
+
+.matches .teams > div {
+  text-align: center;
+  color: #d5ad4c;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.matches .teams > div small {
+  display: block;
+  margin-top: 6px;
+  color: #9aacc0;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.matches .match-foot {
+  border-color: rgba(148, 163, 184, 0.15);
+  padding-top: 14px;
+  font-size: 10px;
+}
+
+/* Match Centre presentation */
+.heading {
+  padding: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #172a42, #0a1423);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.match-centre-teams {
+  gap: 14px;
+  margin: 25px 0 18px;
+}
+
+.match-centre-teams img,
+.match-centre-teams span {
+  width: 68px;
+  height: 68px;
+  padding: 6px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2);
+}
+
+.match-centre-teams b {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.match-centre-teams em {
+  color: #d5ad4c;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* Match detail panels */
+.details {
+  gap: 16px;
+}
+
+.details article {
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 16px;
+  background: linear-gradient(145deg, #14243a, #0b1525);
+}
+
+/* Mobile refinements */
+@media (max-width: 760px) {
+  .section-title {
+    margin: 24px 0 15px;
+  }
+
+  .section-title h2 {
+    font-size: 17px;
+  }
+
+  .matches {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .matches .match {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .matches .teams {
+    grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr);
+    gap: 6px;
+    padding: 22px 0;
+  }
+
+  .matches .teams > b {
+    font-size: 11px;
+  }
+
+  .matches .teams > b span,
+  .matches .teams > b img {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+  }
+
+  .heading {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .match-centre-teams {
+    gap: 6px;
+  }
+
+  .match-centre-teams img,
+  .match-centre-teams span {
+    width: 54px;
+    height: 54px;
+  }
+
+  .match-centre-teams b {
+    font-size: 11px;
+  }
+
+  .details {
+    grid-template-columns: 1fr;
+  }
+}
